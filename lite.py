@@ -13,9 +13,9 @@ def main():
     if qtTr.load("qt_" + QLocale.system().name(), './.config/i18n'):
         app.installTranslator(qtTr)
 
-    surveytoolTr = QTranslator()
-    if surveytoolTr.load("surveytool_" + QLocale.system().name(), './.config/i18n'):
-        app.installTranslator(surveytoolTr)
+    liteTr = QTranslator()
+    if liteTr.load("lite_" + QLocale.system().name(), './.config/i18n'):
+        app.installTranslator(liteTr)
 
     splash = None
     splashpath = QApplication.translate('main', './.config/splashscreen.png')
