@@ -35,7 +35,7 @@ def split(x):
 def expand_multiple(series):
     index = series.index
     result = (
-        _expand_base(series)
+        expand_base(series)
             .apply(sorted)
             .apply(pandas.Series)
             .reindex(index)
@@ -48,7 +48,7 @@ def expand_multiple(series):
 def expand_multiple_bool(series):
     index = series.index
     result = (
-        _expand_base(series)
+        expand_base(series)
            .apply(lambda x: pandas.Series(1, index=x))
            .fillna(0)
            .astype(bool)
@@ -60,7 +60,7 @@ def expand_multiple_bool(series):
     return result
 
 
-def _expand_base(series):
+def expand_base(series):
     return (
         series
             .dropna()
