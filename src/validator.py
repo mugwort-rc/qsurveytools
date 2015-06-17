@@ -12,6 +12,9 @@ class ValidationCallback(callback.Callback):
     def settingNotFound(self, column):
         raise NotImplementedError
 
+    def settingIsUnknown(self, column):
+        raise NotImplementedError
+
     def validationError(self, column, row, value):
         raise NotImplementedError
 
@@ -49,7 +52,7 @@ class ValidationObject(object):
             type = conf.get('type', config.UNKNOWN)
             # check type
             if type == config.UNKNOWN:
-                self.cb.settingNotFound(column)
+                self.cb.settingIsUnknown(column)
                 has_error = True
                 continue
             # get choice size

@@ -46,6 +46,12 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
                     .arg(column)
         )
 
+    def settingIsUnknown(self, column):
+        self.messages.append(
+            self.tr("Warning: Setting \"%1\" is Unknown type.")
+                    .arg(column)
+        )
+
     def validationError(self, column, row, value):
         self.messages.append(
             self.tr('Warning: Undefined value found in "%1" - #%2 : \'%3\'')
