@@ -58,6 +58,9 @@ class ValidationObject(object):
                 self.cb.settingIsUnknown(column)
                 has_error = True
                 continue
+            elif type == config.FREE:
+                # no check
+                continue
             # get choice size
             size = len(conf.choice)
             # check answers

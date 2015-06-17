@@ -639,22 +639,27 @@ def test_parse_filter():
 def test_mk_type():
     assert config.mk_type(config.SINGLE) == "S"
     assert config.mk_type(config.MULTIPLE) == "M"
+    assert config.mk_type(config.FREE) == "F"
     assert config.mk_type(config.UNKNOWN) == ""
 
     assert config.mk_type(config.SINGLE, blank=True) == "S/NB"
     assert config.mk_type(config.MULTIPLE, blank=True) == "M/NB"
+    assert config.mk_type(config.FREE, blank=True) == "F/NB"
     assert config.mk_type(config.UNKNOWN, blank=True) == "NB"
 
 
 def test_get_type():
     assert config.get_type("S") == config.SINGLE
     assert config.get_type("M") == config.MULTIPLE
+    assert config.get_type("F") == config.FREE
     assert config.get_type("") == config.UNKNOWN
 
     # error case
     assert config.get_type(1) == config.UNKNOWN
     assert config.get_type("SM") == config.SINGLE
     assert config.get_type("MS") == config.SINGLE
+    assert config.get_type("SMF") == config.FREE
+    assert config.get_type("MSF") == config.FREE
 
     # with noblank
     assert config.get_type("S/NB") == config.SINGLE
@@ -665,6 +670,7 @@ def test_get_type():
 def test_get_blank():
     assert config.get_blank("S") == False
     assert config.get_blank("M") == False
+    assert config.get_blank("F") == False
     assert config.get_blank("") == False
 
     assert config.get_blank("S/NB") == True
@@ -676,6 +682,7 @@ def test_get_limit():
     assert config.get_limit("") == 0
     assert config.get_limit("S") == 0
     assert config.get_limit("M") == 0
+    assert config.get_limit("F") == 0
     assert config.get_limit("NB") == 0
     assert config.get_limit("S/NB") == 0
     assert config.get_limit("M/NB") == 0
@@ -693,6 +700,7 @@ def test_get_multiex():
     assert config.get_multiex("") == []
     assert config.get_multiex("S") == []
     assert config.get_multiex("M") == []
+    assert config.get_multiex("F") == []
     assert config.get_multiex("NB") == []
     assert config.get_multiex("S/NB") == []
     assert config.get_multiex("M/NB") == []

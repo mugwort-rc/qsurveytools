@@ -16,6 +16,7 @@ from utils import expand_multiple_bool
 UNKNOWN = 0
 SINGLE = 1
 MULTIPLE = 2
+FREE = 3
 
 class ConfigBase(dict):
 
@@ -444,6 +445,8 @@ def mk_type(type, blank=False):
         temp.append('S')
     elif type == MULTIPLE:
         temp.append('M')
+    elif type == FREE:
+        temp.append('F')
     if blank:
         temp.append('NB')
     return '/'.join(temp)
@@ -452,7 +455,9 @@ def get_type(type):
     if not isinstance(type, six.string_types):
         return UNKNOWN
     type = utils.text_normalize(type)
-    if 'S' in type:
+    if 'F' in type:
+        return FREE
+    elif 'S' in type:
         return SINGLE
     elif 'M' in type:
         return MULTIPLE
