@@ -96,6 +96,7 @@ class Config(ConfigBase):
 
 
 _make_column_choice = make_lambdas([make_lambda_map(six.text_type), make_unique], [])
+_make_multiex = make_lambdas([make_lambda_map(int), make_unique], [])
 
 class Column(ConfigBase):
     CONFIG = [
@@ -103,7 +104,8 @@ class Column(ConfigBase):
         ("title", six.text_type),
         ("choice", _make_column_choice),
         ("noblank", bool),
-        ("limit", int),]
+        ("limit", int),
+        ("multiex", _make_multiex),]
 
 class Filter(ConfigBase):
 
@@ -324,6 +326,7 @@ def makeConfigByDataFrame(frame, cross=None):
             'type': get_type(types[column]),
             'noblank': get_blank(types[column]),
             'limit': get_limit(types[column]),
+            'multiex': get_multiex(types[column]),
             'title': six.text_type(titles[column]),
             'choice': map(six.text_type, choices[column].dropna().values.tolist()),
         })
@@ -448,6 +451,7 @@ def mk_type(type, blank=False):
 def get_type(type):
     if not isinstance(type, six.string_types):
         return UNKNOWN
+    type = utils.text_normalize(type)
     if 'S' in type:
         return SINGLE
     elif 'M' in type:
@@ -456,16 +460,33 @@ def get_type(type):
 
 def get_blank(type):
     if isinstance(type, six.string_types):
+        type = utils.text_normalize(type)
         return 'NB' in type
     return False
 
 def get_limit(type):
     if get_type(type) != MULTIPLE:
         return 0
-    m = re.search(r"M\s*\(\s*(\d+)\s*\)", type)
+    type = utils.text_normalize(type)
+    m = re.search(r"M\s*(?:\[[^\]]+\]\s*)?\(\s*(\d+)\s*\)", type)
     if not m:
         return 0
     return int(m.group(1))
+
+def get_multiex(type):
+    if get_type(type) != MULTIPLE:
+        return []
+    type = utils.text_normalize(type)
+    m = re.search(r"M\s*(?:\(\s*\d+\s*\))?\[\s*(\d+(\s*,\s*\d+)*)\s*\]", type)
+    if not m:
+        return []
+    result = []
+    for value in utils.parse_csv(m.group(1)):
+        try:
+            result.append(int(value))
+        except:
+            continue
+    return utils.unique_list(result)
 
 
 def mk_filter(column_config):

@@ -18,6 +18,9 @@ class ValidationCallback(callback.Callback):
     def validationError(self, column, row, value):
         raise NotImplementedError
 
+    def multipleExceptionError(self, column, row, value):
+        raise NotImplementedError
+
     def limitationError(self, column, row, value):
         raise NotImplementedError
 
@@ -64,6 +67,12 @@ class ValidationObject(object):
                     has_error = True
             elif type == config.MULTIPLE:
                 mframe = utils.expand_multiple_bool(series)
+                # check multi-ex
+                for v in conf.multiex:
+                    test = series[mframe[v]].apply(utils.int_cast)
+                    for i in test[test != v].index:
+                        self.cb.multipleExceptionError(column, get_id(i), test[i])
+                # check range
                 for i in range(1, size+1):
                     if i not in mframe:
                         continue

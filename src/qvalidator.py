@@ -60,6 +60,14 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
                     .arg(value)
         )
 
+    def multipleExceptionError(self, column, row, value):
+        self.messages.append(
+            self.tr('Warning: Multiple exception error found in "%1" - #%2 : \'%3\'')
+                    .arg(column)
+                    .arg(row)
+                    .arg(value)
+        )
+
     def limitationError(self, column, row, value):
         self.messages.append(
             self.tr('Warning: It exceeds the limit value was found in "%1" - #%2 : \'%3\'')

@@ -65,7 +65,7 @@ def expand_base(series):
         series
             .dropna()
             .apply(six.text_type)
-            .apply(lambda x: unicodedata.normalize("NFKC", x))
+            .apply(text_normalize)
             .str
             .split(r"\s*,\s*")
             .apply(lambda x: map(int_cast, x))
@@ -78,6 +78,14 @@ def int_cast(x):
         return int(x)
     except:
         return x
+
+
+def text_normalize(text):
+    return unicodedata.normalize("NFKC", six.text_type(text))
+
+
+def parse_csv(text):
+    return re.split(r"\s*,\s*", text)
 
 
 def unique_list(seq):

@@ -415,6 +415,7 @@ def test_dump():
                 "type": 1,
                 "noblank": False,
                 "limit": 0,
+                "multiex": [],
             },
             "Q2": {
                 "choice": ["x", "y", "z"],
@@ -422,6 +423,7 @@ def test_dump():
                 "type": 2,
                 "noblank": False,
                 "limit": 0,
+                "multiex": [],
             },
             "3": {
                 "choice": ["1", "2", "3"],
@@ -429,6 +431,7 @@ def test_dump():
                 "type": 1,
                 "noblank": True,
                 "limit": 0,
+                "multiex": [],
             },
         },
         "filters": [{
@@ -678,6 +681,30 @@ def test_get_limit():
     assert config.get_limit("M/NB") == 0
     assert config.get_limit("M(3)") == 3
     assert config.get_limit("M(4)/NB") == 4
+    assert config.get_limit("M[3]") == 0
+    assert config.get_limit("M[4]/NB") == 0
+    assert config.get_limit("M(3)[4]") == 3
+    assert config.get_limit("M(4)[5]/NB") == 4
+    assert config.get_limit("M[4](3)") == 3
+    assert config.get_limit("M[5](4)/NB") == 4
+
+
+def test_get_multiex():
+    assert config.get_multiex("") == []
+    assert config.get_multiex("S") == []
+    assert config.get_multiex("M") == []
+    assert config.get_multiex("NB") == []
+    assert config.get_multiex("S/NB") == []
+    assert config.get_multiex("M/NB") == []
+    assert config.get_multiex("M(3)") == []
+    assert config.get_multiex("M(4)/NB") == []
+    assert config.get_multiex("M[3]") == [3]
+    assert config.get_multiex("M[4]/NB") == [4]
+    assert config.get_multiex("M(3)[4]") == [4]
+    assert config.get_multiex("M(4)[5]/NB") == [5]
+    assert config.get_multiex("M[4](3)") == [4]
+    assert config.get_multiex("M[5](4)/NB") == [5]
+    assert config.get_multiex("M[3, 4, 5]") == [3, 4, 5]
 
 
 def test_mk_filter():

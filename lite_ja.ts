@@ -167,9 +167,14 @@
         <translation>警告： 未定義の値 &quot;%3&quot; が見つかりました。 位置： &quot;%1&quot; - ID:%2</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="64"/>
+        <location filename="src/qvalidator.py" line="72"/>
         <source>Warning: It exceeds the limit value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告：制限を超えた値が見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
+    </message>
+    <message>
+        <location filename="src/qvalidator.py" line="64"/>
+        <source>Warning: Multiple exception error found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
+        <translation>警告： 複数回答例外エラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
     </message>
 </context>
 <context>
