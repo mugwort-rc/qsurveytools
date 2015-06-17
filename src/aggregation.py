@@ -106,7 +106,7 @@ class SimpleAggregationObject(AggregationObject):
         """
         conf = self.config.columns.get(column, config.Column())
         if conf.type not in [config.SINGLE, config.MULTIPLE]:
-            return self.reindex(pandas.Series(), column)
+            return self.reindex(pandas.Series(), column, named_index)
         frame = self.filteredFrame(frame, [column])
         if conf.type == config.SINGLE:
             return self.single_value_counts(frame, column, named_index)
