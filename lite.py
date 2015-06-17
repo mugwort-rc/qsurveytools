@@ -24,7 +24,7 @@ def main():
         splash = QSplashScreen(pixmap)
         splash.show()
 
-    from viewer.lite.mainwindow import MainWindow
+    from src.lite.mainwindow import MainWindow
     win = MainWindow()
     win.show()
     if splash is not None:
