@@ -1,0 +1,50 @@
+columnOrder:
+  - Q1
+  - Q2
+  - 3
+columns:
+  Q1:
+    choice:
+    - a
+    - b
+    - c
+    - d
+    title: aaa
+    type: 1
+  Q2:
+    choice:
+    - x
+    - y
+    - z
+    title: xxx
+    type: 2
+  3:
+    choice:
+    - 1
+    - 2
+    - 3
+    title: 111
+    type: 1
+    noblank: true
+filters:
+- key: Q1
+  type: ignore
+  choices:
+  - 4
+  targets:
+  - Q2
+  - 3
+- key: Q2
+  type: pickup
+  choices:
+  - 1
+  - 2
+  targets:
+  - 3
+cross:
+  keys:
+  - id: Q2
+  - id: 3
+    name: Q3
+  targets:
+  - id: Q1
