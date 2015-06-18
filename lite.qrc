@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/">
+    <file>i18n/qt_ja.qm</file>
+    <file>i18n/lite_ja.qm</file>
+    <file>img/splashscreen.png</file>
+  </qresource>
+</RCC>

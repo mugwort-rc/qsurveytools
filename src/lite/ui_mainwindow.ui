@@ -147,7 +147,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../lite.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionExit</sender>

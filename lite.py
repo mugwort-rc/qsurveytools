@@ -6,31 +6,35 @@ import os
 
 from PyQt4.Qt import *
 
-def main():
-    app = QApplication(sys.argv)
+
+import lite_rc
+
+
+def main(argv):
+    app = QApplication(argv)
+
+    splash = None
+    pixmap = QPixmap(':/img/splashscreen.png')
+    splash = QSplashScreen(pixmap)
+    splash.show()
 
     qtTr = QTranslator()
-    if qtTr.load("qt_" + QLocale.system().name(), './.config/i18n'):
+    if qtTr.load("qt_" + QLocale.system().name(), ':/i18n'):
         app.installTranslator(qtTr)
 
     liteTr = QTranslator()
-    if liteTr.load("lite_" + QLocale.system().name(), './.config/i18n'):
+    if liteTr.load("lite_" + QLocale.system().name(), ':/i18n'):
         app.installTranslator(liteTr)
 
-    splash = None
-    splashpath = QApplication.translate('main', './.config/splashscreen.png')
-    if os.path.exists(str(splashpath)):
-        pixmap = QPixmap(splashpath)
-        splash = QSplashScreen(pixmap)
-        splash.show()
-
     from src.lite.mainwindow import MainWindow
+
     win = MainWindow()
     win.show()
+
     if splash is not None:
         splash.finish(win)
 
     return app.exec_()
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(main(sys.argv))
