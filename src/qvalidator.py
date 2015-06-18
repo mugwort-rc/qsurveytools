@@ -16,6 +16,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
         """
         super(QValidationObject, self).__init__(parent)
         self.messages = []
+        self.error = False
 
     def initialize(self, maximum):
         """
@@ -31,50 +32,59 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
         """
         self.updated.emit(current)
 
-    def finish(self, error):
-        self.finished.emit(error)
+    def finish(self):
+        self.finished.emit(self.error)
 
     def columnNotFound(self, column):
         self.messages.append(
             self.tr("Warning: Column \"%1\" is not found.")
                     .arg(column)
         )
+        self.error = True
 
     def settingNotFound(self, column):
         self.messages.append(
             self.tr("Warning: Setting \"%1\" is not found.")
                     .arg(column)
         )
+        self.error = True
 
     def settingIsUnknown(self, column):
         self.messages.append(
             self.tr("Warning: Setting \"%1\" is Unknown type.")
                     .arg(column)
         )
+        self.error = True
 
-    def validationError(self, column, row, value):
+    def validationError(self, column, row, value, **kwargs):
+        row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
             self.tr('Warning: Undefined value found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
                     .arg(value)
         )
+        self.error = True
 
-    def multipleExceptionError(self, column, row, value):
+    def multipleExceptionError(self, column, row, value, **kwargs):
+        row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
             self.tr('Warning: Multiple exception error found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
                     .arg(value)
         )
+        self.error = True
 
-    def limitationError(self, column, row, value):
+    def limitationError(self, column, row, value, **kwargs):
+        row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
             self.tr('Warning: It exceeds the limit value was found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
                     .arg(value)
         )
+        self.error = True
 
     def validate(self, conf, frame):
         impl = validator.ValidationObject(self, conf)
