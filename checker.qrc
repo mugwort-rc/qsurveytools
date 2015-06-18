@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file>i18n/qt_ja.qm</file>
+    <file>i18n/checker_ja.qm</file>
+  </qresource>
+</RCC>

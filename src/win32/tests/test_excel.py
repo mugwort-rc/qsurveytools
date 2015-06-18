@@ -3,6 +3,11 @@
 from .. import excel
 
 
+def test_com_range():
+    assert list(excel.com_range(3)) == [1, 2, 3]
+    assert list(excel.com_range(5)) == [1, 2, 3, 4, 5]
+
+
 def run_test_byUsedRange(data):
     df = excel.byUsedRange(data)
     assert df.columns.values.tolist() == ['ID', 'A', 'B', 'C']

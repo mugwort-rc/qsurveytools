@@ -9,5 +9,7 @@ FORMS = \
 
 TRANSLATIONS = lite_ja.ts
 
+RESOURCES = lite.qrc
+
 CODECFORTR = UTF-8
 CODECFORSRC = UTF-8
