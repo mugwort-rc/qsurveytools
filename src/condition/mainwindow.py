@@ -4,12 +4,12 @@ from PyQt4.Qt import *
 
 import win32com.client
 from pywintypes import com_error
-import constants
+from ..win32 import constants
+from ..win32 import excel
 
 from .. import config
 from .. import cursor
 from .. import models
-import frame
 
 from conditiondialog import ConditionDialog
 
@@ -103,7 +103,7 @@ class MainWindow(QMainWindow):
             return
         with cursor.BusyCursor(self):
             self.showMessage(self.tr("loading..."))
-            df = frame.byUsedRange(data)
+            df = excel.byUsedRange(data)
             try:
                 conf = config.makeConfigByDataFrame(df)
             except:
