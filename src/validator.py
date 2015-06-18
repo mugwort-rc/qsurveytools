@@ -43,19 +43,15 @@ class ValidationObject(object):
                 continue
             # drop N/A
             series = frame[column].dropna()
-            # check config, column exists
-            if column not in self.config.columns:
-                self.cb.settingNotFound(column)
-                continue
             # get type
             conf = self.config.columns[column]
             type = conf.get('type', config.UNKNOWN)
             # check type
-            if type == config.UNKNOWN:
-                self.cb.settingIsUnknown(column)
-                continue
-            elif type == config.FREE:
+            if type == config.FREE:
                 # no check
+                continue
+            elif type not in [config.SINGLE, config.MULTIPLE]:
+                self.cb.settingIsUnknown(column)
                 continue
             # get choice size
             size = len(conf.choice)
