@@ -11,6 +11,14 @@ from src.condition.mainwindow import MainWindow
 def main(args):
     app = QApplication(args)
 
+    qtTr = QTranslator()
+    if qtTr.load("qt_" + QLocale.system().name(), ":/i18n/"):
+        app.installTranslator(qtTr)
+
+    appTr = QTranslator()
+    if appTr.load("condition_" + QLocale.system().name(), ":/i18n/"):
+        app.installTranslator(appTr)
+
     win = MainWindow()
     win.show()
 
