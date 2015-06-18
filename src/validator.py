@@ -72,6 +72,8 @@ class ValidationObject(object):
                 mframe = utils.expand_multiple_bool(series)
                 # check multi-ex
                 for v in conf.multiex:
+                    if v not in mframe:
+                        continue
                     test = series[mframe[v]].apply(utils.int_cast)
                     for i in test[test != v].index:
                         self.cb.multipleExceptionError(column, get_id(i), test[i])
