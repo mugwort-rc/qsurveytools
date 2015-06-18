@@ -77,6 +77,7 @@ class ValidationObject(object):
                     test = series[mframe[v]].apply(utils.int_cast)
                     for i in test[test != v].index:
                         self.cb.multipleExceptionError(column, get_id(i), test[i])
+                        has_error = True
                 # check range
                 for i in range(1, size+1):
                     if i not in mframe:
