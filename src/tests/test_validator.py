@@ -378,9 +378,9 @@ def test_multiple_exception_error_for_multiple():
     v = validator.ValidationObject(cb, conf)
     v.validate(frame)
 
-    assert cb.validationError.called
-    assert cb.validationError.call_count == 1
-    assert cb.validationError.call_args == mock.call("Q1", 0, "1,3,5", id="x")
+    assert cb.multipleExceptionError.called
+    assert cb.multipleExceptionError.call_count == 1
+    assert cb.multipleExceptionError.call_args == mock.call("Q1", 0, "1,3,5", id="x")
 
 
 def test_limitation_error_for_single():
