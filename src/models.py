@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy
+import six
 
 from PyQt4.Qt import *
 
@@ -119,8 +120,8 @@ class ReprArrayListModel(ArrayListModel):
             return val
         return self.REPR(val)
 
-class UnicodeArrayListModel(ReprArrayListModel):
-    REPR = unicode
+class StrArrayListModel(ReprArrayListModel):
+    REPR = six.text_type
 
 
 class Role:

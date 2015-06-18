@@ -1,5 +1,8 @@
 #! /usr/bin/env bash
 
+pyuic4 src/condition/ui_conditiondialog.ui -o src/condition/ui_conditiondialog.py
+pyuic4 src/condition/ui_mainwindow.ui -o src/condition/ui_mainwindow.py
+
 pyuic4 src/lite/ui_mainwindow.ui -o src/lite/ui_mainwindow.py
 
 pyuic4 src/pro/ui_configdialog.ui -o src/pro/ui_configdialog.py

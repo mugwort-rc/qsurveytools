@@ -5,7 +5,7 @@ from PyQt4.Qt import *
 from config import Config
 from config import Filter
 from config import Cross, CrossItem
-from models import UnicodeArrayListModel
+from models import StrArrayListModel
 from config import SafeDumper
 from models import ArrayListModel
 from models import convertToBuiltinType
@@ -49,13 +49,13 @@ class ConfigDialog(QDialog):
         self.ui.listViewValues.setModel(self.valuesModel)
 
         # filters
-        self.filtersModel = UnicodeArrayListModel(self)
+        self.filtersModel = StrArrayListModel(self)
         self.ui.listViewFilters.setModel(self.filtersModel)
 
         # cross
-        self.crossKeysModel = UnicodeArrayListModel(self)
+        self.crossKeysModel = StrArrayListModel(self)
         self.ui.listViewCrossKeys.setModel(self.crossKeysModel)
-        self.crossTargetsModel = UnicodeArrayListModel(self)
+        self.crossTargetsModel = StrArrayListModel(self)
         self.ui.listViewCrossTargets.setModel(self.crossTargetsModel)
 
         # selection models

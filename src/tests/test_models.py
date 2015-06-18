@@ -64,8 +64,8 @@ def gen_reprmodel():
     model.setArray(objects)
     return model
 
-def gen_unicodemodel():
-    model = models.UnicodeArrayListModel()
+def gen_strmodel():
+    model = models.StrArrayListModel()
     model.setArray(objects)
     return model
 
@@ -192,8 +192,8 @@ def test_reprmodel_data(qapp):
 
 
 @pytest.mark.skipif("QT_API != 'pyqt4'")
-def test_unicodemodel(qapp):
-    model = gen_unicodemodel()
+def test_strmodel(qapp):
+    model = gen_strmodel()
     assert model.array() == objects
     assert model.canFetchMore() == True
     expand_model(model)
@@ -202,8 +202,8 @@ def test_unicodemodel(qapp):
     assert model.columnCount() == 1
 
 @pytest.mark.skipif("QT_API != 'pyqt4'")
-def test_unicodemodel_data(qapp):
-    model = gen_unicodemodel()
+def test_strmodel_data(qapp):
+    model = gen_strmodel()
     expand_model(model)
     assert model.data(model.index(0, 0)) == "a"
     assert model.data(model.index(1, 0)) == "b"
