@@ -345,6 +345,8 @@ def test_config():
             "choice": ["x", "y", "z"],
             "title": "xxx",
             "type": 2,
+            "limit": 2,
+            "multiex": [3],
         }),
         "3": config.Column({
             "choice": ["1", "2", "3"],
@@ -422,8 +424,8 @@ def test_dump():
                 "title": "xxx",
                 "type": 2,
                 "noblank": False,
-                "limit": 0,
-                "multiex": [],
+                "limit": 2,
+                "multiex": [3],
             },
             "3": {
                 "choice": ["1", "2", "3"],
@@ -557,7 +559,7 @@ def test_make_config_by_data_frame():
     frame = pandas.DataFrame(columns=["ID", "Q1", "Q2", 3],
                              data=[
                                  ["TITLE", "aaa", "xxx", 111],
-                                 ["TYPE", "S", "M", "S/NB"],
+                                 ["TYPE", "S", "M(2)[3]", "S/NB"],
                                  ["OK", None, None, "Q2=1,2"],
                                  ["NG", None, "Q1=4", "Q1=4"],
                                  [1, "a", "x", 1],

@@ -18,6 +18,8 @@ columns:
     - z
     title: xxx
     type: 2
+    limit: 2
+    multiex: [3]
   3:
     choice:
     - 1
