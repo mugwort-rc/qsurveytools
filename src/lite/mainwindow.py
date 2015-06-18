@@ -13,13 +13,12 @@ from ..cursor import BusyCursor
 from .. import events
 from ..models import ArrayListModel
 from ..utils import expand_multiple
+from .. import qsource
 from .. import qvalidator
-from .. import source
 from .. import status
 
 from ui_mainwindow import Ui_MainWindow
 
-TEMPLATE_SETTING_PATH = "./.config/template.conf"
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -221,37 +220,59 @@ class MainWindow(QMainWindow):
                 self.showMessageTab()
                 return None, None, None
             self.addMessage(self.tr('Input: "%1"').arg(inputFilePath))
-            tmpl_conf = source.TemplateSetting.from_yaml(TEMPLATE_SETTING_PATH)
+
+            sheet_setting = qsource.Source.sheet_setting()
+            sheet_cross = qsource.Source.sheet_cross()
+            sheet_source = qsource.Source.sheet_source()
             try:
-                frames = self.load_excel_sheets(inputFilePath, [0, 1, 2] + tmpl_conf.sheet_names())
-                if not frames:
-                    raise Exception
+                frames = self.load_excel_sheets(inputFilePath, [
+                    sheet_setting,
+                    sheet_cross,
+                    sheet_source,
+                ])
             except:
-                raise
                 self.addMessage(self.tr('Error: Input "%1" load failed.').arg(inputFilePath))
                 self.showMessageTab()
                 return None, None, None
 
-            def detect_key(data, keys):
-                for key in keys:
-                    if key in data:
-                        return key
-                return None
+            def sheetNotFound(name):
+                self.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
 
-            setting_key = detect_key(frames, [tmpl_conf.sheet_setting, 0])
-            cross_key = detect_key(frames, [tmpl_conf.sheet_cross, 1])
-            has_cross = cross_key is not None and 2 in frames
-            source_key = detect_key(frames, [tmpl_conf.sheet_source, (2 if has_cross else 1)])
+            no_error = True
+            for name in [sheet_setting, sheet_cross, sheet_source]:
+                if name not in frames:
+                    sheetNotFound(name)
+                    no_error = False
+            if not no_error:
+                self.showMessageTab()
+                return None, None, None
 
-            settingFrame = frames[setting_key]
-            crossFrame = None
-            if has_cross:
-                crossFrame = frames[cross_key]
-            sourceFrame = frames[source_key]
+            settingFrame = frames[sheet_setting]
+            crossFrame = frames[sheet_cross]
+            sourceFrame = frames[sheet_source]
+
+            def invalidSource(name):
+                self.addMessage(self.tr('Error: Sheet "%1" is invalid format.').arg(name))
+
+            # check frame
+            no_error = True
+            if not qsource.Source.isSettingFrame(settingFrame):
+                invalidSource(sheet_setting)
+                no_error = False
+            if not qsource.Source.isCrossFrame(crossFrame):
+                invalidSource(sheet_cross)
+                no_error = False
+            if not qsource.Source.isSourceFrame(sourceFrame):
+                invalidSource(sheet_source)
+                no_error
+            if not no_error:
+                self.showMessageTab()
+                return None, None, None
+
             # drop TITLE helper
             sourceFrame = sourceFrame.ix[1:]
             # drop ID NaN
-            sourceFrame = sourceFrame[sourceFrame['ID'].notnull()]
+            sourceFrame = sourceFrame[sourceFrame[qsource.Source.setting_id()].notnull()]
 
             conf = config.makeConfigByDataFrame(settingFrame, crossFrame)
 

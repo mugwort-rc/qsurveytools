@@ -1,5 +1,6 @@
 SOURCES = \
   src/qaggregation.py \
+  src/qsource.py \
   src/qvalidator.py \
   src/lite/mainwindow.py
 
