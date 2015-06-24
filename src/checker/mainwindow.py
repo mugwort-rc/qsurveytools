@@ -151,11 +151,13 @@ class MainWindow(QMainWindow):
 
         self.validator = qvalidator.QValidationObject(self)
         self.setProgressObject(self.validator)
+        self.progressBar.setVisible(True)
         self.validator.finished.connect(self.validationFinished)
         self.validator.validate(conf, sourceFrame)  # no threading
 
     @pyqtSlot(bool)
     def validationFinished(self, error):
+        self.progressBar.setVisible(False)
         self.validation_error = error
         if error:
             self.model.setArray(self.model.array()+self.validator.messages)
