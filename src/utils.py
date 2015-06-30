@@ -64,6 +64,7 @@ def expand_base(series):
     return (
         series
             .dropna()
+            .apply(round_cast)
             .apply(six.text_type)
             .apply(text_normalize)
             .str
@@ -77,6 +78,17 @@ def int_cast(x):
     try:
         return int(x)
     except:
+        return x
+
+
+def round_cast(x):
+    if not isinstance(x, float):
+        return x
+    casted = int_cast(x)
+    # 1 == 1.0
+    if casted == x:
+        return casted
+    else:
         return x
 
 
