@@ -2,6 +2,7 @@
 
 import pandas
 import six
+from xlsxwriter.utility import xl_col_to_name
 
 import win32com.client
 from pywintypes import com_error
@@ -93,35 +94,29 @@ class MainWindow(QMainWindow):
 
         sheets = excel.collect_sheets(book, names)
 
-        def sheetNotFound(name):
-            self.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
-
         no_error = True
         for name in names:
             if name not in sheets:
-                sheetNotFound(name)
+                self.sheetNotFound(name)
                 no_error = False
         if not no_error:
             return
-
-        def sheetCannotLoad(name):
-            self.addMessage(self.tr('Error: Sheet "%1" load failed.').arg(name))
 
         try:
             settingFrame = excel.byUsedRange(sheets[sheet_setting].UsedRange())
         except:
             settingFrame = None
-            sheetCannotLoad(sheet_setting)
+            self.sheetCannotLoad(sheet_setting)
         try:
             crossFrame = excel.byUsedRange(sheets[sheet_cross].UsedRange(), index_col=0)
         except:
             crossFrame = None
-            sheetCannotLoad(sheet_cross)
+            self.sheetCannotLoad(sheet_cross)
         try:
             sourceFrame = excel.byUsedRange(sheets[sheet_source].UsedRange())
         except:
             sourceFrame = None
-            sheetCannotLoad(sheet_source)
+            self.sheetCannotLoad(sheet_source)
 
         if settingFrame is None or crossFrame is None or sourceFrame is None:
             return
@@ -142,6 +137,8 @@ class MainWindow(QMainWindow):
         if not no_error:
             return
 
+        self.clearSourceMarker(sheets[sheet_source])
+
         # drop TITLE helper
         sourceFrame = sourceFrame.ix[1:]
         # drop ID NaN
@@ -154,6 +151,21 @@ class MainWindow(QMainWindow):
         self.progressBar.setVisible(True)
         self.validator.finished.connect(self.validationFinished)
         self.validator.validate(conf, sourceFrame)  # no threading
+
+    def sheetNotFound(self, name):
+        self.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
+
+    def sheetCannotLoad(self, name):
+        self.addMessage(self.tr('Error: Sheet "%1" load failed.').arg(name))
+
+    def clearSourceMarker(self, sheet):
+        used = sheet.UsedRange()
+        height = len(used)
+        if height <= 0:
+            return
+        width = len(used[0])
+        rng = sheet.Range("B3:{}{}".format(xl_col_to_name(width-1), height))
+        rng.Interior.Pattern = constants.constants.xlNone
 
     @pyqtSlot(bool)
     def validationFinished(self, error):
