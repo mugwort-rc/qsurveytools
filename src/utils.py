@@ -92,8 +92,10 @@ def round_cast(x):
         return x
 
 
+text_type = six.text_type
+
 def text_normalize(text):
-    return unicodedata.normalize("NFKC", six.text_type(text))
+    return unicodedata.normalize("NFKC", text_type(text))
 
 
 def parse_csv(text):

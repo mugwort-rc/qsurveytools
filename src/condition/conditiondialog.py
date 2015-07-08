@@ -3,6 +3,7 @@
 from PyQt4.Qt import *
 
 from .. import models
+from .. import utils
 
 from ui_conditiondialog import Ui_ConditionDialog
 
@@ -78,8 +79,9 @@ class ConditionDialog(QDialog):
         button = self.ui.buttonBox.button(QDialogButtonBox.Ok)
         button.setEnabled(enabled)
 
-    @pyqtSlot(str)
+    @pyqtSlot(QString)
     def on_comboBox_currentIndexChanged(self, text):
+        text = utils.text_type(text)
         if text not in self.config.columns:
             return
         choices = self.config.columns[text].get("choice", [])
