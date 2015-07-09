@@ -41,6 +41,8 @@ class MainWindow(QMainWindow):
         self.ui.statusbar.addWidget(self.progressBar)
         self.progressBar.setValue(0)
 
+        self.validator = None
+
         self.model = ArrayListModel(self)
         self.ui.listView.setModel(self.model)
 
@@ -81,6 +83,8 @@ class MainWindow(QMainWindow):
         if book is None:
             QMessageBox.warning(self, self.tr("Error"), self.tr("Please open the Excel book."))
             return
+
+        self.clearMessage()
 
         sheet_setting = qsource.Source.sheet_setting()
         sheet_cross = qsource.Source.sheet_cross()
@@ -151,6 +155,7 @@ class MainWindow(QMainWindow):
         self.progressBar.setVisible(True)
         self.validator.finished.connect(self.validationFinished)
         self.validator.validate(conf, sourceFrame)  # no threading
+        self.validator.selectError(-1)  # select last error
 
     def sheetNotFound(self, name):
         self.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
@@ -174,6 +179,12 @@ class MainWindow(QMainWindow):
         if error:
             self.model.setArray(self.model.array()+self.validator.messages)
 
+    @pyqtSlot(QModelIndex)
+    def on_listView_doubleClicked(self, index):
+        if self.validator is None:
+            return
+        self.validator.selectError(index.row())
+
 
 class CustomValidationObject(qvalidator.QValidationObject):
     def __init__(self, sheet, parent=None):
@@ -182,18 +193,30 @@ class CustomValidationObject(qvalidator.QValidationObject):
         :type parent: QObject
         """
         self.sheet = sheet
-        self.last_sheet = None
+        self.last_error = None
         super(CustomValidationObject, self).__init__(parent)
 
         self._column_map = {x:i for i,x in enumerate(self.sheet.UsedRange()[0])}
+        self._error_map = {}
+
+    def selectError(self, index):
+        if index < 0 and self.last_error is not None:
+            column, row = self.last_error
+        else:
+            if index not in self._error_map:
+                return
+            column, row = self._error_map[index]
+        self.sheet.Range("{}{}".format(xl_col_to_name(column), row)).Select()
 
     def setError(self, column, row):
         if column not in self._column_map:
             return
         column = self._column_map[column]
-        self.sheet.Range("A{}".format(row+2)).Interior.Color = win32com.client.constants.rgbYellow
-        self.last_sheet = "{}{}".format(xl_col_to_name(column), row+2)
-        self.sheet.Range(self.last_sheet).Interior.Color = win32com.client.constants.rgbYellow
+        row += 2
+        self.last_error = (column, row)
+        self.sheet.Range("A{}".format(row)).Interior.Color = win32com.client.constants.rgbYellow
+        self.sheet.Range("{}{}".format(xl_col_to_name(column), row)).Interior.Color = win32com.client.constants.rgbYellow
+        self._error_map[len(self._error_map)] = (column, row)
 
     def validationError(self, column, row, value, **kwargs):
         self.setError(column, row)
