@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
 
         conf = config.makeConfigByDataFrame(settingFrame, crossFrame)
 
-        self.validator = qvalidator.QValidationObject(self)
+        self.validator = CustomValidationObject(sheets[sheet_source], self)
         self.setProgressObject(self.validator)
         self.progressBar.setVisible(True)
         self.validator.finished.connect(self.validationFinished)
@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
         if height <= 0:
             return
         width = len(used[0])
-        rng = sheet.Range("B3:{}{}".format(xl_col_to_name(width-1), height))
+        rng = sheet.Range("A3:{}{}".format(xl_col_to_name(width-1), height))
         rng.Interior.Pattern = constants.constants.xlNone
 
     @pyqtSlot(bool)
@@ -173,3 +173,36 @@ class MainWindow(QMainWindow):
         self.validation_error = error
         if error:
             self.model.setArray(self.model.array()+self.validator.messages)
+
+
+class CustomValidationObject(qvalidator.QValidationObject):
+    def __init__(self, sheet, parent=None):
+        """
+        :type sheet: win32com.client.Object
+        :type parent: QObject
+        """
+        self.sheet = sheet
+        self.last_sheet = None
+        super(CustomValidationObject, self).__init__(parent)
+
+        self._column_map = {x:i for i,x in enumerate(self.sheet.UsedRange()[0])}
+
+    def setError(self, column, row):
+        if column not in self._column_map:
+            return
+        column = self._column_map[column]
+        self.sheet.Range("A{}".format(row+2)).Interior.Color = win32com.client.constants.rgbYellow
+        self.last_sheet = "{}{}".format(xl_col_to_name(column), row+2)
+        self.sheet.Range(self.last_sheet).Interior.Color = win32com.client.constants.rgbYellow
+
+    def validationError(self, column, row, value, **kwargs):
+        self.setError(column, row)
+        super(CustomValidationObject, self).validationError(column, row, value, **kwargs)
+
+    def multipleExceptionError(self, column, row, value, **kwargs):
+        self.setError(column, row)
+        super(CustomValidationObject, self).multipleExceptionError(column, row, value, **kwargs)
+
+    def limitationError(self, column, row, value, **kwargs):
+        self.setError(column, row)
+        super(CustomValidationObject, self).limitationError(column, row, value, **kwargs)
