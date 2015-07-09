@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtGui import QApplication
 
 import progress
 import validator
@@ -37,21 +38,21 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
 
     def columnNotFound(self, column):
         self.messages.append(
-            self.tr("Warning: Column \"%1\" is not found.")
+            QApplication.translate("QValidationObject", "Warning: Column \"%1\" is not found.")
                     .arg(column)
         )
         self.error = True
 
     def settingNotFound(self, column):
         self.messages.append(
-            self.tr("Warning: Setting \"%1\" is not found.")
+            QApplication.translate("QValidationObject", "Warning: Setting \"%1\" is not found.")
                     .arg(column)
         )
         self.error = True
 
     def settingIsUnknown(self, column):
         self.messages.append(
-            self.tr("Warning: Setting \"%1\" is Unknown type.")
+            QApplication.translate("QValidationObject", "Warning: Setting \"%1\" is Unknown type.")
                     .arg(column)
         )
         self.error = True
@@ -59,7 +60,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
     def validationError(self, column, row, value, **kwargs):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            self.tr('Warning: Undefined value found in "%1" - #%2 : \'%3\'')
+            QApplication.translate("QValidationObject", 'Warning: Undefined value found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
                     .arg(value)
@@ -69,7 +70,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
     def multipleExceptionError(self, column, row, value, **kwargs):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            self.tr('Warning: Multiple exception error found in "%1" - #%2 : \'%3\'')
+            QApplication.translate("QValidationObject", 'Warning: Multiple exception error found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
                     .arg(value)
@@ -79,7 +80,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
     def limitationError(self, column, row, value, **kwargs):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            self.tr('Warning: It exceeds the limit value was found in "%1" - #%2 : \'%3\'')
+            QApplication.translate("QValidationObject", 'Warning: It exceeds the limit value was found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
                     .arg(value)

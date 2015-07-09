@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="ja_JP">
+<!DOCTYPE TS><TS version="2.0" language="ja_JP" sourcelanguage="">
 <context>
     <name>MainWindow</name>
     <message>
@@ -157,32 +156,32 @@
 <context>
     <name>QValidationObject</name>
     <message>
-        <location filename="src/qvalidator.py" line="39"/>
+        <location filename="src/qvalidator.py" line="40"/>
         <source>Warning: Column &quot;%1&quot; is not found.</source>
         <translation>警告： &quot;%1&quot;列が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="46"/>
+        <location filename="src/qvalidator.py" line="47"/>
         <source>Warning: Setting &quot;%1&quot; is not found.</source>
         <translation>警告： 設定 &quot;%1&quot; が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="53"/>
+        <location filename="src/qvalidator.py" line="54"/>
         <source>Warning: Setting &quot;%1&quot; is Unknown type.</source>
         <translation>警告： 設定 &quot;%1&quot; は未定義です。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="61"/>
+        <location filename="src/qvalidator.py" line="62"/>
         <source>Warning: Undefined value found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 未定義の値 &quot;%3&quot; が見つかりました。 位置： &quot;%1&quot; - ID:%2</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="81"/>
+        <location filename="src/qvalidator.py" line="82"/>
         <source>Warning: It exceeds the limit value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告：制限を超えた値が見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="71"/>
+        <location filename="src/qvalidator.py" line="72"/>
         <source>Warning: Multiple exception error found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 複数回答例外エラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
     </message>
