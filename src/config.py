@@ -298,6 +298,14 @@ def makeConfigByDataFrame(frame, cross=None):
     # columns
     assert(frame.columns[0] == 'ID')
     del frame['ID']
+    # drop auto generated columns
+    for col in frame.columns:
+        if not isinstance(col, six.string_types):
+            continue
+        # special case for pandas.read_excel and win32.byUsedRange
+        if not is_auto_generated(col):
+            continue
+        del frame[col]
     columns = frame.columns.tolist()
     TITLE  = 0
     TYPE   = 1
@@ -323,6 +331,9 @@ def makeConfigByDataFrame(frame, cross=None):
     config.columnOrder = map(six.text_type, columns)
     # columns
     for column in columns:
+        # skip empty column
+        if column is None:
+            continue
         config.columns[six.text_type(column)] = Column({
             'type': get_type(types[column]),
             'noblank': get_blank(types[column]),
@@ -369,9 +380,14 @@ def makeCrossByDataFrame(frame):
     targets = get_cross_series(frame.T)
 
     def series_to_items(series):
-        return [gen_cross_item(index, series[index]) for index in series.index if not is_empty(index)]
+        return [gen_cross_item(index, series[index]) for index in series.index if not is_empty(index) and not is_auto_generated(index)]
 
     return series_to_items(keys), series_to_items(targets)
+
+
+def is_auto_generated(name):
+    # special case for pandas.read_excel and win32.byUsedRange
+    return name.startswith("Unnamed:") or name.startswith("None.")
 
 
 class FilterBuilder(object):

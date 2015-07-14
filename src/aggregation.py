@@ -48,6 +48,9 @@ class AggregationObject(object):
         :return: filtered data frame
         """
         for column in columns:
+            # nan skip
+            if isinstance(column, float) and pandas.np.isnan(column):
+                continue
             frame = self.filter.applyFilter(frame, column)
         return frame
 
