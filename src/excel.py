@@ -283,7 +283,7 @@ class SimpleBarChartBuilder(ChartBuilder):
             "data_labels": {
                 "value": True,
                 "position": "outside_end",
-                "num_format": '#.0;-#.0;0.0;@',
+                "num_format": '0.0;-0.0;0.0;@',
                 "font": font,
             }
         })
@@ -406,7 +406,7 @@ class CrossStackedChartBuilder(ChartBuilder):
                 ],
                 "data_labels": {
                     "value": True,
-                    "num_format": '#.0;-#.0;"";@',
+                    "num_format": '0.0;-0.0;"";@',
                     "font": font,
                 }
             })
