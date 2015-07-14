@@ -23,29 +23,34 @@
         <translation>ソース検証ツール</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="82"/>
+        <location filename="src/checker/mainwindow.py" line="84"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="82"/>
+        <location filename="src/checker/mainwindow.py" line="84"/>
         <source>Please open the Excel book.</source>
         <translation>エクセルを開いてください。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="156"/>
+        <location filename="src/checker/mainwindow.py" line="162"/>
         <source>Error: Sheet &quot;%1&quot; is not found.</source>
         <translation>エラー：シート &quot;%1&quot; が見つかりませんでした。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="159"/>
+        <location filename="src/checker/mainwindow.py" line="165"/>
         <source>Error: Sheet &quot;%1&quot; load failed.</source>
         <translation>エラー：シート &quot;%1&quot; のロードに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="125"/>
+        <location filename="src/checker/mainwindow.py" line="130"/>
         <source>Error: Sheet &quot;%1&quot; is invalid format.</source>
         <translation>エラー： シート &quot;%1&quot; が正しい形式ではありません。</translation>
+    </message>
+    <message>
+        <location filename="src/checker/mainwindow.py" line="182"/>
+        <source>finished.</source>
+        <translation>完了しました。</translation>
     </message>
 </context>
 <context>

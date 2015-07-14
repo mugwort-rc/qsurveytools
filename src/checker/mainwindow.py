@@ -85,6 +85,7 @@ class MainWindow(QMainWindow):
             return
 
         self.clearMessage()
+        self.ui.statusbar.clearMessage()
 
         sheet_setting = qsource.Source.sheet_setting()
         sheet_cross = qsource.Source.sheet_cross()
@@ -178,6 +179,7 @@ class MainWindow(QMainWindow):
         self.validation_error = error
         if error:
             self.model.setArray(self.model.array()+self.validator.messages)
+        self.ui.statusbar.showMessage(self.tr("finished."), 0)
 
     @pyqtSlot(QModelIndex)
     def on_listView_doubleClicked(self, index):
@@ -206,7 +208,11 @@ class CustomValidationObject(qvalidator.QValidationObject):
             if index not in self._error_map:
                 return
             column, row = self._error_map[index]
-        self.sheet.Range("{}{}".format(xl_col_to_name(column), row)).Select()
+        try:
+            self.sheet.Activate()
+            self.sheet.Range("{}{}".format(xl_col_to_name(column), row)).Select()
+        except:
+            pass
 
     def setError(self, column, row):
         if column not in self._column_map:
@@ -214,9 +220,12 @@ class CustomValidationObject(qvalidator.QValidationObject):
         column = self._column_map[column]
         row += 2
         self.last_error = (column, row)
-        self.sheet.Range("A{}".format(row)).Interior.Color = win32com.client.constants.rgbYellow
-        self.sheet.Range("{}{}".format(xl_col_to_name(column), row)).Interior.Color = win32com.client.constants.rgbYellow
         self._error_map[len(self._error_map)] = (column, row)
+        try:
+            self.sheet.Range("A{}".format(row)).Interior.Color = win32com.client.constants.rgbYellow
+            self.sheet.Range("{}{}".format(xl_col_to_name(column), row)).Interior.Color = win32com.client.constants.rgbYellow
+        except:
+            pass
 
     def validationError(self, column, row, value, **kwargs):
         self.setError(column, row)
