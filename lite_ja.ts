@@ -68,27 +68,27 @@
         <translation>エラー：入力 &quot;%1&quot; の読み込みに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="284"/>
+        <location filename="src/lite/mainwindow.py" line="294"/>
         <source>validating...</source>
         <translation>検証中…</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="337"/>
+        <location filename="src/lite/mainwindow.py" line="347"/>
         <source>Finished</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="337"/>
+        <location filename="src/lite/mainwindow.py" line="347"/>
         <source>Finished.</source>
         <translation>完了しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="339"/>
+        <location filename="src/lite/mainwindow.py" line="349"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="339"/>
+        <location filename="src/lite/mainwindow.py" line="349"/>
         <source>Write error.</source>
         <translation>書き込みに失敗しました。</translation>
     </message>
@@ -152,6 +152,11 @@
         <source>Error: Sheet &quot;%1&quot; is invalid format.</source>
         <translation>エラー：シート &quot;%1&quot; が正しい形式ではありません。</translation>
     </message>
+    <message>
+        <location filename="src/lite/mainwindow.py" line="284"/>
+        <source>Error: filter key &quot;%1&quot; is not defined.</source>
+        <translation>エラー：フィルター要素 &quot;%1&quot; は定義されていません。</translation>
+    </message>
 </context>
 <context>
     <name>QValidationObject</name>
@@ -189,7 +194,7 @@
 <context>
     <name>SimpleAggregationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="363"/>
+        <location filename="src/lite/mainwindow.py" line="373"/>
         <source>SimpleAggregation</source>
         <translation>単純集計</translation>
     </message>

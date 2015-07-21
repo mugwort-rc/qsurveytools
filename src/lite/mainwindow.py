@@ -264,7 +264,7 @@ class MainWindow(QMainWindow):
                 no_error = False
             if not qsource.Source.isSourceFrame(sourceFrame):
                 invalidSource(sheet_source)
-                no_error
+                no_error = False
             if not no_error:
                 self.showMessageTab()
                 return None, None, None
@@ -275,6 +275,16 @@ class MainWindow(QMainWindow):
             sourceFrame = sourceFrame[sourceFrame[qsource.Source.setting_id()].notnull()]
 
             conf = config.makeConfigByDataFrame(settingFrame, crossFrame)
+
+            no_error = True
+            # check filter validation
+            for filter in conf.filters:
+                if filter.key not in conf.columnOrder:
+                    self.addMessage(self.tr('Error: filter key "%1" is not defined.').arg(filter.key))
+                    no_error = False
+            if not no_error:
+                self.showMessageTab()
+                return None, None, None
 
         self.ui.progressBarGeneral.setValue(1)
 
