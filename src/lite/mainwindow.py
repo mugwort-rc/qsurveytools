@@ -20,6 +20,13 @@ from .. import status
 from ui_mainwindow import Ui_MainWindow
 
 
+class ExceptionBase(Exception):
+    pass
+
+class LoadException(ExceptionBase):
+    pass
+
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -167,12 +174,10 @@ class MainWindow(QMainWindow):
         self.ui.pushButtonSimple.setEnabled(False)
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
-        conf, frame, filepath = self.loadSources()
-        if filepath is None or not QFileInfo(filepath).isDir():
-            if filepath is None:
-                self.addMessage(self.tr('Error: config load failed.'))
-            elif not QFileInfo(filepath).isDir():
-                self.addMessage(self.tr('Error: output file path is not directory.'))
+        try:
+            conf, frame, filepath = self.loadSources()
+        except LoadException:
+            self.addMessage(self.tr('Error: config load failed.'))
             self.showMessageTab()
             return
 
@@ -190,12 +195,10 @@ class MainWindow(QMainWindow):
         self.ui.pushButtonSimple.setEnabled(False)
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
-        conf, frame, filepath = self.loadSources()
-        if filepath is None or not QFileInfo(filepath).isDir():
-            if filepath is None:
-                self.addMessage(self.tr('Error: config load failed.'))
-            elif not QFileInfo(filepath).isDir():
-                self.addMessage(self.tr('Error: output file path is not directory.'))
+        try:
+            conf, frame, filepath = self.loadSources()
+        except LoadException:
+            self.addMessage(self.tr('Error: config load failed.'))
             self.showMessageTab()
             return
 
@@ -217,8 +220,7 @@ class MainWindow(QMainWindow):
             inputFilePath = six.text_type(self.ui.lineEditInput.text())
             if not QFile.exists(inputFilePath):
                 self.addMessage(self.tr('Error: Input "%1" not found.').arg(inputFilePath))
-                self.showMessageTab()
-                return None, None, None
+                raise LoadException()
             self.addMessage(self.tr('Input: "%1"').arg(inputFilePath))
 
             sheet_setting = qsource.Source.sheet_setting()
@@ -232,8 +234,7 @@ class MainWindow(QMainWindow):
                 ])
             except:
                 self.addMessage(self.tr('Error: Input "%1" load failed.').arg(inputFilePath))
-                self.showMessageTab()
-                return None, None, None
+                raise LoadException()
 
             def sheetNotFound(name):
                 self.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
@@ -244,8 +245,7 @@ class MainWindow(QMainWindow):
                     sheetNotFound(name)
                     no_error = False
             if not no_error:
-                self.showMessageTab()
-                return None, None, None
+                raise LoadException()
 
             settingFrame = frames[sheet_setting]
             crossFrame = frames[sheet_cross]
@@ -266,8 +266,7 @@ class MainWindow(QMainWindow):
                 invalidSource(sheet_source)
                 no_error = False
             if not no_error:
-                self.showMessageTab()
-                return None, None, None
+                raise LoadException()
 
             # drop TITLE helper
             sourceFrame = sourceFrame.ix[1:]
@@ -283,8 +282,7 @@ class MainWindow(QMainWindow):
                     self.addMessage(self.tr('Error: filter key "%1" is not defined.').arg(filter.key))
                     no_error = False
             if not no_error:
-                self.showMessageTab()
-                return None, None, None
+                raise LoadException()
 
         self.ui.progressBarGeneral.setValue(1)
 
@@ -299,6 +297,9 @@ class MainWindow(QMainWindow):
         self.ui.progressBarGeneral.setValue(2)
 
         outputFilePath = six.text_type(self.ui.lineEditOutput.text())
+        if not QFileInfo(outputFilePath).isDir():
+            self.addMessage(self.tr('Error: output file path is not directory.'))
+            raise LoadException()
 
         return conf, sourceFrame, outputFilePath
 
