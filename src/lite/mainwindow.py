@@ -12,7 +12,7 @@ from .. import config
 from ..cursor import BusyCursor
 from .. import events
 from ..models import ArrayListModel
-from ..utils import expand_multiple
+from .. import utils
 from .. import qsource
 from .. import qvalidator
 from .. import status
@@ -168,6 +168,7 @@ class MainWindow(QMainWindow):
         )
         self.ui.pushButtonSimple.setEnabled(workable)
         self.ui.pushButtonCross.setEnabled(workable)
+        self.ui.actionExpand.setEnabled(workable)
 
     @pyqtSlot()
     def on_pushButtonSimple_clicked(self):
@@ -209,6 +210,37 @@ class MainWindow(QMainWindow):
         self.cross_thread.start()
         #self.cross_aggregation.aggregate()
         self.invoke_aggregate(self.cross_aggregation, conf, frame, dropna)
+
+    @pyqtSlot()
+    def on_actionExpand_triggered(self):
+        try:
+            conf, frame, filepath = self.loadSources()
+        except LoadException:
+            self.addMessage(self.tr('Error: config load failed.'))
+            self.showMessageTab()
+            return
+
+        dest = pandas.DataFrame()
+        self.ui.progressBar.setValue(0)
+        self.progressInit(len(conf.columnOrder))
+        for p, column in enumerate(conf.columnOrder, 1):
+            self.ui.progressBar.setValue(p)
+            columnConfig = conf.columns[column]
+            if columnConfig.type not in [config.SINGLE, config.MULTIPLE]:
+                dest[column] = frame[column]
+                continue
+            if columnConfig.type == config.SINGLE:
+                dest[column] = frame[column]
+            elif columnConfig.type == config.MULTIPLE:
+                expanded = (
+                    utils.expand_base(frame[column])
+                        .apply(lambda x: pandas.Series(1, index=x))
+                        .reindex(index=frame.index, columns=range(1, len(columnConfig.choice)+1))
+                )
+                for i, xcol in enumerate(expanded.columns, 1):
+                    dest["{}-{}".format(column, i)] = expanded[xcol]
+        dest.to_excel(six.text_type(QDir(filepath).filePath(self.tr('expand.xlsx'))))
+        QMessageBox.information(self, self.tr('Finished'), self.tr('Finished.'))
 
     def loadSources(self):
         self.ui.progressBarGeneral.setValue(0)
