@@ -350,7 +350,7 @@ class CrossStackedChartBuilder(ChartBuilder):
     """
 
     WIDTH = 600
-    HEIGHT_PER_SERIES = 25
+    HEIGHT_PER_SERIES = 40
     HEIGHT_MERGIN = 36
     FONT_PT = 9
     LEGEND_TEXT_PT = 12
