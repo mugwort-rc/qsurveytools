@@ -127,6 +127,7 @@ def test_simple_aggregation_object():
     ])
     vc = obj.value_counts(frame, "Q1")
     assert isinstance(vc, pandas.Series)
+    # vc.values == [13, 1, 4, 5, 3, nan]
     assert vc.values.tolist()[:-1] == [13, 1, 4, 5, 3]
     assert numpy.isnan(vc.values.tolist()[-1])
     assert vc.index.tolist() == ["TOTAL", "a", "b", "c", "d", "BLANK"]
@@ -138,10 +139,18 @@ def test_simple_aggregation_object():
 
     vc = obj.value_counts(frame, "3")
     assert isinstance(vc, pandas.Series)
+    # vc.values == [8, 2, 3, 3, nan]
     assert vc.values.tolist()[:-1] == [8, 2, 3, 3]
     assert numpy.isnan(vc.values.tolist()[-1])
     assert vc.index.tolist() == ["TOTAL", "1", "2", "3", "BLANK"]
 
+    # test the not existing column
+    vc = obj.value_counts(frame, "not existing")
+    assert isinstance(vc, pandas.Series)
+    values = vc.values.tolist()
+    assert len(values) == 2
+    assert numpy.isnan(values[0])
+    assert numpy.isnan(values[1])
 
 def test_simple_aggregation_object_with_callback():
     class TestCallback(aggregation.SimpleAggregationObject):
@@ -329,6 +338,13 @@ def test_cross_aggregation_object():
     for column in crossed.columns:
         assert numpy.isnan(crossed[column].values.tolist()[-1])
 
+    # test the not existing column
+    crossed = obj.crosstab(frame, "not existing1", "not existing2")
+    assert crossed.columns.tolist() == ["TOTAL", "BLANK"]
+    values = crossed["TOTAL"].values.tolist()
+    assert len(values) == 2
+    assert numpy.isnan(values[0])
+    assert numpy.isnan(values[1])
 
 def test_cross_aggregation_object_with_callback():
     class TestCallback(aggregation.CrossAggregationObject):
