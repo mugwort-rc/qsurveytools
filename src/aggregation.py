@@ -204,10 +204,10 @@ class CrossAggregationObject(AggregationObject):
         if index == column:
             return self.reindex(pandas.DataFrame(), index, column)
         # check config
-        if key.id not in self.config.columns or target.id not in self.config.columns:
+        if index not in self.config.columns or column not in self.config.columns:
             return self.reindex(pandas.DataFrame(), index, column)
         # check source
-        if key.id not in frame.columns or target.id not in frame.columns:
+        if index not in frame.columns or column not in frame.columns:
             return self.reindex(pandas.DataFrame(), index, column)
         # get configs
         index_conf = self.config.columns.get(index, config.Column())
