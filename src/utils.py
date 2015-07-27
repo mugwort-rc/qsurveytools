@@ -50,9 +50,9 @@ def expand_multiple_bool(series):
     result = (
         expand_base(series)
            .apply(lambda x: pandas.Series(1, index=x))
+           .reindex(index)
            .fillna(0)
            .astype(bool)
-           .reindex(index)
     )
     # Empty special case
     if isinstance(result, pandas.Series):
