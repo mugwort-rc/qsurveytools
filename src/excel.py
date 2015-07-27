@@ -408,7 +408,8 @@ class CrossStackedChartBuilder(ChartBuilder):
                     "value": True,
                     "num_format": '0.0;-0.0;"";@',
                     "font": font,
-                }
+                },
+                "gap": 100,
             })
         # row-base
         """
