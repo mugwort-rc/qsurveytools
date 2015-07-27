@@ -90,8 +90,6 @@ class SimpleAggregationObject(AggregationObject):
         self.cb.initialize(len(self.config.columnOrder))
         for i, column in enumerate(self.config.columnOrder, 1):
             self.cb.update(i)
-            if column not in self.config.columns:
-                continue
             vc = self.value_counts(frame, column)
             self.cb.addSeries(column, vc)
         self.cb.finish()
@@ -107,14 +105,25 @@ class SimpleAggregationObject(AggregationObject):
         :rtype: pandas.Series
         :return: result of single aggregation
         """
+        # check config error
+        if column not in self.config.columns:
+            return self.reindex(pandas.Series(), column, named_index)
+        # check source error
+        if column not in frame.columns:
+            return self.reindex(pandas.Series(), column, named_index)
+        # get column config
         conf = self.config.columns.get(column, config.Column())
+        # check column type
         if conf.type not in [config.SINGLE, config.MULTIPLE]:
             return self.reindex(pandas.Series(), column, named_index)
+        # apply filter
         frame = self.filteredFrame(frame, [column])
+        # aggregation
         if conf.type == config.SINGLE:
             return self.single_value_counts(frame, column, named_index)
         elif conf.type == config.MULTIPLE:
             return self.multiple_value_counts(frame, column, named_index)
+        # error case
         return self.reindex(pandas.Series(), column, named_index)
 
     def single_value_counts(self, frame, column, named_index):
@@ -194,6 +203,13 @@ class CrossAggregationObject(AggregationObject):
         # check same
         if index == column:
             return self.reindex(pandas.DataFrame(), index, column)
+        # check config
+        if key.id not in self.config.columns or target.id not in self.config.columns:
+            return self.reindex(pandas.DataFrame(), index, column)
+        # check source
+        if key.id not in frame.columns or target.id not in frame.columns:
+            return self.reindex(pandas.DataFrame(), index, column)
+        # get configs
         index_conf = self.config.columns.get(index, config.Column())
         column_conf = self.config.columns.get(column, config.Column())
         # check type
@@ -201,12 +217,15 @@ class CrossAggregationObject(AggregationObject):
             return self.reindex(pandas.DataFrame(), index, column)
         if column_conf.type not in [config.SINGLE, config.MULTIPLE]:
             return self.reindex(pandas.DataFrame(), index, column)
+        # apply filter
         frame = self.filteredFrame(frame, [index, column])
         if len(frame) == 0:
             # empty
             return self.reindex(pandas.DataFrame(), index, column)
+        # make arguments
         args = (frame, index, column)
         kwargs = dict(values=values, aggfunc=aggfunc)
+        # aggregations
         if index_conf.type == config.SINGLE:
             if column_conf.type == config.SINGLE:
                 return self.ss_crosstab(*args, **kwargs)
