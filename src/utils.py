@@ -61,6 +61,8 @@ def expand_multiple_bool(series):
 
 
 def expand_base(series):
+    if len(series) == 0:
+        return series
     return (
         series
             .dropna()
