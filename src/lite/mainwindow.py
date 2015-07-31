@@ -431,10 +431,23 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
     def save(self):
         from .. import excel
         book = excel.SurveyExcelBook(unicode(self.filepath))
+        names = []
         for target in self.config.cross.targets:
             if target.id not in self.frames:
                 continue
-            sheet = book.worksheet((target.name if target.name else target.id)[:31])
+            # check unique sheet name
+            name = (target.name if target.name else target.id)[:31]
+            if name.lower() in names:
+                i = 1
+                while True:
+                    i += 1
+                    num_size = len(str(i))
+                    test_name = "{}({})".format(name[:31-(num_size+2)], i)
+                    if test_name.lower() not in names:
+                        name = test_name
+                        break
+            names.append(name.lower())
+            sheet = book.worksheet(name)
             sheet.setTitle(self.config.columns.get(target.id, {}).get('title', ''))
             sheet.addPadding(2)
             for key in self.config.cross.keys:
