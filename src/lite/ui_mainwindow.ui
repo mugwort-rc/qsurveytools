@@ -136,6 +136,34 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabSetting">
+       <attribute name="title">
+        <string>Setting</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTabWidget" name="tabWidgetSetting">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tabCross">
+           <attribute name="title">
+            <string>Cross</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBoxCrossTableConcatenate">
+              <property name="text">
+               <string>Cross table concatenate</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>

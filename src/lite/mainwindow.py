@@ -203,7 +203,12 @@ class MainWindow(QMainWindow):
             self.showMessageTab()
             return
 
-        self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')))
+        cross_table_concat = self.ui.checkBoxCrossTableConcatenate.isChecked()
+        options = {
+            "cross_table_concat": cross_table_concat,
+        }
+
+        self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), options)
         self.setProgressObject(self.cross_aggregation)
         self.cross_aggregation.finished.connect(self.crossFinished)
         self.cross_aggregation.moveToThread(self.cross_thread)
@@ -417,10 +422,11 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
 
 
 class CrossAggregationObject(qaggregation.CrossAggregationObject):
-    def __init__(self, conf, filepath, parent=None):
+    def __init__(self, conf, filepath, options, parent=None):
         super(CrossAggregationObject, self).__init__(parent)
         self.config = conf
         self.filepath = filepath
+        self.options = options
         self.frames = {}
 
     def addDataFrame(self, key, target, frame):
@@ -432,6 +438,9 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
         from .. import excel
         book = excel.SurveyExcelBook(unicode(self.filepath))
         names = []
+        cross_table_concat = self.options.get("cross_table_concat", False)
+        if cross_table_concat:
+            book.SHEET = excel.CrossSingleTableSheet
         for target in self.config.cross.targets:
             if target.id not in self.frames:
                 continue
@@ -453,9 +462,11 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             for key in self.config.cross.keys:
                 if key.id not in self.frames[target.id]:
                     continue
-                sheet.setTitle(self.config.columns.get(key.id, {}).get('title', ''))
+                if not cross_table_concat:
+                    sheet.setTitle(self.config.columns.get(key.id, {}).get('title', ''))
                 sheet.paste(self.frames[target.id][key.id])
-                sheet.addPadding(2)
+                if not cross_table_concat:
+                    sheet.addPadding(2)
         try:
             book.close()
         except IOError:

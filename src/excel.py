@@ -160,6 +160,19 @@ class SurveyExcelSheet(ExcelSheet):
                     # column: formula_start + x + 1 (column header) - 1 (skip total)
                     self.write(y+1, formula_start+x, SURVEY_FORMULA.format(self.cell(y+1, x+1), starts[y]), self.percent_format)
 
+        self.add_cross_chart(frame, formula_start, **kwargs)
+
+        self.current_row += len(frame)
+
+    def cell(self, row, col, row_abs=False, col_abs=False):
+        return utility.xl_rowcol_to_cell(
+            self.current_row+row,
+            self.current_col+col,
+            row_abs,
+            col_abs
+        )
+
+    def add_cross_chart(self, frame, formula_start, **kwargs):
         with_chart = kwargs.get("with_chart", True)
         Builder = kwargs.get("builder", CrossStackedChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
@@ -186,15 +199,138 @@ class SurveyExcelSheet(ExcelSheet):
             # increment chart_row
             self.chart_row += int(math.ceil(builder.chartHeight() / EXCEL_CELL_HEIGHT))
 
-        self.current_row += len(frame)
 
-    def cell(self, row, col, row_abs=False, col_abs=False):
-        return utility.xl_rowcol_to_cell(
-            self.current_row+row,
-            self.current_col+col,
-            row_abs,
-            col_abs
-        )
+class CrossSingleTableSheet(SurveyExcelSheet):
+    def __init__(self, sheet, book):
+        super(CrossSingleTableSheet, self).__init__(sheet, book)
+        self.common_header = None
+        self.last_total = pandas.Series()
+        self.fixed_header = None
+
+    def setCommonHeader(self, frame, **kwargs):
+        if self.common_header is not None:
+            raise Exception("Common header is already set.")
+        self.common_header = frame.columns.tolist()
+        self.fixed_header = self.current_row
+        with_formula = kwargs.get('with_formula', True)
+        formula_start = len(frame.columns) + 2
+        self.write(0, 0, '', self.table_format)
+        if with_formula:
+            self.write(0, formula_start, '%', self.table_format)
+        for x, column in enumerate(frame):
+            # write table column
+            self.write(0, x+1, column, self.table_format)
+            # write table column for formula (skip TOTAL)
+            if with_formula and x != 0:
+                # write to
+                #      row: 0 (header row)
+                #   column: formula_start + x + 1 (column header) - 1 (skip total)
+                self.write(0, formula_start+x, column, self.table_format)
+
+    def pasteDataFrame(self, frame, **kwargs):
+        #assert frame.index[0] == "All"
+        if self.common_header is None:
+            self.setCommonHeader(frame, **kwargs)
+        else:
+            if self.common_header != frame.columns.tolist():
+                raise Exception("columns does not match the common header.")
+
+        with_formula = kwargs.get('with_formula', True)
+        # check first series (except total series.)
+        current_total = frame.iloc[0].copy().fillna(0)
+        skip_total = self.last_total.tolist() == current_total.tolist()
+        if not skip_total:
+            self.last_total = current_total
+        formula_start = len(frame.columns) + 2
+        # generate total cells
+        starts = [self.cell(i+1, 1, row_abs=True) for i in range(len(frame.index))]
+        for x, column in enumerate(frame):
+            #    [0]      | [1]
+            # 0:          | common headers
+            #    ---------|--------------
+            # 1: [total]  | data...
+            # 2: [index1] | data...
+            index_start = 1  # common header skip
+            for y, value in enumerate(frame[column]):
+                # check skip_total
+                if skip_total and y == 0:
+                    assert index_start == 1
+                    index_start -= 1  # skip back; total row
+                    continue
+                # write index header
+                if x == 0:
+                    # write table index
+                    self.write(
+                        # row, col
+                        y+index_start, 0,
+                        # value
+                        frame.index[y],
+                        # cell format
+                        self.table_format)
+                    # write table index for formula
+                    if with_formula:
+                        self.write(
+                            # row, col
+                            y+index_start, formula_start,
+                            # value
+                            frame.index[y],
+                            # cell format
+                            self.table_format)
+                # write to value table
+                self.write(
+                    # row, col
+                    y+index_start, x+1,
+                    # value
+                    value,
+                    # cell format
+                    self.table_format)
+                # write to formula table
+                if with_formula and x != 0:
+                    # write to
+                    #    row: y + 1 (row header)
+                    # column: formula_start + x + 1 (column header) - 1 (skip total)
+                    self.write(
+                        # row, col
+                        y+index_start, formula_start+x,
+                        # value
+                        SURVEY_FORMULA.format(self.cell(y+index_start, x+1), starts[y]),
+                        # cell format
+                        self.percent_format)
+
+        self.add_cross_chart(frame, formula_start, skip_total=skip_total, **kwargs)
+
+        self.current_row += len(frame)
+        if skip_total:
+            self.current_row -= 1
+
+    def add_cross_chart(self, frame, formula_start, **kwargs):
+        with_chart = kwargs.get("with_chart", True)
+        skip_total = kwargs.get("skip_total", False)
+        Builder = kwargs.get("builder", CrossStackedChartBuilder)
+        if with_chart and issubclass(Builder, ChartBuilder):
+            chart_frame = frame.copy()
+            # TODO: drop the user-specified index value
+            builder = Builder(chart_frame)
+            chart = builder.makeChart(self, self.current_row, formula_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)
+            if self.chart_row is None:
+                self.chart_row = self.current_row
+            self.sheet.insert_chart(
+                # back to title row
+                self.chart_row,
+                # column
+                (
+                    # (formula_start+1(to real start point))
+                    (formula_start+1) +
+                    # (1(header)+columns-1('All'))
+                    (len(frame.columns)) +
+                    # padding[defined by builder]
+                    max(1, Builder.TABLE_MARGIN)
+                    ),
+                # chart object
+                chart)
+            # increment chart_row
+            self.chart_row += int(math.ceil(builder.chartHeight() / EXCEL_CELL_HEIGHT))
+
 
 class SurveyExcelBook(ExcelBook):
     SHEET = SurveyExcelSheet
@@ -247,7 +383,7 @@ class SimpleBarChartBuilder(ChartBuilder):
         super(SimpleBarChartBuilder, self).__init__()
         self.series = series
 
-    def makeChart(self, sheet, row, column):
+    def makeChart(self, sheet, row, column, **kwargs):
         """
         :type sheet: SurveyExcelSheet
         :param sheet: write target
@@ -366,7 +502,7 @@ class CrossStackedChartBuilder(ChartBuilder):
             "subtype": "percent_stacked",
         })
 
-    def makeChart(self, sheet, row, column):
+    def makeChart(self, sheet, row, column, **kwargs):
         """
         :type sheet: SurveyExcelSheet
         :param sheet: write target
@@ -374,34 +510,51 @@ class CrossStackedChartBuilder(ChartBuilder):
         :param row: start row
         :type column: int
         :param column: start column
+        
+        kwargs:
+            :type fixed_header: int
+            :param fixed_header: fixed header value (default: row)
+            :type total_skipped: bool
+            :param total_skipped: total row was skipped (default: False)
         """
+        # kwargs
+        name_header = kwargs.get("fixed_header", row)
+        total_skipped = kwargs.get("total_skipped", False)
+        index_start = 1 if not total_skipped else 0
+
+        # constants
         COLUMN_C = column
         COLUMN_R1 = column + 1
+
         font = {
             "size": self.FONT_PT,
         }
         chart = self._createChart(sheet)
         # column-base
+        xaxis_count = self.xaxisCount()
+        if total_skipped:
+            xaxis_count -= 1
+        categories = [
+            sheet.name,
+            row+1+index_start,  # skip "(%)"
+            COLUMN_C,  # target to (C)
+            row+1+xaxis_count,  # skip "(%)"
+            COLUMN_C,
+        ]
         for i in range(self.yaxisCount()):
             COLUMN_RC = COLUMN_R1 + i  # R-current
             chart.add_series({
                 "name": [
                     sheet.name,
-                    row,
+                    name_header,
                     COLUMN_R1+i
                     ],
-                "categories": [
-                    sheet.name,
-                    row+2,  # skip "(%)", "TOTAL"
-                    COLUMN_C,  # target to (C)
-                    row+1+self.xaxisCount(),  # skip "(%)"
-                    COLUMN_C,
-                    ],
+                "categories": categories,
                 "values": [
                     sheet.name,
-                    row+2,  # skip "(%)", "TOTAL"
+                    row+1+index_start,  # skip "(%)"
                     COLUMN_RC,  # target to (RC)
-                    row+1+self.xaxisCount(),  # skip "(%)"
+                    row+1+xaxis_count,  # skip "(%)"
                     COLUMN_RC,
                 ],
                 "data_labels": {
