@@ -259,9 +259,9 @@ class CrossAggregationObject(AggregationObject):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         if self.dropna:
-            frame = frame[[index,column]].dropna()
-            iseries = frame[index]
-            cframe = utils.expand_multiple(frame[column])
+            icframe = frame[[index,column]].dropna()
+            iseries = icframe[index]
+            cframe = utils.expand_multiple(icframe[column])
         else:
             iseries = frame[index].fillna(BLANK)
             cframe = utils.expand_multiple(frame[column].fillna(BLANK))
