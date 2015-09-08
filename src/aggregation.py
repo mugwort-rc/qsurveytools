@@ -241,7 +241,8 @@ class CrossAggregationObject(AggregationObject):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         if self.dropna:
-            frame = frame[[index,column]].dropna()
+            dropped_index = frame[[index,column]].dropna().index
+            frame = frame.ix[dropped_index]
             iseries = frame[index]
             cseries = frame[column]
         else:
@@ -259,9 +260,10 @@ class CrossAggregationObject(AggregationObject):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         if self.dropna:
-            icframe = frame[[index,column]].dropna()
-            iseries = icframe[index]
-            cframe = utils.expand_multiple(icframe[column])
+            dropped_index = frame[[index,column]].dropna().index
+            frame = frame.ix[dropped_index]
+            iseries = frame[index]
+            cframe = utils.expand_multiple(frame[column])
         else:
             iseries = frame[index].fillna(BLANK)
             cframe = utils.expand_multiple(frame[column].fillna(BLANK))
@@ -291,7 +293,8 @@ class CrossAggregationObject(AggregationObject):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         if self.dropna:
-            frame = frame[[index,column]].dropna()
+            dropped_index = frame[[index,column]].dropna().index
+            frame = frame.ix[dropped_index]
             iframe = utils.expand_multiple(frame[index])
             cframe = utils.expand_multiple(frame[column])
         else:

@@ -397,3 +397,101 @@ def test_cross_aggregation_object_with_callback():
     # check series
     assert len(cb.frames) == 1
     assert len(cb.frames["Q1"]) == 2
+
+
+def test_cross_aggregation_object_with_dropna():
+    cb = mock.Mock()
+    conf = config.Config(CONFIG)
+    conf.columnOrder.append("Q4")
+    conf.columns["Q4"] = config.Column({
+        "title": "Q4",
+        "type": config.MULTIPLE,
+        "choice": list("qrs"),
+    })
+    obj = aggregation.CrossAggregationObject(cb, conf, dropna=True)
+
+    frame = pandas.DataFrame(columns=["Q1", "Q2", "3", "Q4"], data=[
+        [1, "1,3", 3, 3],
+        [2, None, 2, 2],
+        [3, "1,2,3", 1, None],
+        [None, 1, 3, 3],
+        [2, 2, 2, 2],
+        [2, None, 1, 1],
+        [None, 1, 3, 3],
+        [4, 2, 2, None],
+        [3, "1,3", 1, 1],
+        [None, None, 3, 3],
+        [3, "2,3", 2, 2],
+        [4, 3, 1, 1],
+        [3, 3, 3, None],
+    ])
+
+    # simple x multiple
+    crossed = obj.crosstab(frame, "Q1", "Q2")
+    print crossed
+    assert isinstance(crossed, pandas.DataFrame)
+
+    assert crossed.index.tolist() == ["TOTAL", "a", "b", "c", "d"]
+    assert crossed.columns.tolist() == ["TOTAL", "x", "y", "z"]
+
+    # check nan
+    numpy.isnan(crossed["x"]["b"])
+    numpy.isnan(crossed["y"]["a"])
+    numpy.isnan(crossed["z"]["b"])
+    assert crossed["TOTAL"].values.tolist()[:-1] == [6, 1, 1, 4]
+    assert crossed["x"].values.tolist()[:-1] == [3, 1, 0, 2]
+    assert crossed["y"].values.tolist()[:-1] == [3, 0, 1, 2]
+    assert crossed["z"].values.tolist()[:-1] == [5, 1, 0, 4]
+    # check nan
+    for column in crossed.columns:
+        # d is ignored value
+        assert numpy.isnan(crossed[column].values.tolist()[-1])
+
+    # muliple x simple
+    crossed = obj.crosstab(frame, "Q2", "3")
+    print crossed
+    assert isinstance(crossed, pandas.DataFrame)
+
+    assert crossed.index.tolist() == ["TOTAL", "x", "y", "z"]
+    assert crossed.columns.tolist() == ["TOTAL", "1", "2", "3"]
+
+    assert crossed["TOTAL"].values.tolist() == [7, 5, 3, 4]
+    assert crossed["1"].values.tolist() == [2, 2, 1, 2]
+    assert crossed["2"].values.tolist() == [2, 0, 2, 1]
+    assert crossed["3"].values.tolist() == [3, 3, 0, 1]
+
+    # simple x simple
+    crossed = obj.crosstab(frame, "Q1", "3")
+    print crossed
+    assert isinstance(crossed, pandas.DataFrame)
+
+    assert crossed.index.tolist() == ["TOTAL", "a", "b", "c", "d"]
+    assert crossed.columns.tolist() == ["TOTAL", "1", "2", "3"]
+
+    assert crossed["TOTAL"].values.tolist()[:-1] == [5, 1, 1, 3]
+    assert crossed["1"].values.tolist()[:-1] == [2, 0, 0, 2]
+    assert crossed["2"].values.tolist()[:-1] == [2, 0, 1, 1]
+    assert crossed["3"].values.tolist()[:-1] == [1, 1, 0, 0]
+    # check nan
+    for column in crossed.columns:
+        assert numpy.isnan(crossed[column].values.tolist()[-1])
+
+    # muliple x multiple
+    crossed = obj.crosstab(frame, "Q2", "Q4")
+    print crossed
+    assert isinstance(crossed, pandas.DataFrame)
+
+    assert crossed.index.tolist() == ["TOTAL", "x", "y", "z"]
+    assert crossed.columns.tolist() == ["TOTAL", "q", "r", "s"]
+
+    assert crossed["TOTAL"].values.tolist() == [6, 4, 2, 3]
+    assert crossed["q"].values.tolist() == [1, 1, 0, 1]
+    assert crossed["r"].values.tolist() == [2, 0, 2, 1]
+    assert crossed["s"].values.tolist() == [3, 3, 0, 1]
+
+    # test the not existing column
+    crossed = obj.crosstab(frame, "not existing1", "not existing2")
+    assert crossed.columns.tolist() == ["TOTAL"]
+    values = crossed["TOTAL"].values.tolist()
+    assert len(values) == 1
+    assert numpy.isnan(values[0])
