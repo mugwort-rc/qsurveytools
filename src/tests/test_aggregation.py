@@ -428,7 +428,6 @@ def test_cross_aggregation_object_with_dropna():
 
     # simple x multiple
     crossed = obj.crosstab(frame, "Q1", "Q2")
-    print crossed
     assert isinstance(crossed, pandas.DataFrame)
 
     assert crossed.index.tolist() == ["TOTAL", "a", "b", "c", "d"]
@@ -449,7 +448,6 @@ def test_cross_aggregation_object_with_dropna():
 
     # muliple x simple
     crossed = obj.crosstab(frame, "Q2", "3")
-    print crossed
     assert isinstance(crossed, pandas.DataFrame)
 
     assert crossed.index.tolist() == ["TOTAL", "x", "y", "z"]
@@ -462,7 +460,6 @@ def test_cross_aggregation_object_with_dropna():
 
     # simple x simple
     crossed = obj.crosstab(frame, "Q1", "3")
-    print crossed
     assert isinstance(crossed, pandas.DataFrame)
 
     assert crossed.index.tolist() == ["TOTAL", "a", "b", "c", "d"]
@@ -478,7 +475,6 @@ def test_cross_aggregation_object_with_dropna():
 
     # muliple x multiple
     crossed = obj.crosstab(frame, "Q2", "Q4")
-    print crossed
     assert isinstance(crossed, pandas.DataFrame)
 
     assert crossed.index.tolist() == ["TOTAL", "x", "y", "z"]
