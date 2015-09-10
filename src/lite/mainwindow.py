@@ -498,10 +498,11 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             for key in self.config.cross.keys:
                 if key.id not in self.frames[target.id]:
                     continue
-                if not cross_table_concat:
+                if cross_table_concat:
+                    sheet.paste(self.frames[target.id][key.id], name=(key.name or key.id))
+                else:
                     sheet.setTitle(self.config.columns.get(key.id, {}).get('title', ''))
-                sheet.paste(self.frames[target.id][key.id])
-                if not cross_table_concat:
+                    sheet.paste(self.frames[target.id][key.id])
                     sheet.addPadding(2)
         try:
             book.close()

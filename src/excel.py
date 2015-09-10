@@ -56,6 +56,14 @@ class ExcelSheet(object):
             value = None
         self.sheet.write(self.current_row+row, self.current_col+column, value, *args)
 
+    def merge_write(self, row, column, height, width, value, *args):
+        if isinstance(value, float) and numpy.isnan(value):
+            value = None
+        rng = "{}:{}".format(
+            utility.xl_rowcol_to_cell(self.current_row+row, self.current_col+column),
+            utility.xl_rowcol_to_cell(self.current_row+row+height, self.current_col+column+width))
+        self.sheet.merge_range(rng, value, *args)
+
     @property
     def name(self):
         return self.sheet.get_name()
@@ -208,6 +216,10 @@ class CrossSingleTableSheet(SurveyExcelSheet):
         self.common_header = None
         self.last_total = pandas.Series()
         self.fixed_header = None
+        self.merge_format = self.book.add_format()
+        self.merge_format.set_border()
+        self.merge_format.set_align("justify")
+        self.merge_format.set_align("top")
 
     def setCommonHeader(self, frame, **kwargs):
         if self.common_header is not None:
@@ -218,9 +230,9 @@ class CrossSingleTableSheet(SurveyExcelSheet):
         table_start = 1
         left_header = 2
         formula_start = len(frame.columns) + left_header*2
-        self.write(0, table_start, "", self.table_format)
+        self.merge_write(0, table_start-1, 0, 1, "", self.merge_format)
         if with_formula:
-            self.write(0, formula_start, "%", self.table_format)
+            self.merge_write(0, formula_start-1, 0, 1, "%", self.merge_format)
         for x, column in enumerate(frame):
             # write table column
             self.write(0, table_start+x+1, column, self.table_format)
@@ -248,6 +260,27 @@ class CrossSingleTableSheet(SurveyExcelSheet):
         table_start = 1
         left_header = 2
         formula_start = len(frame.columns) + left_header*2
+        # write table categories
+        self.merge_write(
+            # row
+            1 if skip_total else 2,
+            # col
+            table_start-1,  # TODO: remove this relative `-1`
+            # height, width
+            len(frame.index)-2, 0,
+            # value
+            kwargs.get("name", ""),
+            self.merge_format)
+        self.merge_write(
+            # row
+            1 if skip_total else 2,
+            # col
+            formula_start-1,  # TODO: remove this relative `-1`
+            # height, width
+            len(frame.index)-2, 0,
+            # value
+            kwargs.get("name", ""),
+            self.merge_format)
         # generate total cells
         starts = [self.cell(i+1, table_start+1, row_abs=True) for i in range(len(frame.index))]
         for x, column in enumerate(frame):
@@ -265,23 +298,46 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                     continue
                 # write index header
                 if x == 0:
-                    # write table index
-                    self.write(
-                        # row, col
-                        y+index_start, table_start,
-                        # value
-                        frame.index[y],
-                        # cell format
-                        self.table_format)
-                    # write table index for formula
-                    if with_formula:
+                    # for All
+                    if y == 0:
+                        # write table index
+                        self.merge_write(
+                            # row, col
+                            y+index_start, table_start-1,
+                            0, 1,
+                            # value
+                            frame.index[y],
+                            # cell format
+                            self.merge_format)
+                        # write table index for formula
+                        if with_formula:
+                            self.merge_write(
+                                # row, col
+                                y+index_start, formula_start-1,
+                                0, 1,
+                                # value
+                                frame.index[y],
+                                # cell format
+                                self.merge_format)
+                    # for other
+                    else:
+                        # write table index
                         self.write(
                             # row, col
-                            y+index_start, formula_start,
+                            y+index_start, table_start,
                             # value
                             frame.index[y],
                             # cell format
                             self.table_format)
+                        # write table index for formula
+                        if with_formula:
+                            self.write(
+                                # row, col
+                                y+index_start, formula_start,
+                                # value
+                                frame.index[y],
+                                # cell format
+                                self.table_format)
                 # write to value table
                 self.write(
                     # row, col
