@@ -282,7 +282,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
             kwargs.get("name", ""),
             self.merge_format)
         # generate total cells
-        starts = [self.cell(i+1, table_start+1, row_abs=True) for i in range(len(frame.index))]
+        starts = [self.cell(i+(0 if skip_total else 1), table_start+1, row_abs=True) for i in range(len(frame.index))]
         for x, column in enumerate(frame):
             #    [0]      | [1]
             # 0:          | common headers
