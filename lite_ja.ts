@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="2.0" language="ja_JP" sourcelanguage="">
 <context>
+    <name>ConfigValidationObject</name>
+    <message>
+        <location filename="src/lite/mainwindow.py" line="424"/>
+        <source>column &quot;%1&quot; has duplicate choices.</source>
+        <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="src/lite/mainwindow.py" line="36"/>

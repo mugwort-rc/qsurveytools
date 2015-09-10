@@ -129,6 +129,10 @@ class MainWindow(QMainWindow):
     def addMessage(self, text):
         self.model.setArray(self.model.array()+[text])
 
+    @pyqtSlot(QStringList)
+    def addMessages(self, texts):
+        self.model.setArray(self.model.array()+texts)
+
     def clearMessage(self):
         self.model.setArray([])
 
@@ -310,7 +314,10 @@ class MainWindow(QMainWindow):
             # drop ID NaN
             sourceFrame = sourceFrame[sourceFrame[qsource.Source.setting_id()].notnull()]
 
-            conf = config.makeConfigByDataFrame(settingFrame, crossFrame)
+            cb = ConfigValidationObject(self)
+            conf = config.makeConfigByDataFrame(settingFrame, crossFrame, cb)
+            if cb.messages():
+                self.addMessages(cb.messages())
 
             no_error = True
             # check filter validation
@@ -392,6 +399,31 @@ class MainWindow(QMainWindow):
         self.validation_error = error
         if error:
             self.model.setArray(self.model.array()+self.validator.messages)
+
+
+class ConfigValidationObject(QObject, config.ConfigCallback):
+
+    warning = pyqtSignal(QString)
+
+    DUPLICATED = 1
+
+    def __init__(self, parent):
+        """
+        :type parent: QObject
+        :param parent: parent object
+        """
+        super(ConfigValidationObject, self).__init__(parent)
+        self.messages_ = []
+
+    def duplicatedChoice(self, column):
+        """
+        :type column: str
+        :param column: name of error column
+        """
+        self.messages_.append(self.tr('column "%1" has duplicate choices.').arg(column))
+
+    def messages(self):
+        return self.messages_
 
 
 class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
