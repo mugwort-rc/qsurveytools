@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="2.0" language="ja_JP" sourcelanguage="">
 <context>
+    <name>ConfigValidationObject</name>
+    <message>
+        <location filename="src/checker/mainwindow.py" line="240"/>
+        <source>column &quot;%1&quot; has duplicate choices.</source>
+        <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="src/checker/ui_mainwindow.ui" line="14"/>
@@ -18,37 +26,37 @@
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="37"/>
+        <location filename="src/checker/mainwindow.py" line="38"/>
         <source>checktool</source>
         <translation>ソース検証ツール</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="84"/>
+        <location filename="src/checker/mainwindow.py" line="81"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="84"/>
+        <location filename="src/checker/mainwindow.py" line="81"/>
         <source>Please open the Excel book.</source>
         <translation>エクセルを開いてください。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="162"/>
+        <location filename="src/checker/mainwindow.py" line="174"/>
         <source>Error: Sheet &quot;%1&quot; is not found.</source>
         <translation>エラー：シート &quot;%1&quot; が見つかりませんでした。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="165"/>
+        <location filename="src/checker/mainwindow.py" line="177"/>
         <source>Error: Sheet &quot;%1&quot; load failed.</source>
         <translation>エラー：シート &quot;%1&quot; のロードに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="130"/>
+        <location filename="src/checker/mainwindow.py" line="131"/>
         <source>Error: Sheet &quot;%1&quot; is invalid format.</source>
         <translation>エラー： シート &quot;%1&quot; が正しい形式ではありません。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="182"/>
+        <location filename="src/checker/mainwindow.py" line="194"/>
         <source>finished.</source>
         <translation>完了しました。</translation>
     </message>

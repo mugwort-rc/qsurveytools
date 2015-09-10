@@ -14,7 +14,8 @@ from PyQt4.Qt import *
 from .. import config
 from .. import cursor
 from .. import events
-from ..models import ArrayListModel
+from .. import models
+from .. import qerror
 from .. import qsource
 from .. import qvalidator
 
@@ -41,10 +42,13 @@ class MainWindow(QMainWindow):
         self.ui.statusbar.addWidget(self.progressBar)
         self.progressBar.setValue(0)
 
+        self.load_error_count = 0
+        self.config_callback = None
+        self.config_error_count = 0
         self.validator = None
 
-        self.model = ArrayListModel(self)
-        self.ui.listView.setModel(self.model)
+        self.error_ctx = qerror.SurveyErrorContext(self)
+        self.ui.listView.setModel(self.error_ctx.model())
 
         self.XL = None
 
@@ -57,13 +61,6 @@ class MainWindow(QMainWindow):
                 return result
             except (AttributeError, com_error) as e:
                 return None
-
-    @pyqtSlot(QString)
-    def addMessage(self, text):
-        self.model.setArray(self.model.array()+[text])
-
-    def clearMessage(self):
-        self.model.setArray([])
 
     def setProgressObject(self, obj):
         """
@@ -84,8 +81,12 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, self.tr("Error"), self.tr("Please open the Excel book."))
             return
 
-        self.clearMessage()
+        # clear last states.
+        self.error_ctx.clear()
         self.ui.statusbar.clearMessage()
+
+        # start loading
+        self.error_ctx.setLoading()
 
         sheet_setting = qsource.Source.sheet_setting()
         sheet_cross = qsource.Source.sheet_cross()
@@ -127,7 +128,7 @@ class MainWindow(QMainWindow):
             return
 
         def invalidSource(name):
-            self.addMessage(self.tr('Error: Sheet "%1" is invalid format.').arg(name))
+            self.error_ctx.addMessage(self.tr('Error: Sheet "%1" is invalid format.').arg(name))
 
         no_error = True
         if not qsource.Source.isSettingFrame(settingFrame):
@@ -149,8 +150,19 @@ class MainWindow(QMainWindow):
         # drop ID NaN
         sourceFrame = sourceFrame[sourceFrame[qsource.Source.setting_id()].notnull()]
 
-        conf = config.makeConfigByDataFrame(settingFrame, crossFrame)
+        # start parsing
+        self.error_ctx.setParsing()
+        self.config_callback = ConfigValidationObject(
+            sheets[sheet_setting],
+            sheets[sheet_cross],
+            sheets[sheet_source],
+            self
+        )
+        self.config_callback.warning.connect(self.error_ctx.addMessage)
+        conf = config.makeConfigByDataFrame(settingFrame, crossFrame, self.config_callback)
 
+        # start validating
+        self.error_ctx.setValidating()
         self.validator = CustomValidationObject(sheets[sheet_source], self)
         self.setProgressObject(self.validator)
         self.progressBar.setVisible(True)
@@ -159,10 +171,10 @@ class MainWindow(QMainWindow):
         self.validator.selectError(-1)  # select last error
 
     def sheetNotFound(self, name):
-        self.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
+        self.error_ctx.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
 
     def sheetCannotLoad(self, name):
-        self.addMessage(self.tr('Error: Sheet "%1" load failed.').arg(name))
+        self.error_ctx.addMessage(self.tr('Error: Sheet "%1" load failed.').arg(name))
 
     def clearSourceMarker(self, sheet):
         used = sheet.UsedRange()
@@ -178,14 +190,68 @@ class MainWindow(QMainWindow):
         self.progressBar.setVisible(False)
         self.validation_error = error
         if error:
-            self.model.setArray(self.model.array()+self.validator.messages)
+            self.error_ctx.addMessages(self.validator.messages)
         self.ui.statusbar.showMessage(self.tr("finished."), 0)
 
     @pyqtSlot(QModelIndex)
     def on_listView_doubleClicked(self, index):
         if self.validator is None:
             return
-        self.validator.selectError(index.row())
+        ctx = self.error_ctx.errorContext(index.row())
+        if ctx < 0:
+            return
+        if ctx == qerror.SurveyErrorContext.LOAD:
+            return
+        elif ctx == qerror.SurveyErrorContext.PARSE:
+            row = self.error_ctx.errorIndex(index.row())
+            self.config_callback.selectError(row)
+        elif ctx == qerror.SurveyErrorContext.VALIDATE:
+            row = self.error_ctx.errorIndex(index.row())
+            self.validator.selectError(row)
+
+
+class ConfigValidationObject(QObject, config.ConfigCallback):
+
+    warning = pyqtSignal(QString)
+
+    DUPLICATED = 1
+
+    def __init__(self, setting, cross, source, parent):
+        """
+        :type setting: win32com.client.Object
+        :type cross: win32com.client.Object
+        :type source: win32com.client.Object
+        :type parent: QObject
+
+        :param parent: parent object
+        """
+        super(ConfigValidationObject, self).__init__(parent)
+        self.setting_sheet = setting
+        self.cross_sheet = cross
+        self.source_sheet = source
+        self.errors = []
+
+    def duplicatedChoice(self, column):
+        """
+        :type column: str
+        :param column: name of error column
+        """
+        self.errors.append((self.DUPLICATED, column))
+        self.warning.emit(self.tr('column "%1" has duplicate choices.').arg(column))
+
+    def selectError(self, index):
+        # check range
+        if index < 0 or len(self.errors) <= index:
+            return
+        reason, value = self.errors[index]
+        if reason == self.DUPLICATED:
+            used = self.setting_sheet.UsedRange()
+            for i, v in enumerate(used[0]):
+                if v != value:
+                    continue
+                self.setting_sheet.Activate()
+                self.setting_sheet.Range("{0}:{0}".format(xl_col_to_name(i))).Select()
+                break
 
 
 class CustomValidationObject(qvalidator.QValidationObject):
@@ -202,8 +268,10 @@ class CustomValidationObject(qvalidator.QValidationObject):
         self._error_map = {}
 
     def selectError(self, index):
+        # selectError(-1) select last error.
         if index < 0 and self.last_error is not None:
             column, row = self.last_error
+        # detect by error number.
         else:
             if index not in self._error_map:
                 return
