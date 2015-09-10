@@ -294,7 +294,14 @@ class FilterController(object):
         return False
 
 
-def makeConfigByDataFrame(frame, cross=None):
+class ConfigCallback(object):
+    def duplicatedChoice(self, column):
+        raise NotImplementedError
+
+
+def makeConfigByDataFrame(frame, cross=None, cb=None):
+    if cb is not None:
+        assert isinstance(cb, ConfigCallback)
     # columns
     assert(frame.columns[0] == 'ID')
     del frame['ID']
@@ -330,18 +337,23 @@ def makeConfigByDataFrame(frame, cross=None):
     # columnOrder
     config.columnOrder = map(six.text_type, columns)
     # columns
-    for column in columns:
+    for rawcol, strcol in zip(columns, config.columnOrder):
         # skip empty column
-        if column is None:
+        if rawcol is None:
             continue
-        config.columns[six.text_type(column)] = Column({
-            'type': get_type(types[column]),
-            'noblank': get_blank(types[column]),
-            'limit': get_limit(types[column]),
-            'multiex': get_multiex(types[column]),
-            'title': six.text_type(titles[column]),
-            'choice': map(six.text_type, choices[column].dropna().values.tolist()),
+        column_config = Column({
+            'type': get_type(types[rawcol]),
+            'noblank': get_blank(types[rawcol]),
+            'limit': get_limit(types[rawcol]),
+            'multiex': get_multiex(types[rawcol]),
+            'title': six.text_type(titles[rawcol]),
+            'choice': map(six.text_type, choices[rawcol].dropna().values.tolist()),
         })
+        if cb is not None:
+            if len(column_config["choice"]) != len(choices[rawcol].dropna()):
+                cb.duplicatedChoice(rawcol)
+        config.columns[strcol] = column_config
+
     # filter
     pickup = FilterBuilder('pickup')
     pickup.build(ok)

@@ -591,6 +591,32 @@ def test_make_config_by_data_frame():
     assert f_conf.cross == y_conf.cross
 
 
+def test_make_config_by_data_frame_duplicated_warning():
+    class Callback(config.ConfigCallback):
+        def __init__(self):
+            self.duplicated = []
+        def duplicatedChoice(self, column):
+            self.duplicated.append(column)
+    cb = Callback()
+
+    frame = pandas.DataFrame(columns=["ID", "Q1"],
+                             data=[
+                                 ["TITLE", "dup_choice"],
+                                 ["TYPE", "S"],
+                                 ["OK", None],
+                                 ["NG", None],
+                                 [1, "fizz"],
+                                 [2, "buzz"],
+                                 [3, "buzz"],
+                                 [4, None],
+                                ])
+    cross = None
+    conf = config.makeConfigByDataFrame(frame, cross, cb)
+    assert conf.columnOrder == ["Q1"]
+    assert conf.columns["Q1"].choice == ["fizz", "buzz"]
+    assert cb.duplicated == ["Q1"]
+
+
 def test_filter_builder():
     conf = config.Config(CONFIG)
 
