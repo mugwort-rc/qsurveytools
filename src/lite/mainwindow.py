@@ -467,16 +467,20 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
         self.frames[target][key] = frame
 
     def save(self):
+        # create workbook
         from .. import excel
         book = excel.SurveyExcelBook(unicode(self.filepath))
+        # get option
         names = []
         cross_table_concat = self.options.get("cross_table_concat", False)
         if cross_table_concat:
             book.SHEET = excel.CrossSingleTableSheet
+        # create sheets
         for target in self.config.cross.targets:
+            # check id
             if target.id not in self.frames:
                 continue
-            # check unique sheet name
+            # check unique sheet name & normalize name
             name = (target.name if target.name else target.id)[:31]
             if name.lower() in names:
                 i = 1

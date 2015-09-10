@@ -128,15 +128,17 @@ class SurveyExcelSheet(ExcelSheet):
 
     def pasteDataFrame(self, frame, **kwargs):
         with_formula = kwargs.get('with_formula', True)
-        formula_start = len(frame.columns) + 2
-        self.write(0, 0, '', self.table_format)
+        table_start = 0
+        left_header = 1
+        formula_start = len(frame.columns) + left_header*2
+        self.write(0, table_start, "", self.table_format)
         if with_formula:
-            self.write(0, formula_start, '%', self.table_format)
+            self.write(0, formula_start, "%", self.table_format)
         # generate total cells
-        starts = [self.cell(i+1, 1, row_abs=True) for i in range(len(frame.index))]
+        starts = [self.cell(i+1, table_start+1, row_abs=True) for i in range(len(frame.index))]
         for x, column in enumerate(frame):
             # write table column
-            self.write(0, x+1, column, self.table_format)
+            self.write(0, table_start+x+1, column, self.table_format)
             # write table column for formula (skip TOTAL)
             if with_formula and x != 0:
                 # write to
@@ -147,7 +149,7 @@ class SurveyExcelSheet(ExcelSheet):
                 # write column header
                 if x == 0:
                     # write table index
-                    self.write(y+1, 0, frame.index[y], self.table_format)
+                    self.write(y+1, table_start, frame.index[y], self.table_format)
                     # write table index for formula
                     if with_formula:
                         self.write(y+1, formula_start, frame.index[y], self.table_format)
@@ -213,13 +215,15 @@ class CrossSingleTableSheet(SurveyExcelSheet):
         self.common_header = frame.columns.tolist()
         self.fixed_header = self.current_row
         with_formula = kwargs.get('with_formula', True)
-        formula_start = len(frame.columns) + 2
-        self.write(0, 0, '', self.table_format)
+        table_start = 1
+        left_header = 2
+        formula_start = len(frame.columns) + left_header*2
+        self.write(0, table_start, "", self.table_format)
         if with_formula:
-            self.write(0, formula_start, '%', self.table_format)
+            self.write(0, formula_start, "%", self.table_format)
         for x, column in enumerate(frame):
             # write table column
-            self.write(0, x+1, column, self.table_format)
+            self.write(0, table_start+x+1, column, self.table_format)
             # write table column for formula (skip TOTAL)
             if with_formula and x != 0:
                 # write to
@@ -241,9 +245,11 @@ class CrossSingleTableSheet(SurveyExcelSheet):
         skip_total = self.last_total.tolist() == current_total.tolist()
         if not skip_total:
             self.last_total = current_total
-        formula_start = len(frame.columns) + 2
+        table_start = 1
+        left_header = 2
+        formula_start = len(frame.columns) + left_header*2
         # generate total cells
-        starts = [self.cell(i+1, 1, row_abs=True) for i in range(len(frame.index))]
+        starts = [self.cell(i+1, table_start+1, row_abs=True) for i in range(len(frame.index))]
         for x, column in enumerate(frame):
             #    [0]      | [1]
             # 0:          | common headers
@@ -262,7 +268,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                     # write table index
                     self.write(
                         # row, col
-                        y+index_start, 0,
+                        y+index_start, table_start,
                         # value
                         frame.index[y],
                         # cell format
@@ -279,7 +285,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                 # write to value table
                 self.write(
                     # row, col
-                    y+index_start, x+1,
+                    y+index_start, table_start+x+1,
                     # value
                     value,
                     # cell format
@@ -293,7 +299,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                         # row, col
                         y+index_start, formula_start+x,
                         # value
-                        SURVEY_FORMULA.format(self.cell(y+index_start, x+1), starts[y]),
+                        SURVEY_FORMULA.format(self.cell(y+index_start, table_start+x+1), starts[y]),
                         # cell format
                         self.percent_format)
 
