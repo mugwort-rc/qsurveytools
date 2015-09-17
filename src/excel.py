@@ -271,16 +271,17 @@ class CrossSingleTableSheet(SurveyExcelSheet):
             # value
             kwargs.get("name", ""),
             self.merge_format)
-        self.merge_write(
-            # row
-            1 if skip_total else 2,
-            # col
-            formula_start-1,  # TODO: remove this relative `-1`
-            # height, width
-            len(frame.index)-2, 0,
-            # value
-            kwargs.get("name", ""),
-            self.merge_format)
+        if with_formula:
+            self.merge_write(
+                # row
+                1 if skip_total else 2,
+                # col
+                formula_start-1,  # TODO: remove this relative `-1`
+                # height, width
+                len(frame.index)-2, 0,
+                # value
+                kwargs.get("name", ""),
+                self.merge_format)
         # generate total cells
         starts = [self.cell(i+(0 if skip_total else 1), table_start+1, row_abs=True) for i in range(len(frame.index))]
         for x, column in enumerate(frame):
