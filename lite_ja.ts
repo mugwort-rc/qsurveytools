@@ -3,7 +3,7 @@
 <context>
     <name>ConfigValidationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="424"/>
+        <location filename="src/lite/mainwindow.py" line="448"/>
         <source>column &quot;%1&quot; has duplicate choices.</source>
         <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
     </message>
@@ -11,92 +11,92 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="36"/>
+        <location filename="src/lite/mainwindow.py" line="46"/>
         <source>Excel (*.xlsx *.xlsm);;CSV (*.csv)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="37"/>
+        <location filename="src/lite/mainwindow.py" line="47"/>
         <source>Excel (*.xlsx)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="41"/>
+        <location filename="src/lite/mainwindow.py" line="51"/>
         <source>surveytool</source>
         <translation>アンケート集計ツール</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="120"/>
+        <location filename="src/lite/mainwindow.py" line="144"/>
         <source>TOTAL</source>
         <translation>総数</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="121"/>
+        <location filename="src/lite/mainwindow.py" line="145"/>
         <source>BLANK</source>
         <translation>無回答</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="229"/>
+        <location filename="src/lite/mainwindow.py" line="253"/>
         <source>Error: config load failed.</source>
         <translation>エラー：設定もしくはソースの読み込みに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="346"/>
+        <location filename="src/lite/mainwindow.py" line="370"/>
         <source>Error: output file path is not directory.</source>
         <translation>エラー：出力パスがフォルダではありません。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="190"/>
+        <location filename="src/lite/mainwindow.py" line="214"/>
         <source>simple.xlsx</source>
         <translation>単純集計.xlsx</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="216"/>
+        <location filename="src/lite/mainwindow.py" line="240"/>
         <source>cross.xlsx</source>
         <translation>クロス集計.xlsx</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="261"/>
+        <location filename="src/lite/mainwindow.py" line="285"/>
         <source>loading...</source>
         <translation>読み込み中…</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="264"/>
+        <location filename="src/lite/mainwindow.py" line="288"/>
         <source>Error: Input &quot;%1&quot; not found.</source>
         <translation>エラー： 入力 &quot;%1&quot; が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="266"/>
+        <location filename="src/lite/mainwindow.py" line="290"/>
         <source>Input: &quot;%1&quot;</source>
         <translation>入力： &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="278"/>
+        <location filename="src/lite/mainwindow.py" line="302"/>
         <source>Error: Input &quot;%1&quot; load failed.</source>
         <translation>エラー：入力 &quot;%1&quot; の読み込みに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="336"/>
+        <location filename="src/lite/mainwindow.py" line="360"/>
         <source>validating...</source>
         <translation>検証中…</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="392"/>
+        <location filename="src/lite/mainwindow.py" line="416"/>
         <source>Finished</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="392"/>
+        <location filename="src/lite/mainwindow.py" line="416"/>
         <source>Finished.</source>
         <translation>完了しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="394"/>
+        <location filename="src/lite/mainwindow.py" line="418"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="394"/>
+        <location filename="src/lite/mainwindow.py" line="418"/>
         <source>Write error.</source>
         <translation>書き込みに失敗しました。</translation>
     </message>
@@ -146,37 +146,37 @@
         <translation>メッセージ</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="191"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="190"/>
         <source>Exit</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="282"/>
+        <location filename="src/lite/mainwindow.py" line="306"/>
         <source>Error: Sheet &quot;%1&quot; is not found.</source>
         <translation>エラー：シート &quot;%1&quot; が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="297"/>
+        <location filename="src/lite/mainwindow.py" line="321"/>
         <source>Error: Sheet &quot;%1&quot; is invalid format.</source>
         <translation>エラー：シート &quot;%1&quot; が正しい形式ではありません。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="327"/>
+        <location filename="src/lite/mainwindow.py" line="351"/>
         <source>Error: filter key &quot;%1&quot; is not defined.</source>
         <translation>エラー：フィルター要素 &quot;%1&quot; は定義されていません。</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="183"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="182"/>
         <source>Data</source>
         <translation>データ</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="196"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="195"/>
         <source>Expand</source>
         <translation>展開出力</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="252"/>
+        <location filename="src/lite/mainwindow.py" line="276"/>
         <source>expand.xlsx</source>
         <translation>展開.xlsx</translation>
     </message>
@@ -186,9 +186,19 @@
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="157"/>
-        <source>Cross table concatenate</source>
-        <translation>クロステーブル結合</translation>
+        <location filename="src/lite/mainwindow.py" line="72"/>
+        <source>Default</source>
+        <translation>標準</translation>
+    </message>
+    <message>
+        <location filename="src/lite/mainwindow.py" line="72"/>
+        <source>SingleTable</source>
+        <translation>シングルテーブル</translation>
+    </message>
+    <message>
+        <location filename="src/lite/mainwindow.py" line="72"/>
+        <source>Azemichi</source>
+        <translation>畦道スタイル</translation>
     </message>
 </context>
 <context>
@@ -227,7 +237,7 @@
 <context>
     <name>SimpleAggregationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="443"/>
+        <location filename="src/lite/mainwindow.py" line="467"/>
         <source>SimpleAggregation</source>
         <translation>単純集計</translation>
     </message>
