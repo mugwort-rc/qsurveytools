@@ -142,7 +142,7 @@ class SurveyExcelSheet(ExcelSheet):
         self.write(0, table_start, "", self.table_format)
         if with_formula:
             self.write(0, formula_start, "%", self.table_format)
-        # generate total cells
+        # generate left-most total cells
         starts = [self.cell(i+1, table_start+1, row_abs=True) for i in range(len(frame.index))]
         for x, column in enumerate(frame):
             # write table column
@@ -282,7 +282,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                 # value
                 kwargs.get("name", ""),
                 self.merge_format)
-        # generate total cells
+        # generate left-most total cells
         starts = [self.cell(i+(0 if skip_total else 1), table_start+1, row_abs=True) for i in range(len(frame.index))]
         for x, column in enumerate(frame):
             #    [0]      | [1]
@@ -299,7 +299,13 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                     continue
                 # write index header
                 if x == 0:
-                    # for All
+                    #       |            | common headers...
+                    # ------|------------|--------
+                    # [a] TOTAL          | ...
+                    # TABLE | [b] INDEX1 |
+                    #       | [b] INDEX2 |
+                    # ...
+                    # [a]: for TOTAL
                     if y == 0:
                         # write table index
                         self.merge_write(
@@ -320,7 +326,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                                 frame.index[y],
                                 # cell format
                                 self.merge_format)
-                    # for other
+                    # [b]: for other
                     else:
                         # write table index
                         self.write(
@@ -384,6 +390,153 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                 (
                     # (formula_start+1(to real start point))
                     (formula_start+1) +
+                    # (1(header)+columns-1('All'))
+                    (len(frame.columns)) +
+                    # padding[defined by builder]
+                    max(1, Builder.TABLE_MARGIN)
+                    ),
+                # chart object
+                chart)
+            # increment chart_row
+            self.chart_row += int(math.ceil(builder.chartHeight() / EXCEL_CELL_HEIGHT))
+
+
+class CrossAzemichiTableSheet(SurveyExcelSheet):
+    def __init__(self, sheet, book):
+        super(CrossAzemichiTableSheet, self).__init__(sheet, book)
+        self.common_header = None
+        self.last_total = pandas.Series()
+        self.fixed_header = None
+        self.merge_format = self.book.add_format()
+        self.merge_format.set_border()
+        self.merge_format.set_align("justify")
+        self.merge_format.set_align("top")
+
+    def setCommonHeader(self, frame, **kwargs):
+        if self.common_header is not None:
+            raise Exception("Common header is already set.")
+        self.common_header = frame.columns.tolist()
+        self.fixed_header = self.current_row
+        table_start = 1
+        self.merge_write(0, table_start-1, 0, 1, "", self.merge_format)
+        for x, column in enumerate(frame):
+            # write table column
+            self.write(0, table_start+x+1, column, self.table_format)
+
+    def pasteDataFrame(self, frame, **kwargs):
+        #assert frame.index[0] == "All"
+        if self.common_header is None:
+            self.setCommonHeader(frame, **kwargs)
+        else:
+            if self.common_header != frame.columns.tolist():
+                raise Exception("columns does not match the common header.")
+
+        # check first series (except total series.)
+        current_total = frame.iloc[0].copy().fillna(0)
+        skip_total = self.last_total.tolist() == current_total.tolist()
+        if not skip_total:
+            self.last_total = current_total
+        table_start = 1
+        # write table categories
+        self.merge_write(
+            # row
+            1 if skip_total else 3,
+            # col
+            table_start-1,  # TODO: remove this relative `-1`
+            # height, width
+            len(frame.index)*2-3, 0,
+            # value
+            kwargs.get("name", ""),
+            self.merge_format)
+        # generate left-most total cells
+        starts = [self.cell(i*2+(-1 if skip_total else 1), table_start+1, row_abs=True) for i in range(len(frame.index))]
+        for x, column in enumerate(frame):
+            #    [0]          | [1]
+            # 0:              | common headers
+            #    -------------|--------------
+            # 1: [total]      | data...
+            # 2: [data/total] | %
+            # 3: [index1]     | data...
+            # 4: [data/total] | %
+            index_start = 1  # common header skip
+            for y, value in enumerate(frame[column]):
+                # check skip_total
+                if skip_total and y == 0:
+                    assert index_start == 1
+                    index_start -= 2  # skip back; total row
+                    continue
+                # write index header
+                if x == 0:
+                    #       |            | common headers...
+                    # ------|------------|--------
+                    # [a] TOTAL          | ...
+                    # TABLE | [b] INDEX1 | value
+                    #       |            | formula%
+                    #       | [b] INDEX2 |
+                    # ...
+                    # [a]: for All
+                    if y == 0:
+                        # write table index
+                        self.merge_write(
+                            # row, col
+                            y*2+index_start, table_start-1,
+                            1, 1,
+                            # value
+                            frame.index[y],
+                            # cell format
+                            self.merge_format)
+                    # [b]: for other
+                    else:
+                        # write table index
+                        self.merge_write(
+                            # row, col
+                            y*2+index_start, table_start,
+                            1, 0,
+                            # value
+                            frame.index[y],
+                            # cell format
+                            self.merge_format)
+                # write to value table
+                self.write(
+                    # row, col
+                    y*2+index_start, table_start+x+1,
+                    # value
+                    value,
+                    # cell format
+                    self.table_format)
+                self.write(
+                    # row, col
+                    y*2+index_start+1, table_start+x+1,
+                    # value
+                    SURVEY_FORMULA.format(self.cell(y*2+index_start, table_start+x+1), starts[y]),
+                    # cell format
+                    self.percent_format)
+
+        self.add_cross_chart(frame, table_start, skip_total=skip_total, **kwargs)
+
+        self.current_row += len(frame)*2
+        if skip_total:
+            self.current_row -= 1*2
+
+    def add_cross_chart(self, frame, table_start, **kwargs):
+        # TODO: here
+        with_chart = kwargs.get("with_chart", True)
+        skip_total = kwargs.get("skip_total", False)
+        Builder = kwargs.get("builder", CrossAzemichiChartBuilder)
+        if with_chart and issubclass(Builder, ChartBuilder):
+            chart_frame = frame.copy()
+            # TODO: drop the user-specified index value
+            builder = Builder(chart_frame)
+            chart = builder.makeChart(self, self.current_row, table_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)
+            if self.chart_row is None:
+                self.chart_row = self.current_row
+            self.sheet.insert_chart(
+                # back to title row
+                self.chart_row,
+                # column
+                (
+                    # (table_start+1(to real start point))
+                    (table_start+1) +
                     # (1(header)+columns-1('All'))
                     (len(frame.columns)) +
                     # padding[defined by builder]
@@ -659,6 +812,160 @@ class CrossStackedChartBuilder(ChartBuilder):
                 }
             })
         """
+        # chart area size
+        width = self.WIDTH
+        height = self.chartHeight()
+        chart.set_size({
+            "width": width,
+            "height": height,
+        })
+        # plot area size
+        longest_category = ""
+        for index in self.frame.index:
+            index = six.text_type(index)
+            longest_category = index if len(index) > len(longest_category) else longest_category
+        index_width = min(self.FONT_PT * len(longest_category), self.WIDTH / 2)
+        index_height = self.HEIGHT_PER_SERIES * self.xaxisCount()
+        index_margin = float(index_width) / width
+        plot_margin = self.HEIGHT_MERGIN / 2.0
+        x_margin = plot_margin / width
+        y_margin = plot_margin / height
+        x_width = 1.0 - x_margin - index_margin
+        y_height = float(index_height) / height
+        chart.set_plotarea({
+            "layout": {
+                "x": x_margin + index_margin,
+                "y": y_margin,
+                "width": x_width,
+                "height": y_height,
+            }
+        })
+        # axis
+        chart.set_x_axis({
+            "num_font": font,
+            "name_font": font,
+        })
+        chart.set_y_axis({
+            "reverse": True,
+            "num_font": font,
+            "name_font": font,
+        })
+        # chart area
+        chart.set_chartarea({
+            "border": {
+                "none": True,
+            },
+        })
+        # legend
+        chart.set_legend({
+            'font': font,
+            'layout': {
+                'x': index_margin,
+                'y': y_margin*2+y_height,
+                'width': 1.0-index_margin,
+                'height': 1.0-y_margin*2-y_height,
+            },
+            'position': 'bottom',
+        })
+        return chart
+
+    def yaxisCount(self):
+        return len(self.frame.columns) - 1
+
+    def xaxisCount(self):
+        return len(self.frame.index) - 1
+
+    def chartHeight(self):
+        """
+        :rtype: int
+        :return: chart height size (px)
+        """
+        return (
+            self.HEIGHT_MERGIN +
+            self.HEIGHT_PER_SERIES * self.xaxisCount() +
+            self.LEGEND_PT * self.yaxisCount()
+            )
+
+
+
+class CrossAzemichiChartBuilder(ChartBuilder):
+    """
+    (I)   | (C1) | (C2)
+    ======|======|======
+    TOTAL | t1   | t2
+          | t1/t1| t2/t1
+    [A]   | a1   | a2
+          | a1/a1| a2/a1
+    [B]   | b1   | b2
+          | b1/b1| b2/b1
+    """
+
+    WIDTH = 600
+    HEIGHT_PER_SERIES = 40
+    HEIGHT_MERGIN = 36
+    FONT_PT = 9
+    LEGEND_TEXT_PT = 12
+    LEGEND_PT = 25
+
+    def __init__(self, frame):
+        super(CrossAzemichiChartBuilder, self).__init__()
+        self.frame = frame
+
+    def _createChart(self, sheet):
+        return sheet.book.add_chart({
+            "type": "bar",
+            "subtype": "percent_stacked",
+        })
+
+    def makeChart(self, sheet, row, column, **kwargs):
+        """
+        :type sheet: SurveyExcelSheet
+        :param sheet: write target
+        :type row: int
+        :param row: start row
+        :type column: int
+        :param column: start column
+
+        kwargs:
+            :type fixed_header: int
+            :param fixed_header: fixed header value (default: row)
+            :type total_skipped: bool
+            :param total_skipped: total row was skipped (default: False)
+        """
+        # kwargs
+        name_header = kwargs.get("fixed_header", row)
+        total_skipped = kwargs.get("total_skipped", False)
+        index_start = 2 if not total_skipped else 0  # index of [A]
+
+        # constants
+        COLUMN_I = column
+        COLUMN_C1 = column + 1
+
+        font = {
+            "size": self.FONT_PT,
+        }
+        chart = self._createChart(sheet)
+        # column-base
+        xaxis_count = self.xaxisCount()
+        # row + 2 + index_start (skip common-header)
+        categories = "=({})".format(",".join(["'{}'!{}".format(sheet.name, utility.xl_rowcol_to_cell(row+1+index_start+i*2, COLUMN_I)) for i in range(xaxis_count)]))
+        for i in range(self.yaxisCount()):
+            current_col = COLUMN_C1 + i + 1  # skip TOTAL
+            chart.add_series({
+                "name": [
+                    sheet.name,
+                    name_header,
+                    current_col
+                    ],
+                "categories": categories,
+                "values": "=({})".format(",".join(["'{}'!{}".format(sheet.name, utility.xl_rowcol_to_cell(row+2+index_start+i*2, current_col)) for i in range(xaxis_count)])),
+                "data_labels": {
+                    "value": True,
+                    "num_format": '0.0;-0.0;"";@',
+                    "font": font,
+                },
+                "gap": 100,
+            })
         # chart area size
         width = self.WIDTH
         height = self.chartHeight()
