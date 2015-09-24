@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import enum
+
 import pandas
 import six
 import xlrd
@@ -18,6 +20,12 @@ from .. import qvalidator
 from .. import status
 
 from ui_mainwindow import Ui_MainWindow
+
+
+class CrossFormat(enum.Enum):
+    Default = 0
+    SingleTable = 1
+    Azemichi = 2
 
 
 class ExceptionBase(Exception):
@@ -55,6 +63,20 @@ class MainWindow(QMainWindow):
 
         self.model = ArrayListModel(self)
         self.ui.listView.setModel(self.model)
+
+        # output format of cross
+        self.crossModel = QStringListModel(self)
+        self.crossModel.setStringList([
+            self.tr("Default"),
+            self.tr("SingleTable"),
+            self.tr("Azemichi"),
+        ])
+        self.crossEnums = [
+            CrossFormat.Default,
+            CrossFormat.SingleTable,
+            CrossFormat.Azemichi,
+        ]
+        self.ui.comboBoxCrossFormat.setModel(self.crossModel)
 
         self.simple_aggregation = None
         self.cross_aggregation = None
@@ -207,9 +229,9 @@ class MainWindow(QMainWindow):
             self.showMessageTab()
             return
 
-        cross_table_concat = self.ui.checkBoxCrossTableConcatenate.isChecked()
+        cross_table_format = self.crossEnums[self.ui.comboBoxCrossFormat.currentIndex()]
         options = {
-            "cross_table_concat": cross_table_concat,
+            "cross_table_format": cross_table_format,
         }
 
         self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), options)
@@ -472,9 +494,11 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
         book = excel.SurveyExcelBook(unicode(self.filepath))
         # get option
         names = []
-        cross_table_concat = self.options.get("cross_table_concat", False)
-        if cross_table_concat:
+        cross_table_format = self.options.get("cross_table_format", False)
+        if cross_table_format == CrossFormat.SingleTable:
             book.SHEET = excel.CrossSingleTableSheet
+        elif cross_table_format == CrossFormat.Azemichi:
+            book.SHEET = excel.CrossAzemichiTableSheet
         # create sheets
         for target in self.config.cross.targets:
             # check id
@@ -498,9 +522,10 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             for key in self.config.cross.keys:
                 if key.id not in self.frames[target.id]:
                     continue
-                if cross_table_concat:
+                if cross_table_format in [CrossFormat.SingleTable, CrossFormat.Azemichi]:
                     sheet.paste(self.frames[target.id][key.id], name=(key.name or key.id))
                 else:
+                    # Default
                     sheet.setTitle(self.config.columns.get(key.id, {}).get('title', ''))
                     sheet.paste(self.frames[target.id][key.id])
                     sheet.addPadding(2)

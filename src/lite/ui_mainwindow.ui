@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>456</width>
+    <width>440</width>
     <height>236</height>
    </rect>
   </property>
@@ -151,12 +151,11 @@
             <string>Cross</string>
            </attribute>
            <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0">
-             <widget class="QCheckBox" name="checkBoxCrossTableConcatenate">
-              <property name="text">
-               <string>Cross table concatenate</string>
-              </property>
-             </widget>
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            </property>
+            <item row="0" column="0" colspan="2">
+             <widget class="QComboBox" name="comboBoxCrossFormat"/>
             </item>
            </layout>
           </widget>
@@ -174,7 +173,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>456</width>
+     <width>440</width>
      <height>24</height>
     </rect>
    </property>
