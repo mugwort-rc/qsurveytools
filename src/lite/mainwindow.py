@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import enum
 
 import pandas
@@ -506,6 +508,8 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
                 continue
             # check unique sheet name & normalize name
             name = (target.name if target.name else target.id)[:31]
+            name = name.replace("[", "【").replace("]", "】")
+            name = name.replace("\r", "").replace("\n", "")
             if name.lower() in names:
                 i = 1
                 while True:
