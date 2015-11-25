@@ -59,9 +59,9 @@ class MainWindow(QMainWindow):
         ]
         for lineEdit in self.line_edits:
             lineEdit.installEventFilter(self.file_dd_filter)
-            lineEdit.textChanged.connect(self.setWorkable)
+            lineEdit.textChanged.connect(self.updateWorkable)
 
-        self.setWorkable()
+        self.updateWorkable()
 
         self.model = ArrayListModel(self)
         self.ui.listView.setModel(self.model)
@@ -185,7 +185,7 @@ class MainWindow(QMainWindow):
         self.ui.lineEditOutput.setText(filepath)
 
     @pyqtSlot()
-    def setWorkable(self):
+    def updateWorkable(self):
         input_info = QFileInfo(self.ui.lineEditInput.text())
         output_info = QFileInfo(self.ui.lineEditOutput.text())
         workable = (
