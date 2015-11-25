@@ -211,8 +211,10 @@ class MainWindow(QMainWindow):
             return
 
         with_percent = self.ui.checkBoxWithPercent.isChecked()
+        sa_to_pie = self.ui.checkBoxSAToPie.isChecked()
         options = {
             "with_percent": with_percent,
+            "sa_to_pie": sa_to_pie,
         }
 
         self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), options)
@@ -471,6 +473,7 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
     def save(self):
         # options
         with_percent = self.options.get("with_percent", False)
+        sa_to_pie = self.options.get("sa_to_pie", False)
 
         from .. import excel
         book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent)
@@ -479,8 +482,10 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
         for column in self.config.columnOrder:
             if column not in self.series:
                 continue
-            sheet.setTitle(self.config.columns.get(column, {}).get('title', ''))
-            sheet.paste(self.series[column], with_percent=with_percent)
+            current_config = self.config.columns.get(column, {})
+            sheet.setTitle(current_config.get('title', ''))
+            to_pie = sa_to_pie and (current_config.get("type") == config.SINGLE)
+            sheet.paste(self.series[column], with_percent=with_percent, to_pie=to_pie)
             sheet.addPadding(3)
         try:
             book.close()

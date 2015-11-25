@@ -113,10 +113,13 @@ class SurveyExcelSheet(ExcelSheet):
         :param with_formula: insert rate column
         :type with_chart: bool
         :param with_chart: insert rate chart
+        :type to_pie: bool
+        :param to_pie: change to pie chart
         :type builder: ChartBuilder
         :param builder: chart builder
         """
         with_formula = kwargs.get('with_formula', True)
+        to_pie = kwargs.get("to_pie", False)
         start = None
         for i, value in enumerate(series):
             if i == 0:
@@ -130,7 +133,7 @@ class SurveyExcelSheet(ExcelSheet):
         Builder = kwargs.get("builder", SimpleBarChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
             builder = Builder(series)
-            chart = builder.makeChart(self, self.current_row, self.current_col)
+            chart = builder.makeChart(self, self.current_row, self.current_col, to_pie=to_pie)
             self.sheet.insert_chart(
                 # back to title row
                 self.current_row,
@@ -614,16 +617,27 @@ class SimpleBarChartBuilder(ChartBuilder):
         :param row: start row
         :type column: int
         :param column: start column
+        :type to_pie: bool
+        :param to_pie: change to pie chart
         """
+        to_pie = kwargs.get("to_pie", False)
+
         COLUMN_C = column
         COLUMN_R = column + 2
         font = {
             "size": self.FONT_PT,
         }
-        chart = sheet.book.add_chart({
-            "type": "bar",
-            "subtype": "clustered",
-        })
+
+        if to_pie:
+            chart = sheet.book.add_chart({
+                "type": "pie",
+            })
+        else:
+            chart = sheet.book.add_chart({
+                "type": "bar",
+                "subtype": "clustered",
+            })
+
         chart.add_series({
             "categories": [
                 sheet.name,
@@ -647,8 +661,12 @@ class SimpleBarChartBuilder(ChartBuilder):
             }
         })
         # chart area size
-        width = self.WIDTH
-        height = self.HEIGHT_MERGIN + self.HEIGHT_PER_SERIES * self.seriesCount()
+        if to_pie:
+            width = self.WIDTH / 1.5
+            height = self.HEIGHT_MERGIN + self.HEIGHT_PER_SERIES * 8
+        else:
+            width = self.WIDTH
+            height = self.HEIGHT_MERGIN + self.HEIGHT_PER_SERIES * self.seriesCount()
         chart.set_size({
             "width": width,
             "height": height,
@@ -659,19 +677,23 @@ class SimpleBarChartBuilder(ChartBuilder):
             index = six.text_type(index)
             longest_category = index if len(index) > len(longest_category) else longest_category
         index_width = min(self.FONT_PT * len(longest_category), self.WIDTH / 2)
-        index_height = self.HEIGHT_PER_SERIES * self.seriesCount()
+        if to_pie:
+            index_height = self.HEIGHT_PER_SERIES * 8
+        else:
+            index_height = self.HEIGHT_PER_SERIES * self.seriesCount()
         index_margin = float(index_width) / width
         plot_margin = self.HEIGHT_MERGIN / 2.0
         x_margin = plot_margin / width
         y_margin = plot_margin / height
-        chart.set_plotarea({
-            "layout": {
-                "x": x_margin + index_margin,
-                "y": y_margin,
-                "width": 1.0 - x_margin - index_margin,
-                "height": float(index_height) / height,
-            }
-        })
+        if not to_pie:
+            chart.set_plotarea({
+                "layout": {
+                    "x": x_margin + index_margin,
+                    "y": y_margin,
+                    "width": 1.0 - x_margin - index_margin,
+                    "height": float(index_height) / height,
+                }
+            })
         # axis
         chart.set_x_axis({
             "num_font": font,
@@ -684,9 +706,10 @@ class SimpleBarChartBuilder(ChartBuilder):
             "name_font": font,
         })
         # legend
-        chart.set_legend({
-            "none": True,
-        })
+        if not to_pie:
+            chart.set_legend({
+                "none": True,
+            })
         # chart area
         chart.set_chartarea({
             "border": {

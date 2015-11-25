@@ -180,6 +180,20 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tabSimple">
+           <attribute name="title">
+            <string>Simple</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBoxSAToPie">
+              <property name="text">
+               <string>SA to Pie</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="tabCross">
            <attribute name="title">
             <string>Cross</string>
