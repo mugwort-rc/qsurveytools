@@ -210,7 +210,12 @@ class MainWindow(QMainWindow):
             self.showMessageTab()
             return
 
-        self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')))
+        with_percent = self.ui.checkBoxWithPercent.isChecked()
+        options = {
+            "with_percent": with_percent,
+        }
+
+        self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), options)
         self.setProgressObject(self.simple_aggregation)
         self.simple_aggregation.finished.connect(self.simpleFinished)
 
@@ -232,8 +237,10 @@ class MainWindow(QMainWindow):
             return
 
         cross_table_format = self.crossEnums[self.ui.comboBoxCrossFormat.currentIndex()]
+        with_percent = self.ui.checkBoxWithPercent.isChecked()
         options = {
             "cross_table_format": cross_table_format,
+            "with_percent": with_percent,
         }
 
         self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), options)
@@ -451,24 +458,29 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
 
 
 class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
-    def __init__(self, conf, filepath, parent=None):
+    def __init__(self, conf, filepath, options, parent=None):
         super(SimpleAggregationObject, self).__init__(parent)
         self.config = conf
         self.filepath = filepath
+        self.options = options
         self.series = {}
 
     def addSeries(self, name, series):
         self.series[name] = series
 
     def save(self):
+        # options
+        with_percent = self.options.get("with_percent", False)
+
         from .. import excel
-        book = excel.SurveyExcelBook(six.text_type(self.filepath))
+        book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent)
         sheet = book.worksheet(six.text_type(self.tr('SimpleAggregation')))
+
         for column in self.config.columnOrder:
             if column not in self.series:
                 continue
             sheet.setTitle(self.config.columns.get(column, {}).get('title', ''))
-            sheet.paste(self.series[column])
+            sheet.paste(self.series[column], with_percent=with_percent)
             sheet.addPadding(3)
         try:
             book.close()
@@ -491,9 +503,12 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
         self.frames[target][key] = frame
 
     def save(self):
+        # options
+        with_percent = self.options.get("with_percent", False)
+
         # create workbook
         from .. import excel
-        book = excel.SurveyExcelBook(six.text_type(self.filepath))
+        book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent)
         # get option
         names = []
         cross_table_format = self.options.get("cross_table_format", False)
@@ -501,6 +516,7 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             book.SHEET = excel.CrossSingleTableSheet
         elif cross_table_format == CrossFormat.Azemichi:
             book.SHEET = excel.CrossAzemichiTableSheet
+
         # create sheets
         for target in self.config.cross.targets:
             # check id

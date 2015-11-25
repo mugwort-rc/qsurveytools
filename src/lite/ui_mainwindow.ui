@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
@@ -42,13 +42,6 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="2">
-         <widget class="QCheckBox" name="checkBoxDropNA">
-          <property name="text">
-           <string>Drop N/A</string>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="5">
          <widget class="QPushButton" name="pushButtonCross">
           <property name="text">
@@ -62,19 +55,6 @@
            <number>24</number>
           </property>
          </widget>
-        </item>
-        <item row="4" column="3">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>90</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item row="1" column="1">
          <widget class="QLabel" name="labelOutput">
@@ -124,6 +104,19 @@
           </property>
          </widget>
         </item>
+        <item row="4" column="3">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>90</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tabMessage">
@@ -146,6 +139,27 @@
           <property name="currentIndex">
            <number>0</number>
           </property>
+          <widget class="QWidget" name="tabGeneral">
+           <attribute name="title">
+            <string>General</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBoxDropNA">
+              <property name="text">
+               <string>Drop N/A</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBoxWithPercent">
+              <property name="text">
+               <string>with %</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="tabCross">
            <attribute name="title">
             <string>Cross</string>

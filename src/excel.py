@@ -75,22 +75,27 @@ class ExcelBook(object):
 
     SHEET = ExcelSheet
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, **kwargs):
         self.book = xlsxwriter.Workbook(filepath)
+        self.options = kwargs
 
     def close(self):
         self.book.close()
 
     def worksheet(self, name=None):
-        return self.SHEET(self.book.add_worksheet(name), self.book)
+        return self.SHEET(self.book.add_worksheet(name), self.book, **self.options)
 
 
 SURVEY_FORMULA = '=IFERROR({}/{}%, "")'
 
 class SurveyExcelSheet(ExcelSheet):
-    def __init__(self, sheet, book):
+    def __init__(self, sheet, book, **kwargs):
         super(SurveyExcelSheet, self).__init__(sheet, book)
-        self.percent_format = self.book.add_format({'num_format': '0.0'})
+        with_percent = kwargs.get("with_percent", False)
+
+        self.percent_format = self.book.add_format({
+            'num_format': '0.0' + ('"%"' if with_percent else "")
+        })
         self.percent_format.set_border()
         self.chart_row = None
 
@@ -213,8 +218,8 @@ class SurveyExcelSheet(ExcelSheet):
 
 
 class CrossSingleTableSheet(SurveyExcelSheet):
-    def __init__(self, sheet, book):
-        super(CrossSingleTableSheet, self).__init__(sheet, book)
+    def __init__(self, sheet, book, **kwargs):
+        super(CrossSingleTableSheet, self).__init__(sheet, book, **kwargs)
         self.common_header = None
         self.last_total = pandas.Series()
         self.fixed_header = None
@@ -404,8 +409,8 @@ class CrossSingleTableSheet(SurveyExcelSheet):
 
 
 class CrossAzemichiTableSheet(SurveyExcelSheet):
-    def __init__(self, sheet, book):
-        super(CrossAzemichiTableSheet, self).__init__(sheet, book)
+    def __init__(self, sheet, book, **kwargs):
+        super(CrossAzemichiTableSheet, self).__init__(sheet, book, **kwargs)
         self.common_header = None
         self.last_total = pandas.Series()
         self.fixed_header = None
