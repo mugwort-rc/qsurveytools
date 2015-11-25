@@ -462,8 +462,8 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
 
     def save(self):
         from .. import excel
-        book = excel.SurveyExcelBook(unicode(self.filepath))
-        sheet = book.worksheet(unicode(self.tr('SimpleAggregation')))
+        book = excel.SurveyExcelBook(six.text_type(self.filepath))
+        sheet = book.worksheet(six.text_type(self.tr('SimpleAggregation')))
         for column in self.config.columnOrder:
             if column not in self.series:
                 continue
@@ -493,7 +493,7 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
     def save(self):
         # create workbook
         from .. import excel
-        book = excel.SurveyExcelBook(unicode(self.filepath))
+        book = excel.SurveyExcelBook(six.text_type(self.filepath))
         # get option
         names = []
         cross_table_format = self.options.get("cross_table_format", False)
