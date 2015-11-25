@@ -671,7 +671,7 @@ class SimpleBarChartBuilder(ChartBuilder):
         chart.set_x_axis({
             "num_font": font,
             "name_font": font,
-            "num_format": "0.0\"%\"",
+            "num_format": "0\"%\"",
         })
         chart.set_y_axis({
             "reverse": True,
