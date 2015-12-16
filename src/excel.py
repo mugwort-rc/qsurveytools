@@ -426,26 +426,39 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
         if self.common_header is not None:
             raise Exception("Common header is already set.")
         self.common_header = frame.columns.tolist()
+
+    def writeCommonHeader(self):
+        self.current_row += 1
         self.fixed_header = self.current_row
         table_start = 1
         self.merge_write(0, table_start-1, 0, 1, "", self.merge_format)
-        for x, column in enumerate(frame):
+        for x, column in enumerate(self.common_header):
             # write table column
             self.write(0, table_start+x+1, column, self.table_format)
 
     def pasteDataFrame(self, frame, **kwargs):
         #assert frame.index[0] == "All"
+        init = False
+        skip_header = kwargs.get("skip_header", True)
+        skip_same_all = kwargs.get("skip_same_all", True)
         if self.common_header is None:
+            init = True
             self.setCommonHeader(frame, **kwargs)
         else:
             if self.common_header != frame.columns.tolist():
                 raise Exception("columns does not match the common header.")
+        # set common header
+        if init or not skip_header:
+            self.writeCommonHeader()
 
         # check first series (except total series.)
         current_total = frame.iloc[0].copy().fillna(0)
         skip_total = self.last_total.tolist() == current_total.tolist()
         if not skip_total:
             self.last_total = current_total
+        # force update
+        if not skip_same_all:
+            skip_total = False
         table_start = 1
         # write table categories
         self.merge_write(

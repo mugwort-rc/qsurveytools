@@ -28,6 +28,7 @@ class CrossFormat(enum.Enum):
     Default = 0
     SingleTable = 1
     Azemichi = 2
+    AzemichiAdvanced = 3
 
 
 class ExceptionBase(Exception):
@@ -72,11 +73,13 @@ class MainWindow(QMainWindow):
             self.tr("Default"),
             self.tr("SingleTable"),
             self.tr("Azemichi"),
+            self.tr("Azemichi (advanced)"),
         ])
         self.crossEnums = [
             CrossFormat.Default,
             CrossFormat.SingleTable,
             CrossFormat.Azemichi,
+            CrossFormat.AzemichiAdvanced,
         ]
         self.ui.comboBoxCrossFormat.setModel(self.crossModel)
 
@@ -436,6 +439,12 @@ class MainWindow(QMainWindow):
         if error:
             self.model.setArray(self.model.array()+self.validator.messages)
 
+    @pyqtSlot(QString)
+    def on_lineEditInput_textChanged(self, text):
+        inputFilePath = six.text_type(self.ui.lineEditInput.text())
+        if QFile.exists(inputFilePath):
+            self.ui.lineEditOutput.setText(QFileInfo(inputFilePath).dir().absolutePath())
+
 
 class ConfigValidationObject(QObject, config.ConfigCallback):
 
@@ -519,10 +528,10 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
         book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent)
         # get option
         names = []
-        cross_table_format = self.options.get("cross_table_format", False)
+        cross_table_format = self.options.get("cross_table_format", CrossFormat.Default)
         if cross_table_format == CrossFormat.SingleTable:
             book.SHEET = excel.CrossSingleTableSheet
-        elif cross_table_format == CrossFormat.Azemichi:
+        elif cross_table_format in [CrossFormat.Azemichi, CrossFormat.AzemichiAdvanced]:
             book.SHEET = excel.CrossAzemichiTableSheet
 
         # create sheets
@@ -550,8 +559,12 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             for key in self.config.cross.keys:
                 if key.id not in self.frames[target.id]:
                     continue
-                if cross_table_format in [CrossFormat.SingleTable, CrossFormat.Azemichi]:
-                    sheet.paste(self.frames[target.id][key.id], name=(key.name or key.id))
+                if cross_table_format in [CrossFormat.SingleTable, CrossFormat.Azemichi, CrossFormat.AzemichiAdvanced]:
+                    option = {}
+                    if cross_table_format == CrossFormat.AzemichiAdvanced:
+                        option["skip_header"] = False
+                        option["skip_same_all"] = False
+                    sheet.paste(self.frames[target.id][key.id], name=(key.name or key.id), **option)
                 else:
                     # Default
                     sheet.setTitle(self.config.columns.get(key.id, {}).get('title', ''))
