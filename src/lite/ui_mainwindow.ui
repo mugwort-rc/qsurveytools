@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="toolTip">
-   <string>When disabled, labels move by the thickness of the series.</string>
+   <string/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
@@ -163,21 +163,28 @@
            <attribute name="title">
             <string>General</string>
            </attribute>
-           <layout class="QFormLayout" name="formLayout_2">
-            <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-            </property>
-            <item row="2" column="0">
-             <widget class="QCheckBox" name="checkBoxWithPercent">
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBoxDropNA">
               <property name="text">
-               <string>with %</string>
+               <string>Drop N/A</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="checkBoxExtendFilter">
+              <property name="text">
+               <string>Extend Filter</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QCheckBox" name="checkBoxDropNA">
+             <widget class="QCheckBox" name="checkBoxWithPercent">
               <property name="text">
-               <string>Drop N/A</string>
+               <string>with %</string>
               </property>
              </widget>
             </item>

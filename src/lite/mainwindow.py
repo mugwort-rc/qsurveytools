@@ -138,7 +138,7 @@ class MainWindow(QMainWindow):
         obj.initialized.connect(self.progressInit)
         obj.updated.connect(self.ui.progressBar.setValue)
 
-    def invoke_aggregate(self, obj, conf, frame, dropna):
+    def invoke_aggregate(self, obj, conf, frame, dropna, extend_refs):
         strings = {
             'TOTAL': six.text_type(self.tr('TOTAL')),
             'BLANK': six.text_type(self.tr('BLANK')),
@@ -147,7 +147,8 @@ class MainWindow(QMainWindow):
                                  Q_ARG(config.Config, conf),
                                  Q_ARG(pandas.DataFrame, frame),
                                  Q_ARG(bool, dropna),
-                                 Q_ARG(dict, strings))
+                                 Q_ARG(dict, strings),
+                                 Q_ARG(bool, extend_refs))
 
     @pyqtSlot(QString)
     def addMessage(self, text):
@@ -203,6 +204,7 @@ class MainWindow(QMainWindow):
         self.ui.pushButtonSimple.setEnabled(False)
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
+        extend_refs = self.ui.checkBoxExtendFilter.isChecked()
         try:
             conf, frame, filepath = self.loadSources()
         except LoadException:
@@ -224,13 +226,14 @@ class MainWindow(QMainWindow):
         self.simple_aggregation.moveToThread(self.simple_thread)
         self.simple_thread.start()
         #self.simple_aggregation.aggregate()
-        self.invoke_aggregate(self.simple_aggregation, conf, frame, dropna)
+        self.invoke_aggregate(self.simple_aggregation, conf, frame, dropna, extend_refs)
 
     @pyqtSlot()
     def on_pushButtonCross_clicked(self):
         self.ui.pushButtonSimple.setEnabled(False)
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
+        extend_refs = self.ui.checkBoxExtendFilter.isChecked()
         try:
             conf, frame, filepath = self.loadSources()
         except LoadException:
@@ -251,7 +254,7 @@ class MainWindow(QMainWindow):
         self.cross_aggregation.moveToThread(self.cross_thread)
         self.cross_thread.start()
         #self.cross_aggregation.aggregate()
-        self.invoke_aggregate(self.cross_aggregation, conf, frame, dropna)
+        self.invoke_aggregate(self.cross_aggregation, conf, frame, dropna, extend_refs)
 
     @pyqtSlot()
     def on_actionExpand_triggered(self):

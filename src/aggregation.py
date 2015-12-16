@@ -28,7 +28,7 @@ class CrossAggregationCallback(AggregationCallback):
 
 
 class AggregationObject(object):
-    def __init__(self, cb, conf, dropna=False, strings={}):
+    def __init__(self, cb, conf, dropna=False, strings={}, extend_refs=False):
         self.BLANK_STR = strings.get('BLANK', 'BLANK')
         self.TOTAL_STR = strings.get('TOTAL', 'TOTAL')
 
@@ -37,13 +37,16 @@ class AggregationObject(object):
         self.config = conf
         self.dropna = dropna
         self.filter = config.FilterController(conf)
+        self.extend_refs = extend_refs
 
-    def filteredFrame(self, frame, columns):
+    def filteredFrame(self, frame, columns, extend_refs=False):
         """
         :type frame: pandas.DataFrame
         :param frame: source data frame
         :type columns: list[str]
         :param columns: filter key columns
+        :type extend_refs: bool
+        :param extend_refs: extend to referenced config
         :rtype: pandas.DataFrame
         :return: filtered data frame
         """
@@ -51,7 +54,7 @@ class AggregationObject(object):
             # nan skip
             if isinstance(column, float) and pandas.np.isnan(column):
                 continue
-            frame = self.filter.applyFilter(frame, column)
+            frame = self.filter.applyFilter(frame, column, extend_refs=extend_refs)
         return frame
 
     def reindex(self, data, column, axis, prefix=[], suffix=[], named_index=True):
@@ -102,6 +105,8 @@ class SimpleAggregationObject(AggregationObject):
         :param column: target column
         :type named_index: bool
         :param named_index: reindex to named index
+        :type extend_refs: bool
+        :param extend_refs: extend to referenced config
         :rtype: pandas.Series
         :return: result of single aggregation
         """
@@ -117,7 +122,7 @@ class SimpleAggregationObject(AggregationObject):
         if conf.type not in [config.SINGLE, config.MULTIPLE]:
             return self.reindex(pandas.Series(), column, named_index)
         # apply filter
-        frame = self.filteredFrame(frame, [column])
+        frame = self.filteredFrame(frame, [column], extend_refs=self.extend_refs)
         # aggregation
         if conf.type == config.SINGLE:
             return self.single_value_counts(frame, column, named_index)
@@ -197,6 +202,8 @@ class CrossAggregationObject(AggregationObject):
         :param values: column name for aggfunc values
         :type aggfunc: callable
         :param aggfunc: aggregation function
+        :type extend_refs: bool
+        :param extend_refs: extend to referenced config
         :rtype: pandas.DataFrame
         :return: result of cross aggregation
         """
@@ -218,7 +225,7 @@ class CrossAggregationObject(AggregationObject):
         if column_conf.type not in [config.SINGLE, config.MULTIPLE]:
             return self.reindex(pandas.DataFrame(), index, column)
         # apply filter
-        frame = self.filteredFrame(frame, [index, column])
+        frame = self.filteredFrame(frame, [index, column], extend_refs=self.extend_refs)
         if len(frame) == 0:
             # empty
             return self.reindex(pandas.DataFrame(), index, column)

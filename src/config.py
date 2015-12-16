@@ -226,12 +226,25 @@ class FilterController(object):
     def removeIgnore(self, target, index):
         self._remove(target, 'ignore', index)
 
-    def applyFilter(self, frame, column):
+    def applyFilter(self, frame, column, extend_refs=False, applied=None):
+        if applied is None:
+            applied = list()
+        # check applied
+        if column in applied:
+            return frame
+        else:
+            applied.append(column)
+        # check config existing
         if column not in self.filter:
             return frame
+        # get filter
         filter = self.filter[column]
         conds = []
+        refs = []
+        # get pickup filters
         for ref,values in filter['pickup']:
+            if ref not in refs:
+                refs.append(ref)
             type = self.typeMap.get(ref, UNKNOWN)
             if type != MULTIPLE:
                 conds.append(frame[ref].isin(values))
@@ -246,7 +259,10 @@ class FilterController(object):
                     conds.append(or_concat(m_conds))
                 else:
                     return frame[:0]  # Empty DataFrame
+        # get ignore filters
         for ref,values in filter['ignore']:
+            if ref not in refs:
+                refs.append(ref)
             type = self.typeMap.get(ref, UNKNOWN)
             if type != MULTIPLE:
                 conds.append(~frame[ref].isin(values))
@@ -259,9 +275,15 @@ class FilterController(object):
                     m_conds.append(~multiple[value])
                 if m_conds:
                     conds.append(or_concat(m_conds))
+        # check filters
         if not conds:
             return frame
-        return frame[and_concat(conds)]
+        # extend to ref columns
+        frame = frame[and_concat(conds)]
+        if extend_refs:
+            for ref in refs:
+                frame = self.applyFilter(frame, ref, extend_refs=extend_refs, applied=applied)
+        return frame
 
     def isIgnore(self, frame, row, column):
         index = frame.index[row]
