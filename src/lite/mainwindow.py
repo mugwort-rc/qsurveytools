@@ -442,7 +442,9 @@ class MainWindow(QMainWindow):
     @pyqtSlot(QString)
     def on_lineEditInput_textChanged(self, text):
         inputFilePath = six.text_type(self.ui.lineEditInput.text())
-        if QFile.exists(inputFilePath):
+        outputFilePath = six.text_type(self.ui.lineEditOutput.text())
+        # input existing & output empty
+        if QFile.exists(inputFilePath) and not outputFilePath:
             self.ui.lineEditOutput.setText(QFileInfo(inputFilePath).dir().absolutePath())
 
 
