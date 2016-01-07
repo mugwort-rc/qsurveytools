@@ -132,10 +132,13 @@ C3以降の灰色のセルは認識しません。
 
 ![cross_key.png](img/cross_key.png)
 
-表側の**要素名**は現在使用されません。（将来的に利用します。）
+表側の**要素名**は[シングルテーブル]・[畦道スタイル]の表側に表示されます。（詳しくはクロス集計設定の[テーブルスタイル]を参照して下さい。）
 
 
 [アンケートソース]: source.html
+[テーブルスタイル]: aggregation.html#table-style
+[シングルテーブル]: aggregation.html#table-style-single-table
+[畦道スタイル]: aggregation.html#table-style-azemichi
 [複数回答制限]: #limit
 [複数回答例外]: #multiex
 [該当]: #ok
