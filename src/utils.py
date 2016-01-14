@@ -28,6 +28,25 @@ def all_false_case(frame):
         conds.append(frame[column].eq(False))
     return and_concat(conds)
 
+
+def is_nans(array):
+    """
+    :type array: list of value or pandas.Series
+    """
+    if isinstance(array, pandas.Series):
+        return set(array.isnull()) == {True}
+    temp = []
+    return set([is_nan(x) for x in array]) == {True}
+
+def is_nan(x):
+    """
+    :type x: any value
+    """
+    if not isinstance(x, float):
+        return False
+    return pandas.np.isnan(x)
+
+
 def split(x):
     return CSV_RE.split(x)
 

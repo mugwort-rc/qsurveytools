@@ -9,6 +9,8 @@ import six
 import xlsxwriter
 from xlsxwriter import utility
 
+import utils
+
 EXCEL_CELL_WIDTH = 72.0
 EXCEL_CELL_HEIGHT = 18.0
 
@@ -263,8 +265,13 @@ class CrossSingleTableSheet(SurveyExcelSheet):
 
         with_formula = kwargs.get('with_formula', True)
         # check first series (except total series.)
-        current_total = frame.iloc[0].copy().fillna(0)
-        skip_total = self.last_total.tolist() == current_total.tolist()
+        skip_total = False
+        current_total = None
+        if utils.is_nans(frame.iloc[0].copy()):
+            skip_total = True
+        else:
+            current_total = frame.iloc[0].copy().fillna(0)
+            skip_total = self.last_total.tolist() == current_total.tolist()
         if not skip_total:
             self.last_total = current_total
         table_start = 1
@@ -452,8 +459,13 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
             self.writeCommonHeader()
 
         # check first series (except total series.)
-        current_total = frame.iloc[0].copy().fillna(0)
-        skip_total = self.last_total.tolist() == current_total.tolist()
+        skip_total = False
+        current_total = None
+        if utils.is_nans(frame.iloc[0].copy()):
+            skip_total = True
+        else:
+            current_total = frame.iloc[0].copy().fillna(0)
+            skip_total = self.last_total.tolist() == current_total.tolist()
         if not skip_total:
             self.last_total = current_total
         # force update
