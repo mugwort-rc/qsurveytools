@@ -195,10 +195,21 @@ class SurveyExcelSheet(ExcelSheet):
         )
 
     def add_cross_chart(self, frame, formula_start, **kwargs):
+        # parameters
         with_chart = kwargs.get("with_chart", True)
+        # for drop blank
+        BLANK = kwargs.get("strings", {}).get("BLANK", "BLANK")
+        drop_x_blank = kwargs.get("chart", {}).get("drop_x_blank", False)
+        drop_y_blank = kwargs.get("chart", {}).get("drop_y_blank", False)
+
         Builder = kwargs.get("builder", CrossStackedChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
             chart_frame = frame.copy()
+            # drop blank
+            if drop_x_blank:
+                chart_frame = chart_frame.reindex(columns=[x for x in chart_frame.columns if x != BLANK])
+            if drop_y_blank:
+                chart_frame = chart_frame.reindex(index=[x for x in chart_frame.index if x != BLANK])
             # TODO: drop the user-specified index value
             builder = Builder(chart_frame)
             chart = builder.makeChart(self, self.current_row, formula_start+1)
@@ -390,11 +401,22 @@ class CrossSingleTableSheet(SurveyExcelSheet):
             self.current_row -= 1
 
     def add_cross_chart(self, frame, formula_start, **kwargs):
+        # parameters
         with_chart = kwargs.get("with_chart", True)
         skip_total = kwargs.get("skip_total", False)
+        # for drop blank
+        BLANK = kwargs.get("strings", {}).get("BLANK", "BLANK")
+        drop_x_blank = kwargs.get("chart", {}).get("drop_x_blank", False)
+        drop_y_blank = kwargs.get("chart", {}).get("drop_y_blank", False)
+
         Builder = kwargs.get("builder", CrossStackedChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
             chart_frame = frame.copy()
+            # drop blank
+            if drop_x_blank:
+                chart_frame = chart_frame.reindex(columns=[x for x in chart_frame.columns if x != BLANK])
+            if drop_y_blank:
+                chart_frame = chart_frame.reindex(index=[x for x in chart_frame.index if x != BLANK])
             # TODO: drop the user-specified index value
             builder = Builder(chart_frame)
             chart = builder.makeChart(self, self.current_row, formula_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)
@@ -554,12 +576,22 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
             self.current_row -= 1*2
 
     def add_cross_chart(self, frame, table_start, **kwargs):
-        # TODO: here
+        # parameters
         with_chart = kwargs.get("with_chart", True)
         skip_total = kwargs.get("skip_total", False)
+        # for drop blank
+        BLANK = kwargs.get("strings", {}).get("BLANK", "BLANK")
+        drop_x_blank = kwargs.get("chart", {}).get("drop_x_blank", False)
+        drop_y_blank = kwargs.get("chart", {}).get("drop_y_blank", False)
+
         Builder = kwargs.get("builder", CrossAzemichiChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
             chart_frame = frame.copy()
+            # drop blank
+            if drop_x_blank:
+                chart_frame = chart_frame.reindex(columns=[x for x in chart_frame.columns if x != BLANK])
+            if drop_y_blank:
+                chart_frame = chart_frame.reindex(index=[x for x in chart_frame.index if x != BLANK])
             # TODO: drop the user-specified index value
             builder = Builder(chart_frame)
             chart = builder.makeChart(self, self.current_row, table_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)

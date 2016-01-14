@@ -47,6 +47,10 @@ class MainWindow(QMainWindow):
         self.SOURCE_FILTER = self.tr('Excel (*.xlsx *.xlsm);;CSV (*.csv)')
         self.OUTPUT_FILTER = self.tr('Excel (*.xlsx)')
         self.lastDirectory = ''
+        self.STRINGS = {
+            'TOTAL': six.text_type(self.tr('TOTAL')),
+            'BLANK': six.text_type(self.tr('BLANK')),
+        }
 
         self.setWindowTitle(self.tr('surveytool'))
         self.ui.progressBar.setValue(0)
@@ -142,15 +146,11 @@ class MainWindow(QMainWindow):
         obj.updated.connect(self.ui.progressBar.setValue)
 
     def invoke_aggregate(self, obj, conf, frame, dropna, extend_refs):
-        strings = {
-            'TOTAL': six.text_type(self.tr('TOTAL')),
-            'BLANK': six.text_type(self.tr('BLANK')),
-        }
         QMetaObject.invokeMethod(obj, "aggregate",
                                  Q_ARG(config.Config, conf),
                                  Q_ARG(pandas.DataFrame, frame),
                                  Q_ARG(bool, dropna),
-                                 Q_ARG(dict, strings),
+                                 Q_ARG(dict, self.STRINGS),
                                  Q_ARG(bool, extend_refs))
 
     @pyqtSlot(QString)
@@ -222,7 +222,7 @@ class MainWindow(QMainWindow):
             "sa_to_pie": sa_to_pie,
         }
 
-        self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), options)
+        self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), options, strings=self.STRINGS)
         self.setProgressObject(self.simple_aggregation)
         self.simple_aggregation.finished.connect(self.simpleFinished)
 
@@ -246,12 +246,19 @@ class MainWindow(QMainWindow):
 
         cross_table_format = self.crossEnums[self.ui.comboBoxCrossFormat.currentIndex()]
         with_percent = self.ui.checkBoxWithPercent.isChecked()
+        #chart_drop_x_blank = self.ui.checkBoxChartDropXBlank.isChecked()
+        chart_drop_y_blank = self.ui.checkBoxChartDropYBlank.isChecked()
         options = {
             "cross_table_format": cross_table_format,
             "with_percent": with_percent,
+            # chart option
+            "chart": {
+                #"drop_x_blank": chart_drop_x_blank,
+                "drop_y_blank": chart_drop_y_blank,
+            },
         }
 
-        self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), options)
+        self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), options, strings=self.STRINGS)
         self.setProgressObject(self.cross_aggregation)
         self.cross_aggregation.finished.connect(self.crossFinished)
         self.cross_aggregation.moveToThread(self.cross_thread)
@@ -474,11 +481,12 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
 
 
 class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
-    def __init__(self, conf, filepath, options, parent=None):
+    def __init__(self, conf, filepath, options, strings, parent=None):
         super(SimpleAggregationObject, self).__init__(parent)
         self.config = conf
         self.filepath = filepath
         self.options = options
+        self.strings = strings
         self.series = {}
 
     def addSeries(self, name, series):
@@ -509,11 +517,12 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
 
 
 class CrossAggregationObject(qaggregation.CrossAggregationObject):
-    def __init__(self, conf, filepath, options, parent=None):
+    def __init__(self, conf, filepath, options, strings, parent=None):
         super(CrossAggregationObject, self).__init__(parent)
         self.config = conf
         self.filepath = filepath
         self.options = options
+        self.strings = strings
         self.frames = {}
 
     def addDataFrame(self, key, target, frame):
@@ -561,16 +570,18 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             for key in self.config.cross.keys:
                 if key.id not in self.frames[target.id]:
                     continue
+                paste_option = {
+                    "chart": self.options.get("chart", {}),
+                }
                 if cross_table_format in [CrossFormat.SingleTable, CrossFormat.Azemichi, CrossFormat.AzemichiAdvanced]:
-                    option = {}
                     if cross_table_format == CrossFormat.AzemichiAdvanced:
-                        option["skip_header"] = False
-                        option["skip_same_all"] = False
-                    sheet.paste(self.frames[target.id][key.id], name=(key.name or key.id), **option)
+                        paste_option["skip_header"] = False
+                        paste_option["skip_same_all"] = False
+                    sheet.paste(self.frames[target.id][key.id], name=(key.name or key.id), strings=self.strings, **paste_option)
                 else:
                     # Default
                     sheet.setTitle(self.config.columns.get(key.id, {}).get('title', ''))
-                    sheet.paste(self.frames[target.id][key.id])
+                    sheet.paste(self.frames[target.id][key.id], strings=self.strings, **paste_option)
                     sheet.addPadding(2)
         try:
             book.close()

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>447</width>
-    <height>280</height>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -221,6 +221,13 @@
             </item>
             <item row="0" column="1">
              <widget class="QComboBox" name="comboBoxCrossFormat"/>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBoxChartDropYBlank">
+              <property name="text">
+               <string>[Chart] Drop Y Blank</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
