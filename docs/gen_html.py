@@ -32,11 +32,19 @@ def main(args):
     tpl = env.get_template('template.html')
     import markdown
     from markdown.extensions.headerid import HeaderIdExtension
-    md = markdown.Markdown(extensions=['markdown.extensions.attr_list', HeaderIdExtension(forceid=False), 'markdown.extensions.toc'])
+    md = markdown.Markdown(
+        extensions=[
+            'markdown.extensions.attr_list',
+            HeaderIdExtension(forceid=False),
+            'markdown.extensions.toc',
+            "markdown.extensions.meta",
+        ]
+    )
     for path, file in locate('*.md', args.input):
         data = open(os.path.join(path, file)).read().decode('utf-8')
         html = tpl.render({
             'html': md.convert(data),
+            "meta": md.Meta if hasattr(md, "Meta") else {},
         })
         distpath = args.output + path[len(args.input):]
         open(os.path.join(distpath, file[:-2]+'html'), 'w').write(html.encode('utf-8'))
