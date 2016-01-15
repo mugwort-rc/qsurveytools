@@ -419,12 +419,14 @@ class MainWindow(QMainWindow):
             ret = self.simple_aggregation.save()
         self.ui.pushButtonSimple.setEnabled(True)
         self.ui.pushButtonCross.setEnabled(True)
-        if ret:
-            QMessageBox.information(self, self.tr('Finished'), self.tr('Finished.'))
-        else:
-            QMessageBox.information(self, self.tr('Error'), self.tr('Write error.'))
+        if not ret:
+            QMessageBox.warning(self, self.tr('Error'), self.tr('Write error.'))
+            return
         if self.validation_error:
             self.showMessageTab()
+            QMessageBox.warning(self, self.tr('Finished'), self.tr('Finished, but input data have errors.'))
+            return
+        QMessageBox.information(self, self.tr('Finished'), self.tr('Finished.'))
 
     @pyqtSlot()
     def crossFinished(self):
@@ -433,12 +435,14 @@ class MainWindow(QMainWindow):
             ret = self.cross_aggregation.save()
         self.ui.pushButtonSimple.setEnabled(True)
         self.ui.pushButtonCross.setEnabled(True)
-        if ret:
-            QMessageBox.information(self, self.tr('Finished'), self.tr('Finished.'))
-        else:
-            QMessageBox.information(self, self.tr('Error'), self.tr('Write error.'))
+        if not ret:
+            QMessageBox.warning(self, self.tr('Error'), self.tr('Write error.'))
+            return
         if self.validation_error:
             self.showMessageTab()
+            QMessageBox.warning(self, self.tr('Finished'), self.tr('Finished, but input data have errors.'))
+            return
+        QMessageBox.information(self, self.tr('Finished'), self.tr('Finished.'))
 
     @pyqtSlot(bool)
     def validationFinished(self, error):

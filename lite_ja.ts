@@ -3,7 +3,7 @@
 <context>
     <name>ConfigValidationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="478"/>
+        <location filename="src/lite/mainwindow.py" line="482"/>
         <source>column &quot;%1&quot; has duplicate choices.</source>
         <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
     </message>
@@ -81,12 +81,12 @@
         <translation>検証中…</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="438"/>
+        <location filename="src/lite/mainwindow.py" line="446"/>
         <source>Finished</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="438"/>
+        <location filename="src/lite/mainwindow.py" line="446"/>
         <source>Finished.</source>
         <translation>完了しました。</translation>
     </message>
@@ -235,6 +235,11 @@
         <source>[Chart] Drop Y Blank</source>
         <translation>【グラフ】Y軸に無回答を含めない</translation>
     </message>
+    <message>
+        <location filename="src/lite/mainwindow.py" line="444"/>
+        <source>Finished, but input data have errors.</source>
+        <translation>完了しましたが、入力データにエラーがあります。</translation>
+    </message>
 </context>
 <context>
     <name>QValidationObject</name>
@@ -272,7 +277,7 @@
 <context>
     <name>SimpleAggregationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="503"/>
+        <location filename="src/lite/mainwindow.py" line="507"/>
         <source>SimpleAggregation</source>
         <translation>単純集計</translation>
     </message>
