@@ -215,6 +215,7 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
     warning = pyqtSignal(QString)
 
     DUPLICATED = 1
+    RESERVED = 2
 
     def __init__(self, setting, cross, source, parent):
         """
@@ -239,12 +240,20 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
         self.errors.append((self.DUPLICATED, column))
         self.warning.emit(self.tr('column "%1" has duplicate choices.').arg(column))
 
+    def reservedChoice(self, column):
+        """
+        :type column: str
+        :param column: name of error column
+        """
+        self.errors.append((self.RESERVED, column))
+        self.messages_.append(self.tr('column "%1" has reserved name.').arg(column))
+
     def selectError(self, index):
         # check range
         if index < 0 or len(self.errors) <= index:
             return
         reason, value = self.errors[index]
-        if reason == self.DUPLICATED:
+        if reason in [self.DUPLICATED, self.RESERVED]:
             used = self.setting_sheet.UsedRange()
             for i, v in enumerate(used[0]):
                 if v != value:

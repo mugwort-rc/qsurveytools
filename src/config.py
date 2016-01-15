@@ -320,8 +320,11 @@ class ConfigCallback(object):
     def duplicatedChoice(self, column):
         raise NotImplementedError
 
+    def reservedChoice(self, column):
+        raise NotImplementedError
 
-def makeConfigByDataFrame(frame, cross=None, cb=None):
+
+def makeConfigByDataFrame(frame, cross=None, cb=None, reserved=[]):
     if cb is not None:
         assert isinstance(cb, ConfigCallback)
     # columns
@@ -372,6 +375,9 @@ def makeConfigByDataFrame(frame, cross=None, cb=None):
             'choice': map(six.text_type, choices[rawcol].dropna().values.tolist()),
         })
         if cb is not None:
+            for choice in choices[rawcol].dropna():
+                if choice in reserved:
+                    cb.reservedChoice(rawcol)
             if len(column_config["choice"]) != len(choices[rawcol].dropna()):
                 cb.duplicatedChoice(rawcol)
         config.columns[strcol] = column_config

@@ -381,8 +381,13 @@ class MainWindow(QMainWindow):
             # drop ID NaN
             sourceFrame = sourceFrame[sourceFrame[qsource.Source.setting_id()].notnull()]
 
+            TOTAL = self.STRINGS.get("TOTAL", "TOTAL")
+            BLANK = self.STRINGS.get("BLANK", "BLANK")
+            ERROR = self.STRINGS.get("ERROR", "ERROR")
+            reserved_names = [TOTAL, BLANK, ERROR]
+
             cb = ConfigValidationObject(self)
-            conf = config.makeConfigByDataFrame(settingFrame, crossFrame, cb)
+            conf = config.makeConfigByDataFrame(settingFrame, crossFrame, cb, reserved=reserved_names)
             if cb.messages():
                 self.addMessages(cb.messages())
 
@@ -405,7 +410,7 @@ class MainWindow(QMainWindow):
             self.validator.finished.connect(self.validationFinished)
             self.validator.validate(sourceFrame)  # no threading
             if aggregate_error:
-                sourceFrame = self.validator.errorToError(sourceFrame, self.STRINGS.get("ERROR", "ERROR"))
+                sourceFrame = self.validator.errorToError(sourceFrame, ERROR)
             else:
                 sourceFrame = self.validator.errorToNaN(sourceFrame)
 
@@ -504,6 +509,13 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
         :param column: name of error column
         """
         self.messages_.append(self.tr('column "%1" has duplicate choices.').arg(column))
+
+    def reservedChoice(self, column):
+        """
+        :type column: str
+        :param column: name of error column
+        """
+        self.messages_.append(self.tr('column "%1" has reserved name.').arg(column))
 
     def messages(self):
         return self.messages_

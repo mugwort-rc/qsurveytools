@@ -3,9 +3,14 @@
 <context>
     <name>ConfigValidationObject</name>
     <message>
-        <location filename="src/checker/mainwindow.py" line="240"/>
+        <location filename="src/checker/mainwindow.py" line="241"/>
         <source>column &quot;%1&quot; has duplicate choices.</source>
         <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
+    </message>
+    <message>
+        <location filename="src/checker/mainwindow.py" line="249"/>
+        <source>column &quot;%1&quot; has reserved name.</source>
+        <translation>&quot;%1&quot; 列に予約された選択肢があります。</translation>
     </message>
 </context>
 <context>
@@ -64,32 +69,32 @@
 <context>
     <name>QValidationObject</name>
     <message>
-        <location filename="src/qvalidator.py" line="40"/>
+        <location filename="src/qvalidator.py" line="41"/>
         <source>Warning: Column &quot;%1&quot; is not found.</source>
         <translation>警告： &quot;%1&quot;列が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="47"/>
+        <location filename="src/qvalidator.py" line="48"/>
         <source>Warning: Setting &quot;%1&quot; is not found.</source>
         <translation>警告： 設定 &quot;%1&quot; が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="54"/>
+        <location filename="src/qvalidator.py" line="55"/>
         <source>Warning: Setting &quot;%1&quot; is Unknown type.</source>
         <translation>警告： 設定 &quot;%1&quot; は未定義です。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="62"/>
+        <location filename="src/qvalidator.py" line="63"/>
         <source>Warning: Undefined value found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 未定義の値 &apos;%3&apos; が見つかりました。 位置： &quot;%1&quot; - ID:%2</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="72"/>
+        <location filename="src/qvalidator.py" line="73"/>
         <source>Warning: Multiple exception error found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 複数回答例外エラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="82"/>
+        <location filename="src/qvalidator.py" line="83"/>
         <source>Warning: It exceeds the limit value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 制限を超えた値が見つかりました。位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
     </message>
