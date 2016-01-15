@@ -390,6 +390,8 @@ class MainWindow(QMainWindow):
             conf = config.makeConfigByDataFrame(settingFrame, crossFrame, cb, reserved=reserved_names)
             if cb.messages():
                 self.addMessages(cb.messages())
+                self.showMessageTab()
+                QMessageBox.warning(self, self.tr("Warning"), self.tr("There is a problem with the configuration."))
 
             no_error = True
             # check filter validation

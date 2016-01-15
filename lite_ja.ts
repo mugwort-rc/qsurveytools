@@ -3,12 +3,12 @@
 <context>
     <name>ConfigValidationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="512"/>
+        <location filename="src/lite/mainwindow.py" line="514"/>
         <source>column &quot;%1&quot; has duplicate choices.</source>
         <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="519"/>
+        <location filename="src/lite/mainwindow.py" line="521"/>
         <source>column &quot;%1&quot; has reserved name.</source>
         <translation>&quot;%1&quot; 列に予約された選択肢があります。</translation>
     </message>
@@ -46,7 +46,7 @@
         <translation>エラー：設定もしくはソースの読み込みに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="422"/>
+        <location filename="src/lite/mainwindow.py" line="424"/>
         <source>Error: output file path is not directory.</source>
         <translation>エラー：出力パスがフォルダではありません。</translation>
     </message>
@@ -81,27 +81,27 @@
         <translation>エラー：入力 &quot;%1&quot; の読み込みに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="408"/>
+        <location filename="src/lite/mainwindow.py" line="410"/>
         <source>validating...</source>
         <translation>検証中…</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="476"/>
+        <location filename="src/lite/mainwindow.py" line="478"/>
         <source>Finished</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="476"/>
+        <location filename="src/lite/mainwindow.py" line="478"/>
         <source>Finished.</source>
         <translation>完了しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="470"/>
+        <location filename="src/lite/mainwindow.py" line="472"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="470"/>
+        <location filename="src/lite/mainwindow.py" line="472"/>
         <source>Write error.</source>
         <translation>書き込みに失敗しました。</translation>
     </message>
@@ -166,7 +166,7 @@
         <translation>エラー：シート &quot;%1&quot; が正しい形式ではありません。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="399"/>
+        <location filename="src/lite/mainwindow.py" line="401"/>
         <source>Error: filter key &quot;%1&quot; is not defined.</source>
         <translation>エラー：フィルター要素 &quot;%1&quot; は定義されていません。</translation>
     </message>
@@ -241,7 +241,7 @@
         <translation>【グラフ】Y軸に無回答を含めない</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="474"/>
+        <location filename="src/lite/mainwindow.py" line="476"/>
         <source>Finished, but input data have errors.</source>
         <translation>完了。入力データにエラーがあります。</translation>
     </message>
@@ -254,6 +254,16 @@
         <location filename="src/lite/mainwindow.py" line="54"/>
         <source>ERROR</source>
         <translation>エラー</translation>
+    </message>
+    <message>
+        <location filename="src/lite/mainwindow.py" line="395"/>
+        <source>Warning</source>
+        <translation>警告</translation>
+    </message>
+    <message>
+        <location filename="src/lite/mainwindow.py" line="395"/>
+        <source>There is a problem with the configuration.</source>
+        <translation>設定に問題があります。</translation>
     </message>
 </context>
 <context>
@@ -292,7 +302,7 @@
 <context>
     <name>SimpleAggregationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="544"/>
+        <location filename="src/lite/mainwindow.py" line="546"/>
         <source>SimpleAggregation</source>
         <translation>単純集計</translation>
     </message>
