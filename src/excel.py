@@ -156,7 +156,7 @@ class SurveyExcelSheet(ExcelSheet):
             self.write(0, formula_start, "%", self.table_format)
         # generate left-most total cells
         starts = [self.cell(i+1, table_start+1, row_abs=True) for i in range(len(frame.index))]
-        for x, column in enumerate(frame):
+        for x, column in enumerate(frame.columns):
             # write table column
             self.write(0, table_start+x+1, column, self.table_format)
             # write table column for formula (skip TOTAL)
@@ -165,16 +165,16 @@ class SurveyExcelSheet(ExcelSheet):
                 #      row: 0 (header row)
                 #   column: formula_start + x + 1 (column header) - 1 (skip total)
                 self.write(0, formula_start+x, column, self.table_format)
-            for y, value in enumerate(frame[column]):
+            for y, index in enumerate(frame.index):
                 # write column header
                 if x == 0:
                     # write table index
-                    self.write(y+1, table_start, frame.index[y], self.table_format)
+                    self.write(y+1, table_start, index, self.table_format)
                     # write table index for formula
                     if with_formula:
-                        self.write(y+1, formula_start, frame.index[y], self.table_format)
+                        self.write(y+1, formula_start, index, self.table_format)
                 # write to value table
-                self.write(y+1, x+1, value, self.table_format)
+                self.write(y+1, x+1, frame.values[y][x], self.table_format)
                 # write to formula table
                 if with_formula and x != 0:
                     # write to
@@ -312,14 +312,14 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                 self.merge_format)
         # generate left-most total cells
         starts = [self.cell(i+(0 if skip_total else 1), table_start+1, row_abs=True) for i in range(len(frame.index))]
-        for x, column in enumerate(frame):
+        for x, column in enumerate(frame.columns):
             #    [0]      | [1]
             # 0:          | common headers
             #    ---------|--------------
             # 1: [total]  | data...
             # 2: [index1] | data...
             index_start = 1  # common header skip
-            for y, value in enumerate(frame[column]):
+            for y, index in enumerate(frame.index):
                 # check skip_total
                 if skip_total and y == 0:
                     assert index_start == 1
@@ -341,7 +341,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                             y+index_start, table_start-1,
                             0, 1,
                             # value
-                            frame.index[y],
+                            index,
                             # cell format
                             self.merge_format)
                         # write table index for formula
@@ -351,7 +351,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                                 y+index_start, formula_start-1,
                                 0, 1,
                                 # value
-                                frame.index[y],
+                                index,
                                 # cell format
                                 self.merge_format)
                     # [b]: for other
@@ -361,7 +361,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                             # row, col
                             y+index_start, table_start,
                             # value
-                            frame.index[y],
+                            index,
                             # cell format
                             self.table_format)
                         # write table index for formula
@@ -370,7 +370,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                                 # row, col
                                 y+index_start, formula_start,
                                 # value
-                                frame.index[y],
+                                index,
                                 # cell format
                                 self.table_format)
                 # write to value table
@@ -378,7 +378,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                     # row, col
                     y+index_start, table_start+x+1,
                     # value
-                    value,
+                    frame.values[y][x],
                     # cell format
                     self.table_format)
                 # write to formula table
@@ -507,7 +507,7 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
             self.merge_format)
         # generate left-most total cells
         starts = [self.cell(i*2+(-1 if skip_total else 1), table_start+1, row_abs=True) for i in range(len(frame.index))]
-        for x, column in enumerate(frame):
+        for x, column in enumerate(frame.columns):
             #    [0]          | [1]
             # 0:              | common headers
             #    -------------|--------------
@@ -516,7 +516,7 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
             # 3: [index1]     | data...
             # 4: [data/total] | %
             index_start = 1  # common header skip
-            for y, value in enumerate(frame[column]):
+            for y, index in enumerate(frame.index):
                 # check skip_total
                 if skip_total and y == 0:
                     assert index_start == 1
@@ -539,7 +539,7 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
                             y*2+index_start, table_start-1,
                             1, 1,
                             # value
-                            frame.index[y],
+                            index,
                             # cell format
                             self.merge_format)
                     # [b]: for other
@@ -550,7 +550,7 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
                             y*2+index_start, table_start,
                             1, 0,
                             # value
-                            frame.index[y],
+                            index,
                             # cell format
                             self.merge_format)
                 # write to value table
@@ -558,7 +558,7 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
                     # row, col
                     y*2+index_start, table_start+x+1,
                     # value
-                    value,
+                    frame.values[y][x],
                     # cell format
                     self.table_format)
                 self.write(
