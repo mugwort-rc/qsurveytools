@@ -58,31 +58,26 @@ class AggregationObject(object):
         return frame
 
     def reindex(self, data, column, axis, prefix=[], suffix=[], named_index=True):
+        # create index set
         items = []
-        itemMap = {}
+        index_set = set()
         if column in self.config.columns:
             items = self.config.columns[column].choice
-            if named_index:
-                itemMap = {i:x for i,x in enumerate(items, 1)}
-            else:
-                itemMap = {i:i for i in range(1, len(items)+1)}
+            index_set = set(list(range(1, len(items)+1)))
+        # detect error index
         index = getattr(data, axis)
-        newindex = []
         error = []
         for idx in index:
-            newindex.append(itemMap.get(idx, idx))
-            if idx not in itemMap and idx not in prefix and idx not in suffix:
+            if idx not in index_set and idx not in prefix and idx not in suffix:
                 error.append(idx)
         data = data.copy()
-        setattr(data, axis, newindex)
-        if named_index:
-            base_index = items
-        else:
-            base_index = list(range(1, len(items)+1))
         kwargs = {
-            axis: prefix+base_index+error+suffix,
+            axis: prefix+list(range(1, len(items)+1))+error+suffix,
         }
-        return data.reindex(**kwargs)
+        data = data.reindex(**kwargs)
+        if named_index:
+            setattr(data, axis, prefix+items+error+suffix)
+        return data
 
 class SimpleAggregationObject(AggregationObject):
     def simple_aggregation(self, frame):
