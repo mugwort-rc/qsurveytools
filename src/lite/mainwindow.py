@@ -257,13 +257,17 @@ class MainWindow(QMainWindow):
 
         cross_table_format = self.crossEnums[self.ui.comboBoxCrossFormat.currentIndex()]
         with_percent = self.ui.checkBoxWithPercent.isChecked()
-        chart_drop_y_blank = self.ui.checkBoxChartDropYBlank.isChecked()
+        drops = []
+        if self.ui.checkBoxChartDropYBlank.isChecked():
+            drops.append(self.STRINGS.get("BLANK", "BLANK"))
+            if aggregate_error:
+                drops.append(self.STRINGS.get("ERROR", "ERROR"))
         output_options = {
             "cross_table_format": cross_table_format,
             "with_percent": with_percent,
             # chart option
             "chart": {
-                "drop_y_blank": chart_drop_y_blank,
+                "drops": drops,
             },
         }
 

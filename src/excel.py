@@ -197,21 +197,11 @@ class SurveyExcelSheet(ExcelSheet):
     def add_cross_chart(self, frame, formula_start, **kwargs):
         # parameters
         with_chart = kwargs.get("with_chart", True)
-        # for drop blank
-        BLANK = kwargs.get("strings", {}).get("BLANK", "BLANK")
-        drop_x_blank = kwargs.get("chart", {}).get("drop_x_blank", False)
-        drop_y_blank = kwargs.get("chart", {}).get("drop_y_blank", False)
+        drops = kwargs.get("chart", {}).get("drops", [])
 
         Builder = kwargs.get("builder", CrossStackedChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
-            chart_frame = frame.copy()
-            # drop blank
-            if drop_x_blank:
-                chart_frame = chart_frame.reindex(columns=[x for x in chart_frame.columns if x != BLANK])
-            if drop_y_blank:
-                chart_frame = chart_frame.reindex(index=[x for x in chart_frame.index if x != BLANK])
-            # TODO: drop the user-specified index value
-            builder = Builder(chart_frame)
+            builder = Builder(frame.copy(), drops=drops)
             chart = builder.makeChart(self, self.current_row, formula_start+1)
             if self.chart_row is None:
                 self.chart_row = self.current_row
@@ -404,21 +394,11 @@ class CrossSingleTableSheet(SurveyExcelSheet):
         # parameters
         with_chart = kwargs.get("with_chart", True)
         skip_total = kwargs.get("skip_total", False)
-        # for drop blank
-        BLANK = kwargs.get("strings", {}).get("BLANK", "BLANK")
-        drop_x_blank = kwargs.get("chart", {}).get("drop_x_blank", False)
-        drop_y_blank = kwargs.get("chart", {}).get("drop_y_blank", False)
+        drops = kwargs.get("chart", {}).get("drops", [])
 
         Builder = kwargs.get("builder", CrossStackedChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
-            chart_frame = frame.copy()
-            # drop blank
-            if drop_x_blank:
-                chart_frame = chart_frame.reindex(columns=[x for x in chart_frame.columns if x != BLANK])
-            if drop_y_blank:
-                chart_frame = chart_frame.reindex(index=[x for x in chart_frame.index if x != BLANK])
-            # TODO: drop the user-specified index value
-            builder = Builder(chart_frame)
+            builder = Builder(frame.copy(), drops=drops)
             chart = builder.makeChart(self, self.current_row, formula_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)
             if self.chart_row is None:
                 self.chart_row = self.current_row
@@ -579,21 +559,11 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
         # parameters
         with_chart = kwargs.get("with_chart", True)
         skip_total = kwargs.get("skip_total", False)
-        # for drop blank
-        BLANK = kwargs.get("strings", {}).get("BLANK", "BLANK")
-        drop_x_blank = kwargs.get("chart", {}).get("drop_x_blank", False)
-        drop_y_blank = kwargs.get("chart", {}).get("drop_y_blank", False)
+        drops = kwargs.get("chart", {}).get("drops", [])
 
         Builder = kwargs.get("builder", CrossAzemichiChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
-            chart_frame = frame.copy()
-            # drop blank
-            if drop_x_blank:
-                chart_frame = chart_frame.reindex(columns=[x for x in chart_frame.columns if x != BLANK])
-            if drop_y_blank:
-                chart_frame = chart_frame.reindex(index=[x for x in chart_frame.index if x != BLANK])
-            # TODO: drop the user-specified index value
-            builder = Builder(chart_frame)
+            builder = Builder(frame.copy(), drops=drops)
             chart = builder.makeChart(self, self.current_row, table_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)
             if self.chart_row is None:
                 self.chart_row = self.current_row
@@ -647,6 +617,30 @@ class ChartBuilder(object):
         :return: chart height size (px)
         """
         raise NotImplementedError
+
+    def createChartRange(self, sheetname, column, rows):
+        assert(len(rows) > 0)
+        kwargs = {
+            "row_abs": True,
+            "col_abs": True,
+        }
+        to_cell = lambda y: utility.xl_rowcol_to_cell(y, column, **kwargs)
+        def to_range(start, end):
+            if start == end:
+                return to_cell(start)
+            else:
+                return "{}:{}".format(to_cell(start), to_cell(end))
+        start = rows[0]
+        prev = rows[0]
+        cells = []
+        for row in rows[1:]:
+            if prev + 1 != row:
+                cells.append(to_range(start, prev))
+                start = row
+            prev = row
+        cells.append(to_range(start, row))
+        return "=({})".format(",".join(["'{}'!{}".format(sheetname, x) for x in cells]))
+
 
 class SimpleBarChartBuilder(ChartBuilder):
     """
@@ -795,9 +789,10 @@ class CrossStackedChartBuilder(ChartBuilder):
     LEGEND_TEXT_PT = 12
     LEGEND_PT = 25
 
-    def __init__(self, frame):
+    def __init__(self, frame, drops=[]):
         super(CrossStackedChartBuilder, self).__init__()
         self.frame = frame
+        self.drops = drops
 
     def _createChart(self, sheet):
         return sheet.book.add_chart({
@@ -837,15 +832,10 @@ class CrossStackedChartBuilder(ChartBuilder):
         xaxis_count = self.xaxisCount()
         if total_skipped:
             xaxis_count -= 1
-        categories = [
-            sheet.name,
-            row+1+index_start,  # skip "(%)"
-            COLUMN_C,  # target to (C)
-            row+1+xaxis_count,  # skip "(%)"
-            COLUMN_C,
-        ]
+        categories = self.createChartRange(sheet.name, COLUMN_C, [row+1+index_start+i for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops])
         for i in range(self.yaxisCount()):
             COLUMN_RC = COLUMN_R1 + i  # R-current
+            values_range = [row+1+index_start+x for x in range(xaxis_count) if self.frame.index[x+1] not in self.drops]
             chart.add_series({
                 "name": [
                     sheet.name,
@@ -853,13 +843,7 @@ class CrossStackedChartBuilder(ChartBuilder):
                     COLUMN_R1+i
                     ],
                 "categories": categories,
-                "values": [
-                    sheet.name,
-                    row+1+index_start,  # skip "(%)"
-                    COLUMN_RC,  # target to (RC)
-                    row+1+xaxis_count,  # skip "(%)"
-                    COLUMN_RC,
-                ],
+                "values": self.createChartRange(sheet.name, COLUMN_RC, values_range),
                 "data_labels": {
                     "value": True,
                     "num_format": '0.0;-0.0;"";@',
@@ -907,12 +891,14 @@ class CrossStackedChartBuilder(ChartBuilder):
             "height": height,
         })
         # plot area size
+        chart_xaxis_count = self.xaxisCount()
+        chart_xaxis_count -= len([x for x in self.frame.index if x in self.drops])
         longest_category = ""
         for index in self.frame.index:
             index = six.text_type(index)
             longest_category = index if len(index) > len(longest_category) else longest_category
         index_width = min(self.FONT_PT * len(longest_category), self.WIDTH / 2)
-        index_height = self.HEIGHT_PER_SERIES * self.xaxisCount()
+        index_height = self.HEIGHT_PER_SERIES * chart_xaxis_count
         index_margin = float(index_width) / width
         plot_margin = self.HEIGHT_MERGIN / 2.0
         x_margin = plot_margin / width
@@ -967,9 +953,11 @@ class CrossStackedChartBuilder(ChartBuilder):
         :rtype: int
         :return: chart height size (px)
         """
+        xaxis_count = self.xaxisCount()
+        xaxis_count -= len([x for x in self.frame.index if x in self.drops])
         return (
             self.HEIGHT_MERGIN +
-            self.HEIGHT_PER_SERIES * self.xaxisCount() +
+            self.HEIGHT_PER_SERIES * xaxis_count +
             self.LEGEND_PT * self.yaxisCount()
             )
 
@@ -994,9 +982,10 @@ class CrossAzemichiChartBuilder(ChartBuilder):
     LEGEND_TEXT_PT = 12
     LEGEND_PT = 25
 
-    def __init__(self, frame):
+    def __init__(self, frame, drops=[]):
         super(CrossAzemichiChartBuilder, self).__init__()
         self.frame = frame
+        self.drops = drops
 
     def _createChart(self, sheet):
         return sheet.book.add_chart({
@@ -1035,7 +1024,8 @@ class CrossAzemichiChartBuilder(ChartBuilder):
         # column-base
         xaxis_count = self.xaxisCount()
         # row + 2 + index_start (skip common-header)
-        categories = "=({})".format(",".join(["'{}'!{}".format(sheet.name, utility.xl_rowcol_to_cell(row+1+index_start+i*2, COLUMN_I)) for i in range(xaxis_count)]))
+        categories = self.createChartRange(sheet.name, COLUMN_I, [row+1+index_start+i*2 for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops])
+        values_range = [row+2+index_start+i*2 for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops]
         for i in range(self.yaxisCount()):
             current_col = COLUMN_C1 + i + 1  # skip TOTAL
             chart.add_series({
@@ -1045,7 +1035,7 @@ class CrossAzemichiChartBuilder(ChartBuilder):
                     current_col
                     ],
                 "categories": categories,
-                "values": "=({})".format(",".join(["'{}'!{}".format(sheet.name, utility.xl_rowcol_to_cell(row+2+index_start+i*2, current_col)) for i in range(xaxis_count)])),
+                "values": self.createChartRange(sheet.name, current_col, values_range),
                 "data_labels": {
                     "value": True,
                     "num_format": '0.0;-0.0;"";@',
