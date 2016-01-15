@@ -188,6 +188,13 @@
               </property>
              </widget>
             </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="checkBoxAggregateError">
+              <property name="text">
+               <string>Aggregate Error</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="tabSimple">

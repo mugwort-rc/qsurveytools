@@ -48,8 +48,9 @@ class MainWindow(QMainWindow):
         self.OUTPUT_FILTER = self.tr('Excel (*.xlsx)')
         self.lastDirectory = ''
         self.STRINGS = {
-            'TOTAL': six.text_type(self.tr('TOTAL')),
-            'BLANK': six.text_type(self.tr('BLANK')),
+            "TOTAL": six.text_type(self.tr("TOTAL")),
+            "BLANK": six.text_type(self.tr("BLANK")),
+            "ERROR": six.text_type(self.tr("ERROR")),
         }
 
         self.setWindowTitle(self.tr('surveytool'))
@@ -145,13 +146,13 @@ class MainWindow(QMainWindow):
         obj.initialized.connect(self.progressInit)
         obj.updated.connect(self.ui.progressBar.setValue)
 
-    def invoke_aggregate(self, obj, conf, frame, dropna, extend_refs):
+    def invoke_aggregate(self, obj, conf, frame, dropna, options):
         QMetaObject.invokeMethod(obj, "aggregate",
                                  Q_ARG(config.Config, conf),
                                  Q_ARG(pandas.DataFrame, frame),
                                  Q_ARG(bool, dropna),
                                  Q_ARG(dict, self.STRINGS),
-                                 Q_ARG(bool, extend_refs))
+                                 Q_ARG(dict, options))
 
     @pyqtSlot(QString)
     def addMessage(self, text):
@@ -208,8 +209,13 @@ class MainWindow(QMainWindow):
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
         extend_refs = self.ui.checkBoxExtendFilter.isChecked()
+        aggregate_error = self.ui.checkBoxAggregateError.isChecked()
+        aggregate_options = {
+            "extend_refs": extend_refs,
+            "aggregate_error": aggregate_error,
+        }
         try:
-            conf, frame, filepath = self.loadSources()
+            conf, frame, filepath = self.loadSources(aggregate_error=aggregate_error)
         except LoadException:
             self.addMessage(self.tr('Error: config load failed.'))
             self.showMessageTab()
@@ -217,19 +223,19 @@ class MainWindow(QMainWindow):
 
         with_percent = self.ui.checkBoxWithPercent.isChecked()
         sa_to_pie = self.ui.checkBoxSAToPie.isChecked()
-        options = {
+        output_options = {
             "with_percent": with_percent,
             "sa_to_pie": sa_to_pie,
         }
 
-        self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), options, strings=self.STRINGS)
+        self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), output_options, strings=self.STRINGS)
         self.setProgressObject(self.simple_aggregation)
         self.simple_aggregation.finished.connect(self.simpleFinished)
 
         self.simple_aggregation.moveToThread(self.simple_thread)
         self.simple_thread.start()
         #self.simple_aggregation.aggregate()
-        self.invoke_aggregate(self.simple_aggregation, conf, frame, dropna, extend_refs)
+        self.invoke_aggregate(self.simple_aggregation, conf, frame, dropna, aggregate_options)
 
     @pyqtSlot()
     def on_pushButtonCross_clicked(self):
@@ -237,8 +243,13 @@ class MainWindow(QMainWindow):
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
         extend_refs = self.ui.checkBoxExtendFilter.isChecked()
+        aggregate_error = self.ui.checkBoxAggregateError.isChecked()
+        aggregate_options = {
+            "extend_refs": extend_refs,
+            "aggregate_error": aggregate_error,
+        }
         try:
-            conf, frame, filepath = self.loadSources()
+            conf, frame, filepath = self.loadSources(aggregate_error=aggregate_error)
         except LoadException:
             self.addMessage(self.tr('Error: config load failed.'))
             self.showMessageTab()
@@ -246,25 +257,23 @@ class MainWindow(QMainWindow):
 
         cross_table_format = self.crossEnums[self.ui.comboBoxCrossFormat.currentIndex()]
         with_percent = self.ui.checkBoxWithPercent.isChecked()
-        #chart_drop_x_blank = self.ui.checkBoxChartDropXBlank.isChecked()
         chart_drop_y_blank = self.ui.checkBoxChartDropYBlank.isChecked()
-        options = {
+        output_options = {
             "cross_table_format": cross_table_format,
             "with_percent": with_percent,
             # chart option
             "chart": {
-                #"drop_x_blank": chart_drop_x_blank,
                 "drop_y_blank": chart_drop_y_blank,
             },
         }
 
-        self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), options, strings=self.STRINGS)
+        self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), output_options, strings=self.STRINGS)
         self.setProgressObject(self.cross_aggregation)
         self.cross_aggregation.finished.connect(self.crossFinished)
         self.cross_aggregation.moveToThread(self.cross_thread)
         self.cross_thread.start()
         #self.cross_aggregation.aggregate()
-        self.invoke_aggregate(self.cross_aggregation, conf, frame, dropna, extend_refs)
+        self.invoke_aggregate(self.cross_aggregation, conf, frame, dropna, aggregate_options)
 
     @pyqtSlot()
     def on_actionExpand_triggered(self):
@@ -297,7 +306,15 @@ class MainWindow(QMainWindow):
         dest.to_excel(six.text_type(QDir(filepath).filePath(self.tr('expand.xlsx'))))
         QMessageBox.information(self, self.tr('Finished'), self.tr('Finished.'))
 
-    def loadSources(self):
+    def loadSources(self, **kwargs):
+        """
+        :rtype: config.Config, pandas.DataFrame, str
+        :kwargs:
+          - :type aggregate_error: bool
+        """
+        # parameters
+        aggregate_error = kwargs.get("aggregate_error", False)
+
         self.ui.progressBarGeneral.setValue(0)
         self.ui.progressBar.setValue(0)
         self.clearMessage()
@@ -383,7 +400,10 @@ class MainWindow(QMainWindow):
             self.setProgressObject(self.validator)
             self.validator.finished.connect(self.validationFinished)
             self.validator.validate(sourceFrame)  # no threading
-            sourceFrame = self.validator.errorToNaN(sourceFrame)
+            if aggregate_error:
+                sourceFrame = self.validator.errorToError(sourceFrame, self.STRINGS.get("ERROR", "ERROR"))
+            else:
+                sourceFrame = self.validator.errorToNaN(sourceFrame)
 
         self.ui.progressBarGeneral.setValue(2)
 

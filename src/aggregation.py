@@ -28,9 +28,10 @@ class CrossAggregationCallback(AggregationCallback):
 
 
 class AggregationObject(object):
-    def __init__(self, cb, conf, dropna=False, strings={}, extend_refs=False):
-        self.BLANK_STR = strings.get('BLANK', 'BLANK')
-        self.TOTAL_STR = strings.get('TOTAL', 'TOTAL')
+    def __init__(self, cb, conf, dropna=False, strings={}, extend_refs=False, aggregate_error=False):
+        self.TOTAL_STR = strings.get("TOTAL", "TOTAL")
+        self.BLANK_STR = strings.get("BLANK", "BLANK")
+        self.ERROR_STR = strings.get("ERROR", "ERROR")
 
         self.cb = cb
 
@@ -38,6 +39,7 @@ class AggregationObject(object):
         self.dropna = dropna
         self.filter = config.FilterController(conf)
         self.extend_refs = extend_refs
+        self.aggregate_error = aggregate_error
 
     def filteredFrame(self, frame, columns, extend_refs=False):
         """
@@ -57,7 +59,7 @@ class AggregationObject(object):
             frame = self.filter.applyFilter(frame, column, extend_refs=extend_refs)
         return frame
 
-    def reindex(self, data, column, axis, prefix=[], suffix=[], named_index=True):
+    def reindex(self, data, column, axis, prefix=[], suffix=[], errors=[], named_index=True):
         # create index set
         items = []
         index_set = set()
@@ -66,17 +68,18 @@ class AggregationObject(object):
             index_set = set(list(range(1, len(items)+1)))
         # detect error index
         index = getattr(data, axis)
-        error = []
+        error_index = []
+        error_ignore = prefix + suffix + errors
         for idx in index:
-            if idx not in index_set and idx not in prefix and idx not in suffix:
-                error.append(idx)
+            if idx not in index_set and idx not in error_ignore:
+                error_index.append(idx)
         data = data.copy()
         kwargs = {
-            axis: prefix+list(range(1, len(items)+1))+error+suffix,
+            axis: prefix+list(range(1, len(items)+1))+error_index+suffix+errors,
         }
         data = data.reindex(**kwargs)
         if named_index:
-            setattr(data, axis, prefix+items+error+suffix)
+            setattr(data, axis, prefix+items+error_index+suffix+errors)
         return data
 
 class SimpleAggregationObject(AggregationObject):
@@ -170,8 +173,10 @@ class SimpleAggregationObject(AggregationObject):
     def reindex(self, series, column, named_index):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
+        ERROR = six.text_type(self.ERROR_STR)
         suffix = [BLANK] if not self.dropna else []
-        return super(SimpleAggregationObject, self).reindex(series, column, "index", prefix=[TOTAL], suffix=suffix, named_index=named_index)
+        errors = [ERROR] if self.aggregate_error else []
+        return super(SimpleAggregationObject, self).reindex(series, column, "index", prefix=[TOTAL], suffix=suffix, errors=errors, named_index=named_index)
 
 
 class CrossAggregationObject(AggregationObject):
@@ -327,9 +332,11 @@ class CrossAggregationObject(AggregationObject):
     def reindex(self, frame, index, column):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
+        ERROR = six.text_type(self.ERROR_STR)
         suffix = [BLANK] if not self.dropna else []
-        frame = super(CrossAggregationObject, self).reindex(frame, index, 'index', prefix=['All'], suffix=suffix)
-        frame = super(CrossAggregationObject, self).reindex(frame, column, 'columns', prefix=['All'], suffix=suffix)
+        errors = [ERROR] if self.aggregate_error else []
+        frame = super(CrossAggregationObject, self).reindex(frame, index, 'index', prefix=['All'], suffix=suffix, errors=errors)
+        frame = super(CrossAggregationObject, self).reindex(frame, column, 'columns', prefix=['All'], suffix=suffix, errors=errors)
         frame.index = [TOTAL] + frame.index.tolist()[1:]
         frame.columns = [TOTAL] + frame.columns.tolist()[1:]
         return frame

@@ -93,3 +93,6 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
 
     def errorToNaN(self, frame):
         return self.impl.errorToNaN(frame)
+
+    def errorToError(self, frame, error_string):
+        return self.impl.errorToError(frame, error_string)
