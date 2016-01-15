@@ -379,10 +379,11 @@ class MainWindow(QMainWindow):
         # validation
         with status.MainWindowStatus(self) as state:
             state.setMessage(self.tr("validating..."))
-            self.validator = qvalidator.QValidationObject(self)
+            self.validator = qvalidator.QValidationObject(conf, self)
             self.setProgressObject(self.validator)
             self.validator.finished.connect(self.validationFinished)
-            self.validator.validate(conf, sourceFrame)  # no threading
+            self.validator.validate(sourceFrame)  # no threading
+            sourceFrame = self.validator.errorToNaN(sourceFrame)
 
         self.ui.progressBarGeneral.setValue(2)
 

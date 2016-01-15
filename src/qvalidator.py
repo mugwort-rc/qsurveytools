@@ -11,11 +11,12 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
 
     finished = pyqtSignal(bool)
 
-    def __init__(self, parent=None):
+    def __init__(self, conf, parent=None):
         """
         :type parent: QObject
         """
         super(QValidationObject, self).__init__(parent)
+        self.impl = validator.ValidationObject(self, conf)
         self.messages = []
         self.error = False
 
@@ -87,6 +88,8 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
         )
         self.error = True
 
-    def validate(self, conf, frame):
-        impl = validator.ValidationObject(self, conf)
-        impl.validate(frame)
+    def validate(self, frame):
+        self.impl.validate(frame)
+
+    def errorToNaN(self, frame):
+        return self.impl.errorToNaN(frame)

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import numpy
+
 import callback
 import config
 import utils
@@ -29,6 +31,10 @@ class ValidationObject(object):
     def __init__(self, cb, conf):
         self.cb = cb
         self.config = conf
+        self.errors = []
+
+    def registerError(self, column, index):
+        self.errors.append((column, index))
 
     def validate(self, frame):
         has_id = "ID" in frame.columns
@@ -58,6 +64,7 @@ class ValidationObject(object):
             # check answers
             if type == config.SINGLE:
                 for i in series[~series.isin(range(1, size+1))].index:
+                    self.registerError(column, i)
                     self.cb.validationError(column, i, series[i], id=get_id(i))
             elif type == config.MULTIPLE:
                 mframe = utils.expand_multiple_bool(series)
@@ -67,6 +74,7 @@ class ValidationObject(object):
                         continue
                     test = series[mframe[v]].apply(utils.int_cast)
                     for i in test[test != v].index:
+                        self.registerError(column, i)
                         self.cb.multipleExceptionError(column, i, test[i], id=get_id(i))
                 # check range
                 for i in range(1, size+1):
@@ -75,11 +83,19 @@ class ValidationObject(object):
                     del mframe[i]
                 for value in mframe.columns:
                     for i in mframe[mframe[value].eq(True)].index:
+                        self.registerError(column, i)
                         self.cb.validationError(column, i, value, id=get_id(i))
             # check multiple limit
             if conf.limit > 0 and type == config.MULTIPLE:
                 mseries = utils.expand_base(series).apply(len)
                 for i in mseries[mseries > conf.limit].index:
+                    self.registerError(column, i)
                     self.cb.limitationError(column, i, series[i], id=get_id(i))
 
         self.cb.finish()
+
+    def errorToNaN(self, frame):
+        frame = frame.copy()
+        for column, index in self.errors:
+            frame[column][index] = numpy.nan
+        return frame
