@@ -134,6 +134,7 @@ def test_simple_aggregation_object():
 
     vc = obj.value_counts(frame, "Q2")
     assert isinstance(vc, pandas.Series)
+    # vc.values == [10, 6, 5, 7, nan]
     assert vc.values.tolist()[:-1] == [10, 6, 5, 7]
     assert numpy.isnan(vc.values.tolist()[-1])
     assert vc.index.tolist() == ["TOTAL", "x", "y", "z", "BLANK"]
@@ -181,7 +182,6 @@ def test_simple_aggregation_object_with_dropna():
     ])
     vc = obj.value_counts(frame, "Q1")
     assert isinstance(vc, pandas.Series)
-    # vc.values == [13, 1, 4, 5, 3, nan]
     assert vc.values.tolist() == [13, 1, 4, 5, 3]
     assert vc.index.tolist() == ["TOTAL", "a", "b", "c", "d"]
 
@@ -192,7 +192,6 @@ def test_simple_aggregation_object_with_dropna():
 
     vc = obj.value_counts(frame, "3")
     assert isinstance(vc, pandas.Series)
-    # vc.values == [8, 2, 3, 3, nan]
     assert vc.values.tolist() == [7, 2, 3, 2]
     assert vc.index.tolist() == ["TOTAL", "1", "2", "3"]
 
