@@ -193,8 +193,8 @@ def test_simple_aggregation_object_with_dropna():
     vc = obj.value_counts(frame, "3")
     assert isinstance(vc, pandas.Series)
     # vc.values == [8, 2, 3, 3, nan]
-    assert vc.values.tolist() == [8, 2, 3, 3]
-    assert vc.index.tolist() == ["TOTAL", "1", "2", "3", "BLANK"]
+    assert vc.values.tolist() == [7, 2, 3, 2]
+    assert vc.index.tolist() == ["TOTAL", "1", "2", "3"]
 
     # test the not existing column
     vc = obj.value_counts(frame, "not existing")
