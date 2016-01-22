@@ -134,7 +134,8 @@ def test_simple_aggregation_object():
 
     vc = obj.value_counts(frame, "Q2")
     assert isinstance(vc, pandas.Series)
-    assert vc.values.tolist() == [10, 6, 5, 7, 0]
+    assert vc.values.tolist()[:-1] == [10, 6, 5, 7]
+    assert numpy.isnan(vc.values.tolist()[-1])
     assert vc.index.tolist() == ["TOTAL", "x", "y", "z", "BLANK"]
 
     vc = obj.value_counts(frame, "3")
@@ -151,6 +152,56 @@ def test_simple_aggregation_object():
     assert len(values) == 2
     assert numpy.isnan(values[0])
     assert numpy.isnan(values[1])
+
+def test_simple_aggregation_object_with_dropna():
+    cb = mock.Mock()
+    conf = config.Config(CONFIG)
+    obj = aggregation.SimpleAggregationObject(cb, conf, dropna=True)
+
+    # Q1     Q2     Q3
+    # T: 13  T: 10  T: 7
+    # 1:  1  1:  5  1: 2
+    # 2:  4  2:  5  2: 3
+    # 3:  5  3:  7  3: 2
+    # 4:  3
+    frame = pandas.DataFrame(columns=["Q1", "Q2", "3"], data=[
+        [1, "1,3", 3],
+        [2, "1,2", 2],
+        [3, "1,2,3", 1],
+        [4, 1, 3],
+        [2, 2, 2],
+        [2, 3, 1],
+        [3, None, 3],
+        [4, 2, 2],
+        [3, "1,3", 1],
+        [2, "1,2,3", 3],
+        [3, "2,3", 2],
+        [4, 3, 1],
+        [3, 3, 3],
+    ])
+    vc = obj.value_counts(frame, "Q1")
+    assert isinstance(vc, pandas.Series)
+    # vc.values == [13, 1, 4, 5, 3, nan]
+    assert vc.values.tolist() == [13, 1, 4, 5, 3]
+    assert vc.index.tolist() == ["TOTAL", "a", "b", "c", "d"]
+
+    vc = obj.value_counts(frame, "Q2")
+    assert isinstance(vc, pandas.Series)
+    assert vc.values.tolist() == [10, 6, 5, 7]
+    assert vc.index.tolist() == ["TOTAL", "x", "y", "z"]
+
+    vc = obj.value_counts(frame, "3")
+    assert isinstance(vc, pandas.Series)
+    # vc.values == [8, 2, 3, 3, nan]
+    assert vc.values.tolist() == [8, 2, 3, 3]
+    assert vc.index.tolist() == ["TOTAL", "1", "2", "3", "BLANK"]
+
+    # test the not existing column
+    vc = obj.value_counts(frame, "not existing")
+    assert isinstance(vc, pandas.Series)
+    values = vc.values.tolist()
+    assert len(values) == 1
+    assert numpy.isnan(values[0])
 
 def test_simple_aggregation_object_with_callback():
     class TestCallback(aggregation.SimpleAggregationObject):
@@ -172,7 +223,7 @@ def test_simple_aggregation_object_with_callback():
     # T: 13  T: 10  T: 8
     # 1:  1  1:  6  1: 2
     # 2:  4  2:  5  2: 3
-    # 3:  5  3:  7  3: 3
+    # 3:  5  3:  6  3: 3
     # 4:  3
     frame = pandas.DataFrame(columns=["Q1", "Q2", "3"], data=[
         [1, "1,3", 3],
@@ -180,7 +231,7 @@ def test_simple_aggregation_object_with_callback():
         [3, "1,2,3", 1],
         [4, 1, 3],
         [2, 2, 2],
-        [2, 3, 1],
+        [2, None, 1],
         [3, 1, 3],
         [4, 2, 2],
         [3, "1,3", 1],
@@ -207,7 +258,7 @@ def test_simple_aggregation_object_with_callback():
     assert isinstance(cb.series[1][1], pandas.Series)
     assert isinstance(cb.series[2][1], pandas.Series)
     assert cb.series[0][1].values.tolist()[:-1] == [13, 1, 4, 5, 3]
-    assert cb.series[1][1].values.tolist() == [10, 6, 5, 7, 0]
+    assert cb.series[1][1].values.tolist() == [10, 6, 5, 6, 1]
     assert cb.series[2][1].values.tolist()[:-1] == [8, 2, 3, 3]
     assert cb.series[0][1].index.tolist() == ["TOTAL", "a", "b", "c", "d", "BLANK"]
     assert cb.series[1][1].index.tolist() == ["TOTAL", "x", "y", "z", "BLANK"]

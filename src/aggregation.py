@@ -167,7 +167,9 @@ class SimpleAggregationObject(AggregationObject):
         vc_frame = pandas.melt(frame).dropna().groupby("value").agg(len)
         vc = vc_frame["variable"] if "variable" in vc_frame else pandas.Series()
         vc.set_value(TOTAL, len(frame.index))
-        vc.set_value(BLANK, len(series)-series.count())  # total - notnull
+        blank = len(series)-series.count()  # total - notnull
+        if not self.dropna and blank > 0:
+            vc.set_value(BLANK, blank)
         return self.reindex(vc, column, named_index)
 
     def reindex(self, series, column, named_index):
