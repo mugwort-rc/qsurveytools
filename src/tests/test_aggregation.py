@@ -187,7 +187,7 @@ def test_simple_aggregation_object_with_dropna():
 
     vc = obj.value_counts(frame, "Q2")
     assert isinstance(vc, pandas.Series)
-    assert vc.values.tolist() == [9, 6, 5, 7]
+    assert vc.values.tolist() == [9, 5, 5, 7]
     assert vc.index.tolist() == ["TOTAL", "x", "y", "z"]
 
     vc = obj.value_counts(frame, "3")
