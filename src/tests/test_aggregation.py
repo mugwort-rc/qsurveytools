@@ -159,7 +159,7 @@ def test_simple_aggregation_object_with_dropna():
     obj = aggregation.SimpleAggregationObject(cb, conf, dropna=True)
 
     # Q1     Q2     Q3
-    # T: 13  T: 10  T: 7
+    # T: 13  T: 9  T: 7
     # 1:  1  1:  5  1: 2
     # 2:  4  2:  5  2: 3
     # 3:  5  3:  7  3: 2
@@ -187,7 +187,7 @@ def test_simple_aggregation_object_with_dropna():
 
     vc = obj.value_counts(frame, "Q2")
     assert isinstance(vc, pandas.Series)
-    assert vc.values.tolist() == [10, 6, 5, 7]
+    assert vc.values.tolist() == [9, 6, 5, 7]
     assert vc.index.tolist() == ["TOTAL", "x", "y", "z"]
 
     vc = obj.value_counts(frame, "3")
