@@ -631,6 +631,7 @@ class ChartBuilder(object):
             else:
                 return "{}:{}".format(to_cell(start), to_cell(end))
         start = rows[0]
+        row = rows[0]  # for len(rows) == 1
         prev = rows[0]
         cells = []
         for row in rows[1:]:
