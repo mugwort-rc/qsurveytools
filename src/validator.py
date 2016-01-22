@@ -97,11 +97,13 @@ class ValidationObject(object):
     def errorToNaN(self, frame):
         frame = frame.copy()
         for column, index in self.errors:
-            frame[column][index] = numpy.nan
+            #frame[column][index] = numpy.nan
+            frame.loc[index, column] = numpy.nan
         return frame
 
     def errorToError(self, frame, error_string):
         frame = frame.copy()
         for column, index in self.errors:
-            frame[column][index] = error_string
+            #frame[column][index] = error_string
+            frame.loc[index, column] = error_string
         return frame
