@@ -69,34 +69,39 @@
 <context>
     <name>QValidationObject</name>
     <message>
-        <location filename="src/qvalidator.py" line="41"/>
+        <location filename="src/qvalidator.py" line="45"/>
         <source>Warning: Column &quot;%1&quot; is not found.</source>
         <translation>警告： &quot;%1&quot;列が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="48"/>
+        <location filename="src/qvalidator.py" line="52"/>
         <source>Warning: Setting &quot;%1&quot; is not found.</source>
         <translation>警告： 設定 &quot;%1&quot; が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="55"/>
+        <location filename="src/qvalidator.py" line="59"/>
         <source>Warning: Setting &quot;%1&quot; is Unknown type.</source>
         <translation>警告： 設定 &quot;%1&quot; は未定義です。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="63"/>
+        <location filename="src/qvalidator.py" line="67"/>
         <source>Warning: Undefined value found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 未定義の値 &apos;%3&apos; が見つかりました。 位置： &quot;%1&quot; - ID:%2</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="73"/>
+        <location filename="src/qvalidator.py" line="77"/>
         <source>Warning: Multiple exception error found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 複数回答例外エラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="83"/>
+        <location filename="src/qvalidator.py" line="87"/>
         <source>Warning: It exceeds the limit value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 制限を超えた値が見つかりました。位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
+    </message>
+    <message>
+        <location filename="src/qvalidator.py" line="99"/>
+        <source>Warning: It exceeds the forbidden value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
+        <translation>警告：入力制限フィルターエラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
     </message>
 </context>
 <context>

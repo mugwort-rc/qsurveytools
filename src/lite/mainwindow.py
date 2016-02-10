@@ -404,10 +404,11 @@ class MainWindow(QMainWindow):
 
         self.ui.progressBarGeneral.setValue(1)
 
+        noticeForbidden = self.ui.checkBoxNoticeForbiddenError.isChecked()
         # validation
         with status.MainWindowStatus(self) as state:
             state.setMessage(self.tr("validating..."))
-            self.validator = qvalidator.QValidationObject(conf, self)
+            self.validator = qvalidator.QValidationObject(conf, self, noticeForbidden=noticeForbidden)
             self.setProgressObject(self.validator)
             self.validator.finished.connect(self.validationFinished)
             self.validator.validate(sourceFrame)  # no threading

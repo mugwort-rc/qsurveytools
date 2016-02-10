@@ -11,13 +11,17 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
 
     finished = pyqtSignal(bool)
 
-    def __init__(self, conf, parent=None):
+    def __init__(self, conf, parent=None, **kwargs):
         """
         :type parent: QObject
+
+        :kwargs:
+          - :type noticeForbidden: bool
         """
         super(QValidationObject, self).__init__(parent)
         self.impl = validator.ValidationObject(self, conf)
         self.messages = []
+        self.noticeForbidden = kwargs.get("noticeForbidden", False)
         self.error = False
 
     def initialize(self, maximum):
@@ -82,6 +86,18 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
             QApplication.translate("QValidationObject", 'Warning: It exceeds the limit value was found in "%1" - #%2 : \'%3\'')
+                    .arg(column)
+                    .arg(row)
+                    .arg(value)
+        )
+        self.error = True
+
+    def forbiddenError(self, column, row, value, **kwargs):
+        if not self.noticeForbidden:
+            return
+        row = row if kwargs.get("id") is None else kwargs.get("id")
+        self.messages.append(
+            QApplication.translate("QValidationObject", 'Warning: It exceeds the forbidden value was found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
                     .arg(value)

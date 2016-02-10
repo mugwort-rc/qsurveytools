@@ -26,11 +26,15 @@ class ValidationCallback(callback.Callback):
     def limitationError(self, column, row, value, **kwargs):
         raise NotImplementedError
 
+    def forbiddenError(self, column, row, value, **kwargs):
+        raise NotImplementedError
+
 
 class ValidationObject(object):
     def __init__(self, cb, conf):
         self.cb = cb
         self.config = conf
+        self.filter = config.FilterController(self.config)
         self.errors = []
 
     def registerError(self, column, index):
@@ -91,6 +95,12 @@ class ValidationObject(object):
                 for i in mseries[mseries > conf.limit].index:
                     self.registerError(column, i)
                     self.cb.limitationError(column, i, series[i], id=get_id(i))
+            # check filtered notnull
+            filtered = self.filter.applyFilter(frame, column, extend_refs=True)
+            notnull = frame[column][~frame.index.isin(filtered.index)].notnull()
+            for i in notnull[notnull == True].index:
+                self.registerError(column, i)
+                self.cb.forbiddenError(column, i, series[i], id=get_id(i))
 
         self.cb.finish()
 

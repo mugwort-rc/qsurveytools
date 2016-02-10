@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>447</width>
-    <height>284</height>
+    <height>296</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -192,6 +192,16 @@
              <widget class="QCheckBox" name="checkBoxAggregateError">
               <property name="text">
                <string>Aggregate Error</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="checkBoxNoticeForbiddenError">
+              <property name="text">
+               <string>Notice the forbidden errors</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
               </property>
              </widget>
             </item>

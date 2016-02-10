@@ -3,12 +3,12 @@
 <context>
     <name>ConfigValidationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="514"/>
+        <location filename="src/lite/mainwindow.py" line="515"/>
         <source>column &quot;%1&quot; has duplicate choices.</source>
         <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="521"/>
+        <location filename="src/lite/mainwindow.py" line="522"/>
         <source>column &quot;%1&quot; has reserved name.</source>
         <translation>&quot;%1&quot; 列に予約された選択肢があります。</translation>
     </message>
@@ -46,7 +46,7 @@
         <translation>エラー：設定もしくはソースの読み込みに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="424"/>
+        <location filename="src/lite/mainwindow.py" line="425"/>
         <source>Error: output file path is not directory.</source>
         <translation>エラー：出力パスがフォルダではありません。</translation>
     </message>
@@ -81,27 +81,27 @@
         <translation>エラー：入力 &quot;%1&quot; の読み込みに失敗しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="410"/>
+        <location filename="src/lite/mainwindow.py" line="411"/>
         <source>validating...</source>
         <translation>検証中…</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="478"/>
+        <location filename="src/lite/mainwindow.py" line="479"/>
         <source>Finished</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="478"/>
+        <location filename="src/lite/mainwindow.py" line="479"/>
         <source>Finished.</source>
         <translation>完了しました。</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="472"/>
+        <location filename="src/lite/mainwindow.py" line="473"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="472"/>
+        <location filename="src/lite/mainwindow.py" line="473"/>
         <source>Write error.</source>
         <translation>書き込みに失敗しました。</translation>
     </message>
@@ -126,7 +126,7 @@
         <translation>無回答を除く</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="216"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="226"/>
         <source>Cross</source>
         <translation>クロス集計</translation>
     </message>
@@ -136,7 +136,7 @@
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="202"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="212"/>
         <source>Simple</source>
         <translation>単純集計</translation>
     </message>
@@ -151,7 +151,7 @@
         <translation>メッセージ</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="269"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="279"/>
         <source>Exit</source>
         <translation>終了</translation>
     </message>
@@ -171,12 +171,12 @@
         <translation>エラー：フィルター要素 &quot;%1&quot; は定義されていません。</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="261"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="271"/>
         <source>Data</source>
         <translation>データ</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="274"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="284"/>
         <source>Expand</source>
         <translation>展開出力</translation>
     </message>
@@ -216,12 +216,12 @@
         <translation>%を付ける</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="208"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="218"/>
         <source>SA to Pie</source>
         <translation>単数回答を円グラフにする</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="225"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="235"/>
         <source>TableStyle</source>
         <translation>テーブルスタイル</translation>
     </message>
@@ -236,12 +236,12 @@
         <translation>畦道スタイル（拡張）</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="235"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="245"/>
         <source>[Chart] Drop Y Blank</source>
         <translation>【グラフ】Y軸に無回答を含めない</translation>
     </message>
     <message>
-        <location filename="src/lite/mainwindow.py" line="476"/>
+        <location filename="src/lite/mainwindow.py" line="477"/>
         <source>Finished, but input data have errors.</source>
         <translation>完了。入力データにエラーがあります。</translation>
     </message>
@@ -265,44 +265,54 @@
         <source>There is a problem with the configuration.</source>
         <translation>設定に問題があります。</translation>
     </message>
+    <message>
+        <location filename="src/lite/ui_mainwindow.ui" line="201"/>
+        <source>Notice the forbidden errors</source>
+        <translation>入力制限エラーを出力する</translation>
+    </message>
 </context>
 <context>
     <name>QValidationObject</name>
     <message>
-        <location filename="src/qvalidator.py" line="41"/>
+        <location filename="src/qvalidator.py" line="45"/>
         <source>Warning: Column &quot;%1&quot; is not found.</source>
         <translation>警告： &quot;%1&quot;列が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="48"/>
+        <location filename="src/qvalidator.py" line="52"/>
         <source>Warning: Setting &quot;%1&quot; is not found.</source>
         <translation>警告： 設定 &quot;%1&quot; が見つかりません。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="55"/>
+        <location filename="src/qvalidator.py" line="59"/>
         <source>Warning: Setting &quot;%1&quot; is Unknown type.</source>
         <translation>警告： 設定 &quot;%1&quot; は未定義です。</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="63"/>
+        <location filename="src/qvalidator.py" line="67"/>
         <source>Warning: Undefined value found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 未定義の値 &quot;%3&quot; が見つかりました。 位置： &quot;%1&quot; - ID:%2</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="83"/>
+        <location filename="src/qvalidator.py" line="87"/>
         <source>Warning: It exceeds the limit value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告：制限を超えた値が見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
     </message>
     <message>
-        <location filename="src/qvalidator.py" line="73"/>
+        <location filename="src/qvalidator.py" line="77"/>
         <source>Warning: Multiple exception error found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告： 複数回答例外エラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
+    </message>
+    <message>
+        <location filename="src/qvalidator.py" line="99"/>
+        <source>Warning: It exceeds the forbidden value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
+        <translation>警告：入力制限フィルターエラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
     </message>
 </context>
 <context>
     <name>SimpleAggregationObject</name>
     <message>
-        <location filename="src/lite/mainwindow.py" line="546"/>
+        <location filename="src/lite/mainwindow.py" line="547"/>
         <source>SimpleAggregation</source>
         <translation>単純集計</translation>
     </message>

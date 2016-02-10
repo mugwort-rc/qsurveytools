@@ -460,6 +460,92 @@ def test_limitation_error_for_multiple():
     assert cb.limitationError.call_args == mock.call("Q1", 0, "1,3,5", id="x")
 
 
+def test_forbidden_error_for_single():
+    conf = config.Config({
+        "columnOrder": ["Q1", "Q2"],
+        "columns": {
+            "Q1": {
+                "choice": ["a", "b"],
+                "title": "aaa",
+                "type": config.SINGLE,
+                "noblank": False,
+                "multiex": [],
+            },
+            "Q2": {
+                "choice": ["a", "b"],
+                "title": "bbb",
+                "type": config.SINGLE,
+                "noblank": False,
+                "multiex": [],
+            },
+        },
+        "filters": [{
+            "key": "Q1",
+            "type": "pickup",
+            "choices": [1],
+            "targets": ["Q2"],
+        }],
+    })
+
+    frame = pandas.DataFrame(columns=["Q1", "Q2"],
+        data=[
+            [1, 1],
+            [2, 2,],
+            [1, 1],
+        ])
+
+    cb = mock.MagicMock()
+    v = validator.ValidationObject(cb, conf)
+    v.validate(frame)
+
+    assert cb.forbiddenError.called
+    assert cb.forbiddenError.call_count == 1
+    assert cb.forbiddenError.call_args == mock.call("Q2", 1, 2, id=None)
+
+
+def test_forbidden_error_for_multiple():
+    conf = config.Config({
+        "columnOrder": ["Q1", "Q2"],
+        "columns": {
+            "Q1": {
+                "choice": ["a", "b", "c"],
+                "title": "aaa",
+                "type": config.MULTIPLE,
+                "noblank": False,
+                "multiex": [],
+            },
+            "Q2": {
+                "choice": ["a", "b"],
+                "title": "bbb",
+                "type": config.SINGLE,
+                "noblank": False,
+                "multiex": [],
+            },
+        },
+        "filters": [{
+            "key": "Q1",
+            "type": "pickup",
+            "choices": [1],
+            "targets": ["Q2"],
+        }],
+    })
+
+    frame = pandas.DataFrame(columns=["Q1", "Q2"],
+        data=[
+            ["1,2", 1],
+            [3, 2,],
+            [1, 1],
+        ])
+
+    cb = mock.MagicMock()
+    v = validator.ValidationObject(cb, conf)
+    v.validate(frame)
+
+    assert cb.forbiddenError.called
+    assert cb.forbiddenError.call_count == 1
+    assert cb.forbiddenError.call_args == mock.call("Q2", 1, 2, id=None)
+
+
 def test_multiple_errors():
     conf = config.Config({
         "columnOrder": ["Q1"],
