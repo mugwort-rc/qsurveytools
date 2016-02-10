@@ -11,6 +11,7 @@ import yaml
 
 from PyQt4.Qt import *
 
+from .. import analyzer
 from .. import qaggregation
 from .. import config
 from ..cursor import BusyCursor
@@ -223,9 +224,11 @@ class MainWindow(QMainWindow):
 
         with_percent = self.ui.checkBoxWithPercent.isChecked()
         sa_to_pie = self.ui.checkBoxSAToPie.isChecked()
+        gen_abstract = self.ui.checkBoxAnalyzeAbstract.isChecked()
         output_options = {
             "with_percent": with_percent,
             "sa_to_pie": sa_to_pie,
+            "gen_abstract": gen_abstract,
         }
 
         self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), output_options, strings=self.STRINGS)
@@ -524,6 +527,34 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
         return self.messages_
 
 
+class QSimpleAggregationAnalyzer(QObject, analyzer.SimpleAggregationAnalyzer):
+    def __init__(self, reserved_names, parent=None):
+        QObject.__init__(self, parent)
+        analyzer.SimpleAggregationAnalyzer.__init__(self, reserved_names)
+
+    def abstract(self, series):
+        rs = self._abstract_info(series)
+        max_count = 4
+        count = 0
+        abstracts = []
+        for key in sorted(rs.keys(), reverse=True):
+            names = rs[key]
+            if count == 0 and len(names) == 1:
+                # first special
+                abstracts.append(six.text_type(self.tr('"%1" is %2%, it is most common').arg(names[0]).arg(key, 0, "f", 1)))
+            else:
+                # other
+                secondary = ""
+                if count == 1:
+                    secondary = six.text_type(self.tr(u"secondary,"))
+                indexes = six.text_type(self.tr(" ", "spacer")).join([six.text_type(self.tr(u'"%1"').arg(x)) for x in names])
+                abstracts.append(six.text_type(self.tr(u'%1%2 is %3%').arg(secondary).arg(indexes).arg(key, 0, "f", 1)))
+            count += len(names)
+            if count >= max_count:
+                break
+        return six.text_type(self.tr(", ", "separator")).join(abstracts) + six.text_type(self.tr("Concluded."))
+
+
 class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
     def __init__(self, conf, filepath, options, strings, parent=None):
         super(SimpleAggregationObject, self).__init__(parent)
@@ -531,6 +562,7 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
         self.filepath = filepath
         self.options = options
         self.strings = strings
+        self.analyzer = QSimpleAggregationAnalyzer(reserved_names=self.strings)
         self.series = {}
 
     def addSeries(self, name, series):
@@ -540,19 +572,33 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
         # options
         with_percent = self.options.get("with_percent", False)
         sa_to_pie = self.options.get("sa_to_pie", False)
+        gen_abstract = self.options.get("gen_abstract", False)
 
         from .. import excel
         book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent)
         sheet = book.worksheet(six.text_type(self.tr('SimpleAggregation')))
 
+        abstracts = []
         for column in self.config.columnOrder:
             if column not in self.series:
                 continue
             current_config = self.config.columns.get(column, {})
-            sheet.setTitle(current_config.get('title', ''))
+            title = current_config.get('title', '')
+            sheet.setTitle(title)
             to_pie = sa_to_pie and (current_config.get("type") == config.SINGLE)
             sheet.paste(self.series[column], with_percent=with_percent, to_pie=to_pie)
+            if gen_abstract:
+                abstracts.append((column, title, self.analyzer.abstract(self.series[column])))
             sheet.addPadding(3)
+
+        if gen_abstract and abstracts:
+            sheet = book.worksheet(six.text_type(self.tr("Comment")))
+            for column, title, abstract in abstracts:
+                sheet.write(0, 0, column)
+                sheet.write(1, 0, title)
+                sheet.write(2, 0, abstract)
+                sheet.addPadding(4)
+
         try:
             book.close()
         except IOError:

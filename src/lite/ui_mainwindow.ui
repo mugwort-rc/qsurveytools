@@ -248,6 +248,23 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tabAnalyze">
+           <attribute name="title">
+            <string>Analyze</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBoxAnalyzeAbstract">
+              <property name="text">
+               <string>Insert abstract information</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
