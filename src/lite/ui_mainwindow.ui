@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>447</width>
-    <height>296</height>
+    <width>446</width>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -177,7 +177,7 @@
                <string>Extend Filter</string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -186,22 +186,32 @@
               <property name="text">
                <string>with %</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
-            <item row="1" column="1">
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tabError">
+           <attribute name="title">
+            <string>Error</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
              <widget class="QCheckBox" name="checkBoxAggregateError">
               <property name="text">
                <string>Aggregate Error</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
-             <widget class="QCheckBox" name="checkBoxNoticeForbiddenError">
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBoxIgnoreForbiddenError">
               <property name="text">
-               <string>Notice the forbidden errors</string>
+               <string>Ignore forbidden errors</string>
               </property>
               <property name="checked">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -265,6 +275,46 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tabData">
+           <attribute name="title">
+            <string>Data</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="pushButtonExpand">
+              <property name="text">
+               <string>Expand</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -279,48 +329,14 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>447</width>
+     <width>446</width>
      <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuData">
-    <property name="title">
-     <string>Data</string>
-    </property>
-    <addaction name="actionExpand"/>
-   </widget>
-   <addaction name="menuData"/>
   </widget>
-  <action name="actionExit">
-   <property name="text">
-    <string>Exit</string>
-   </property>
-  </action>
-  <action name="actionExpand">
-   <property name="text">
-    <string>Expand</string>
-   </property>
-  </action>
  </widget>
  <resources>
   <include location="../../lite.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>actionExit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>248</x>
-     <y>119</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -202,7 +202,7 @@ class MainWindow(QMainWindow):
         )
         self.ui.pushButtonSimple.setEnabled(workable)
         self.ui.pushButtonCross.setEnabled(workable)
-        self.ui.actionExpand.setEnabled(workable)
+        self.ui.pushButtonExpand.setEnabled(workable)
 
     @pyqtSlot()
     def on_pushButtonSimple_clicked(self):
@@ -283,7 +283,7 @@ class MainWindow(QMainWindow):
         self.invoke_aggregate(self.cross_aggregation, conf, frame, dropna, aggregate_options)
 
     @pyqtSlot()
-    def on_actionExpand_triggered(self):
+    def on_pushButtonExpand_clicked(self):
         try:
             conf, frame, filepath = self.loadSources()
         except LoadException:
@@ -407,11 +407,11 @@ class MainWindow(QMainWindow):
 
         self.ui.progressBarGeneral.setValue(1)
 
-        noticeForbidden = self.ui.checkBoxNoticeForbiddenError.isChecked()
+        ignoreForbidden = self.ui.checkBoxIgnoreForbiddenError.isChecked()
         # validation
         with status.MainWindowStatus(self) as state:
             state.setMessage(self.tr("validating..."))
-            self.validator = qvalidator.QValidationObject(conf, self, noticeForbidden=noticeForbidden)
+            self.validator = qvalidator.QValidationObject(conf, self, noticeForbidden=(not ignoreForbidden))
             self.setProgressObject(self.validator)
             self.validator.finished.connect(self.validationFinished)
             self.validator.validate(sourceFrame)  # no threading

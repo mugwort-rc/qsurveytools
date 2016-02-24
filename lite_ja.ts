@@ -126,7 +126,7 @@
         <translation>無回答を除く</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="226"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="236"/>
         <source>Cross</source>
         <translation>クロス集計</translation>
     </message>
@@ -136,7 +136,7 @@
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="212"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="222"/>
         <source>Simple</source>
         <translation>単純集計</translation>
     </message>
@@ -151,7 +151,7 @@
         <translation>メッセージ</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="293"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="339"/>
         <source>Exit</source>
         <translation>終了</translation>
     </message>
@@ -171,14 +171,14 @@
         <translation>エラー：フィルター要素 &quot;%1&quot; は定義されていません。</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="285"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="280"/>
         <source>Data</source>
-        <translation>データ</translation>
+        <translation>展開出力</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="298"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="344"/>
         <source>Expand</source>
-        <translation>展開出力</translation>
+        <translation>複数回答を展開する</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="314"/>
@@ -216,19 +216,19 @@
         <translation>%を付ける</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="218"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="228"/>
         <source>SA to Pie</source>
         <translation>単数回答を円グラフにする</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="235"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="245"/>
         <source>TableStyle</source>
         <translation>テーブルスタイル</translation>
     </message>
     <message>
         <location filename="src/lite/ui_mainwindow.ui" line="177"/>
         <source>Extend Filter</source>
-        <translation>フィルターを波及させる</translation>
+        <translation>参照先の設問設定を適用する</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="79"/>
@@ -236,7 +236,7 @@
         <translation>畦道スタイル（拡張）</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="245"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="255"/>
         <source>[Chart] Drop Y Blank</source>
         <translation>【グラフ】Y軸に無回答を含めない</translation>
     </message>
@@ -246,7 +246,7 @@
         <translation>完了。入力データにエラーがあります。</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="194"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="204"/>
         <source>Aggregate Error</source>
         <translation>エラーを集計する</translation>
     </message>
@@ -266,17 +266,17 @@
         <translation>設定に問題があります。</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="201"/>
-        <source>Notice the forbidden errors</source>
-        <translation>入力制限エラーを出力する</translation>
+        <location filename="src/lite/ui_mainwindow.ui" line="211"/>
+        <source>Ignore forbidden errors</source>
+        <translation>非該当の入力を無視する</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="253"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="263"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="src/lite/ui_mainwindow.ui" line="259"/>
+        <location filename="src/lite/ui_mainwindow.ui" line="269"/>
         <source>Insert abstract information</source>
         <translation>コメントを挿入する</translation>
     </message>
