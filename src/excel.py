@@ -640,7 +640,7 @@ class ChartBuilder(object):
                 start = row
             prev = row
         cells.append(to_range(start, row))
-        return "=({})".format(",".join(["'{}'!{}".format(sheetname, x) for x in cells]))
+        return "=({})".format(",".join(["'{}'!{}".format(sheetname.replace("'", "''"), x) for x in cells]))
 
 
 class SimpleBarChartBuilder(ChartBuilder):
@@ -838,11 +838,7 @@ class CrossStackedChartBuilder(ChartBuilder):
             COLUMN_RC = COLUMN_R1 + i  # R-current
             values_range = [row+1+index_start+x for x in range(xaxis_count) if self.frame.index[x+1] not in self.drops]
             chart.add_series({
-                "name": [
-                    sheet.name,
-                    name_header,
-                    COLUMN_R1+i
-                    ],
+                "name": self.createChartRange(sheet.name, COLUMN_R1+i, [name_header]),
                 "categories": categories,
                 "values": self.createChartRange(sheet.name, COLUMN_RC, values_range),
                 "data_labels": {
@@ -1030,11 +1026,7 @@ class CrossAzemichiChartBuilder(ChartBuilder):
         for i in range(self.yaxisCount()):
             current_col = COLUMN_C1 + i + 1  # skip TOTAL
             chart.add_series({
-                "name": [
-                    sheet.name,
-                    name_header,
-                    current_col
-                    ],
+                "name": self.createChartRange(sheet.name, current_col, [name_header]),
                 "categories": categories,
                 "values": self.createChartRange(sheet.name, current_col, values_range),
                 "data_labels": {
