@@ -209,14 +209,9 @@ class MainWindow(QMainWindow):
         self.ui.pushButtonSimple.setEnabled(False)
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
-        extend_refs = self.ui.checkBoxExtendFilter.isChecked()
-        aggregate_error = self.ui.checkBoxAggregateError.isChecked()
-        aggregate_options = {
-            "extend_refs": extend_refs,
-            "aggregate_error": aggregate_error,
-        }
+        aggregate_options = self.get_aggregate_options()
         try:
-            conf, frame, filepath = self.loadSources(aggregate_error=aggregate_error)
+            conf, frame, filepath = self.loadSources(**aggregate_options)
         except LoadException:
             self.addMessage(self.tr('Error: config load failed.'))
             self.showMessageTab()
@@ -245,14 +240,9 @@ class MainWindow(QMainWindow):
         self.ui.pushButtonSimple.setEnabled(False)
         self.ui.pushButtonCross.setEnabled(False)
         dropna = self.ui.checkBoxDropNA.isChecked()
-        extend_refs = self.ui.checkBoxExtendFilter.isChecked()
-        aggregate_error = self.ui.checkBoxAggregateError.isChecked()
-        aggregate_options = {
-            "extend_refs": extend_refs,
-            "aggregate_error": aggregate_error,
-        }
+        aggregate_options = self.get_aggregate_options()
         try:
-            conf, frame, filepath = self.loadSources(aggregate_error=aggregate_error)
+            conf, frame, filepath = self.loadSources(**aggregate_options)
         except LoadException:
             self.addMessage(self.tr('Error: config load failed.'))
             self.showMessageTab()
@@ -281,6 +271,14 @@ class MainWindow(QMainWindow):
         self.cross_thread.start()
         #self.cross_aggregation.aggregate()
         self.invoke_aggregate(self.cross_aggregation, conf, frame, dropna, aggregate_options)
+
+    def get_aggregate_options(self):
+        extend_refs = self.ui.checkBoxExtendFilter.isChecked()
+        aggregate_error = self.ui.checkBoxAggregateError.isChecked()
+        return {
+            "extend_refs": extend_refs,
+            "aggregate_error": aggregate_error,
+        }
 
     @pyqtSlot()
     def on_pushButtonExpand_clicked(self):
