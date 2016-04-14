@@ -104,7 +104,7 @@ class Column(ConfigBase):
         ("type", int),
         ("title", six.text_type),
         ("choice", _make_column_choice),
-        ("noblank", bool),
+        ("complete", bool),
         ("limit", int),
         ("multiex", _make_multiex),]
 
@@ -368,7 +368,7 @@ def makeConfigByDataFrame(frame, cross=None, cb=None, reserved=[]):
             continue
         column_config = Column({
             'type': get_type(types[rawcol]),
-            'noblank': get_blank(types[rawcol]),
+            'complete': get_complete(types[rawcol]),
             'limit': get_limit(types[rawcol]),
             'multiex': get_multiex(types[rawcol]),
             'title': six.text_type(titles[rawcol]),
@@ -495,7 +495,7 @@ def parse_filter_expr(src):
             yield (key, tuple(values))
 
 
-def mk_type(type, blank=False):
+def mk_type(type, complete=False):
     temp = []
     if type == SINGLE:
         temp.append('S')
@@ -503,8 +503,8 @@ def mk_type(type, blank=False):
         temp.append('M')
     elif type == FREE:
         temp.append('F')
-    if blank:
-        temp.append('NB')
+    if complete:
+        temp.append('C')
     return '/'.join(temp)
 
 def get_type(type):
@@ -519,10 +519,10 @@ def get_type(type):
         return MULTIPLE
     return UNKNOWN
 
-def get_blank(type):
+def get_complete(type):
     if isinstance(type, six.string_types):
         type = utils.text_normalize(type)
-        return 'NB' in type
+        return 'C' in type
     return False
 
 def get_limit(type):

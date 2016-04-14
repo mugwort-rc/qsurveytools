@@ -157,21 +157,21 @@ def test_column():
     assert column.type == 0
     assert column.title == ""
     assert column.choice == []
-    assert column.noblank == False
+    assert column.complete == False
 
 def test_column_with_init():
     column = config.Column({
         "type": 1,
         "title": "hello",
         "choice": list("abcdef"),
-        "noblank": True,
+        "complete": True,
     })
 
     # check value
     assert column.type == 1
     assert column.title == "hello"
     assert column.choice == ["a", "b", "c", "d", "e", "f"]
-    assert column.noblank == True
+    assert column.complete == True
 
 
 def test_column_types():
@@ -179,14 +179,14 @@ def test_column_types():
         "type": "1",
         "title": 123,
         "choice": list(range(1, 5)),
-        "noblank": 0,  # bool(0) == False
+        "complete": 0,  # bool(0) == False
     })
 
     # check value
     assert column.type == 1
     assert column.title == "123"
     assert column.choice == ["1", "2", "3", "4"]
-    assert column.noblank == False
+    assert column.complete == False
 
 
 def test_column_unique_choice():
@@ -194,7 +194,7 @@ def test_column_unique_choice():
         "type": 1,
         "title": "hello",
         "choice": list("aabccdeef"),
-        "noblank": True,
+        "complete": True,
     })
 
     # check value
@@ -204,7 +204,7 @@ def test_column_unique_choice():
         "type": 1,
         "title": "hello",
         "choice": [2, 3, 1, 1, 4, 2, 5],
-        "noblank": True,
+        "complete": True,
     })
 
     # check value
@@ -214,7 +214,7 @@ def test_column_unique_choice():
         "type": 1,
         "title": "hello",
         "choice": [2, 3, 1, "1", 4, "2", 5],
-        "noblank": True,
+        "complete": True,
     })
 
     # check value
@@ -352,7 +352,7 @@ def test_config():
             "choice": ["1", "2", "3"],
             "title": "111",
             "type": 1,
-            "noblank": True,
+            "complete": True,
         }),
     }
 
@@ -415,7 +415,7 @@ def test_dump():
                 "choice": ["a", "b", "c", "d"],
                 "title": "aaa",
                 "type": 1,
-                "noblank": False,
+                "complete": False,
                 "limit": 0,
                 "multiex": [],
             },
@@ -423,7 +423,7 @@ def test_dump():
                 "choice": ["x", "y", "z"],
                 "title": "xxx",
                 "type": 2,
-                "noblank": False,
+                "complete": False,
                 "limit": 2,
                 "multiex": [3],
             },
@@ -431,7 +431,7 @@ def test_dump():
                 "choice": ["1", "2", "3"],
                 "title": "111",
                 "type": 1,
-                "noblank": True,
+                "complete": True,
                 "limit": 0,
                 "multiex": [],
             },
@@ -559,7 +559,7 @@ def test_make_config_by_data_frame():
     frame = pandas.DataFrame(columns=["ID", "Q1", "Q2", 3],
                              data=[
                                  ["TITLE", "aaa", "xxx", 111],
-                                 ["TYPE", "S", "M(2)[3]", "S/NB"],
+                                 ["TYPE", "S", "M(2)[3]", "S/C"],
                                  ["OK", None, None, "Q2=1,2"],
                                  ["NG", None, "Q1=4", "Q1=4"],
                                  [1, "a", "x", 1],
@@ -670,10 +670,10 @@ def test_mk_type():
     assert config.mk_type(config.FREE) == "F"
     assert config.mk_type(config.UNKNOWN) == ""
 
-    assert config.mk_type(config.SINGLE, blank=True) == "S/NB"
-    assert config.mk_type(config.MULTIPLE, blank=True) == "M/NB"
-    assert config.mk_type(config.FREE, blank=True) == "F/NB"
-    assert config.mk_type(config.UNKNOWN, blank=True) == "NB"
+    assert config.mk_type(config.SINGLE, complete=True) == "S/C"
+    assert config.mk_type(config.MULTIPLE, complete=True) == "M/C"
+    assert config.mk_type(config.FREE, complete=True) == "F/C"
+    assert config.mk_type(config.UNKNOWN, complete=True) == "C"
 
 
 def test_get_type():
@@ -689,21 +689,21 @@ def test_get_type():
     assert config.get_type("SMF") == config.FREE
     assert config.get_type("MSF") == config.FREE
 
-    # with noblank
+    # with complete
     assert config.get_type("S/NB") == config.SINGLE
     assert config.get_type("M/NB") == config.MULTIPLE
     assert config.get_type("NB") == config.UNKNOWN
 
 
-def test_get_blank():
-    assert config.get_blank("S") == False
-    assert config.get_blank("M") == False
-    assert config.get_blank("F") == False
-    assert config.get_blank("") == False
+def test_get_complete():
+    assert config.get_complete("S") == False
+    assert config.get_complete("M") == False
+    assert config.get_complete("F") == False
+    assert config.get_complete("") == False
 
-    assert config.get_blank("S/NB") == True
-    assert config.get_blank("M/NB") == True
-    assert config.get_blank("NB") == True
+    assert config.get_complete("S/C") == True
+    assert config.get_complete("M/C") == True
+    assert config.get_complete("C") == True
 
 
 def test_get_limit():
@@ -711,17 +711,17 @@ def test_get_limit():
     assert config.get_limit("S") == 0
     assert config.get_limit("M") == 0
     assert config.get_limit("F") == 0
-    assert config.get_limit("NB") == 0
-    assert config.get_limit("S/NB") == 0
-    assert config.get_limit("M/NB") == 0
+    assert config.get_limit("C") == 0
+    assert config.get_limit("S/C") == 0
+    assert config.get_limit("M/C") == 0
     assert config.get_limit("M(3)") == 3
-    assert config.get_limit("M(4)/NB") == 4
+    assert config.get_limit("M(4)/C") == 4
     assert config.get_limit("M[3]") == 0
-    assert config.get_limit("M[4]/NB") == 0
+    assert config.get_limit("M[4]/C") == 0
     assert config.get_limit("M(3)[4]") == 3
-    assert config.get_limit("M(4)[5]/NB") == 4
+    assert config.get_limit("M(4)[5]/C") == 4
     assert config.get_limit("M[4](3)") == 3
-    assert config.get_limit("M[5](4)/NB") == 4
+    assert config.get_limit("M[5](4)/C") == 4
 
 
 def test_get_multiex():
@@ -729,17 +729,17 @@ def test_get_multiex():
     assert config.get_multiex("S") == []
     assert config.get_multiex("M") == []
     assert config.get_multiex("F") == []
-    assert config.get_multiex("NB") == []
-    assert config.get_multiex("S/NB") == []
-    assert config.get_multiex("M/NB") == []
+    assert config.get_multiex("C") == []
+    assert config.get_multiex("S/C") == []
+    assert config.get_multiex("M/C") == []
     assert config.get_multiex("M(3)") == []
-    assert config.get_multiex("M(4)/NB") == []
+    assert config.get_multiex("M(4)/C") == []
     assert config.get_multiex("M[3]") == [3]
-    assert config.get_multiex("M[4]/NB") == [4]
+    assert config.get_multiex("M[4]/C") == [4]
     assert config.get_multiex("M(3)[4]") == [4]
-    assert config.get_multiex("M(4)[5]/NB") == [5]
+    assert config.get_multiex("M(4)[5]/C") == [5]
     assert config.get_multiex("M[4](3)") == [4]
-    assert config.get_multiex("M[5](4)/NB") == [5]
+    assert config.get_multiex("M[5](4)/C") == [5]
     assert config.get_multiex("M[3, 4, 5]") == [3, 4, 5]
 
 

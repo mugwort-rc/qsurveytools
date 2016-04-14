@@ -27,7 +27,7 @@ columns:
     - 3
     title: 111
     type: 1
-    noblank: true
+    complete: true
 filters:
 - key: Q1
   type: ignore
