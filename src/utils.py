@@ -3,8 +3,11 @@
 import unicodedata
 import re
 
+import enum
 import six
 import pandas
+from xlsxwriter import utility
+
 
 CSV_RE = re.compile(r'\s*,\s*')
 INT_RE = re.compile(r'\d+')
@@ -127,3 +130,36 @@ def unique_list(seq):
     seen = set()
     seen_add = seen.add
     return [x for x in seq if x not in seen and not seen_add(x)]
+
+
+RangeVector = enum.Enum("RangeVector", "Unknown X Y")
+
+def createChartRange(sheetname, rowcols):
+    assert(len(rowcols) > 0)
+    options = {
+        "row_abs": True,
+        "col_abs": True,
+    }
+    to_cell = lambda y, x: utility.xl_rowcol_to_cell(y, x, **options)
+    def to_range(start, end):
+        if start == end:
+            return to_cell(*start)
+        else:
+            return "{}:{}".format(to_cell(*start), to_cell(*end))
+    start = rowcols[0]
+    rowcol = rowcols[0]  # for len(rowcols) == 1
+    prev = rowcols[0]
+    cells = []
+    vec = RangeVector.Unknown
+    for rowcol in rowcols[1:]:
+        if (prev[0]+1, prev[1]) == rowcol and vec in [RangeVector.Y, RangeVector.Unknown]:
+            vec = RangeVector.Y
+        elif (prev[0], prev[1]+1) == rowcol and vec in [RangeVector.X, RangeVector.Unknown]:
+            vec = RangeVector.X
+        else:
+            cells.append(to_range(start, prev))
+            start = rowcol
+            vec = RangeVector.Unknown
+        prev = rowcol
+    cells.append(to_range(start, rowcol))
+    return "=({})".format(",".join(["'{}'!{}".format(sheetname.replace("'", "''"), x) for x in cells]))

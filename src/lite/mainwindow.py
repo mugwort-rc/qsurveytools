@@ -253,13 +253,14 @@ class MainWindow(QMainWindow):
         drops = []
         if self.ui.checkBoxChartDropYBlank.isChecked():
             drops.append(self.STRINGS.get("BLANK", "BLANK"))
-            if aggregate_error:
+            if aggregate_options["aggregate_error"]:
                 drops.append(self.STRINGS.get("ERROR", "ERROR"))
         output_options = {
             "cross_table_format": cross_table_format,
             "with_percent": with_percent,
             # chart option
             "chart": {
+                "with_total": self.ui.checkBoxChartAddYTotal.isChecked(),
                 "drops": drops,
             },
         }

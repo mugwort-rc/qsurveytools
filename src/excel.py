@@ -173,6 +173,10 @@ class SurveyExcelSheet(ExcelSheet):
                     # write table index for formula
                     if with_formula:
                         self.write(y+1, formula_start, index, self.table_format)
+                    # for ChartBuilder
+                    kwargs.update({
+                        "total_row": self.current_row+1,
+                    })
                 # write to value table
                 self.write(y+1, x+1, frame.values[y][x], self.table_format)
                 # write to formula table
@@ -198,11 +202,15 @@ class SurveyExcelSheet(ExcelSheet):
         # parameters
         with_chart = kwargs.get("with_chart", True)
         drops = kwargs.get("chart", {}).get("drops", [])
+        make_options = {
+            "total_row": kwargs.get("total_row", None),
+            "with_total": kwargs.get("chart", {}).get("with_total", False),
+        }
 
         Builder = kwargs.get("builder", CrossStackedChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
             builder = Builder(frame.copy(), drops=drops)
-            chart = builder.makeChart(self, self.current_row, formula_start+1)
+            chart = builder.makeChart(self, self.current_row, formula_start+1, **make_options)
             if self.chart_row is None:
                 self.chart_row = self.current_row
             self.sheet.insert_chart(
@@ -228,6 +236,7 @@ class CrossSingleTableSheet(SurveyExcelSheet):
         super(CrossSingleTableSheet, self).__init__(sheet, book, **kwargs)
         self.common_header = None
         self.last_total = pandas.Series()
+        self.last_total_row = None
         self.fixed_header = None
         self.merge_format = self.book.add_format()
         self.merge_format.set_border()
@@ -275,6 +284,11 @@ class CrossSingleTableSheet(SurveyExcelSheet):
             skip_total = self.last_total.tolist() == current_total.tolist()
         if not skip_total:
             self.last_total = current_total
+            self.last_total_row = self.current_row+1
+        # for ChartBuilder
+        kwargs.update({
+            "total_row": self.last_total_row,
+        })
         table_start = 1
         left_header = 2
         formula_start = len(frame.columns) + left_header*2
@@ -393,13 +407,18 @@ class CrossSingleTableSheet(SurveyExcelSheet):
     def add_cross_chart(self, frame, formula_start, **kwargs):
         # parameters
         with_chart = kwargs.get("with_chart", True)
-        skip_total = kwargs.get("skip_total", False)
         drops = kwargs.get("chart", {}).get("drops", [])
+        make_options = {
+            "fixed_header": self.fixed_header,
+            "total_skipped": kwargs.get("skip_total", False),
+            "total_row": kwargs.get("total_row", None),
+            "with_total": kwargs.get("chart", {}).get("with_total", False),
+        }
 
         Builder = kwargs.get("builder", CrossStackedChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
             builder = Builder(frame.copy(), drops=drops)
-            chart = builder.makeChart(self, self.current_row, formula_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)
+            chart = builder.makeChart(self, self.current_row, formula_start+1, **make_options)
             if self.chart_row is None:
                 self.chart_row = self.current_row
             self.sheet.insert_chart(
@@ -425,6 +444,7 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
         super(CrossAzemichiTableSheet, self).__init__(sheet, book, **kwargs)
         self.common_header = None
         self.last_total = pandas.Series()
+        self.last_total_row = None
         self.fixed_header = None
         self.merge_format = self.book.add_format()
         self.merge_format.set_border()
@@ -470,9 +490,15 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
             skip_total = self.last_total.tolist() == current_total.tolist()
         if not skip_total:
             self.last_total = current_total
+            self.last_total_row = self.current_row+1
         # force update
         if not skip_same_all:
             skip_total = False
+            self.last_total_row = self.current_row+1
+        # for ChartBuilder
+        kwargs.update({
+            "total_row": self.last_total_row,
+        })
         table_start = 1
         # write table categories
         self.merge_write(
@@ -558,13 +584,18 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
     def add_cross_chart(self, frame, table_start, **kwargs):
         # parameters
         with_chart = kwargs.get("with_chart", True)
-        skip_total = kwargs.get("skip_total", False)
         drops = kwargs.get("chart", {}).get("drops", [])
+        make_options = {
+            "fixed_header": self.fixed_header,
+            "total_skipped": kwargs.get("skip_total", False),
+            "total_row": kwargs.get("total_row", None),
+            "with_total": kwargs.get("chart", {}).get("with_total", False),
+        }
 
         Builder = kwargs.get("builder", CrossAzemichiChartBuilder)
         if with_chart and issubclass(Builder, ChartBuilder):
             builder = Builder(frame.copy(), drops=drops)
-            chart = builder.makeChart(self, self.current_row, table_start+1, fixed_header=self.fixed_header, total_skipped=skip_total)
+            chart = builder.makeChart(self, self.current_row, table_start+1, **make_options)
             if self.chart_row is None:
                 self.chart_row = self.current_row
             self.sheet.insert_chart(
@@ -620,27 +651,7 @@ class ChartBuilder(object):
 
     def createChartRange(self, sheetname, column, rows):
         assert(len(rows) > 0)
-        kwargs = {
-            "row_abs": True,
-            "col_abs": True,
-        }
-        to_cell = lambda y: utility.xl_rowcol_to_cell(y, column, **kwargs)
-        def to_range(start, end):
-            if start == end:
-                return to_cell(start)
-            else:
-                return "{}:{}".format(to_cell(start), to_cell(end))
-        start = rows[0]
-        row = rows[0]  # for len(rows) == 1
-        prev = rows[0]
-        cells = []
-        for row in rows[1:]:
-            if prev + 1 != row:
-                cells.append(to_range(start, prev))
-                start = row
-            prev = row
-        cells.append(to_range(start, row))
-        return "=({})".format(",".join(["'{}'!{}".format(sheetname.replace("'", "''"), x) for x in cells]))
+        return utils.createChartRange(sheetname, zip(rows, [column]*len(rows)))
 
 
 class SimpleBarChartBuilder(ChartBuilder):
@@ -815,10 +826,27 @@ class CrossStackedChartBuilder(ChartBuilder):
             :param fixed_header: fixed header value (default: row)
             :type total_skipped: bool
             :param total_skipped: total row was skipped (default: False)
+            :type total_row: int
+            :param total_row: total row value (default: None)
+            :type with_total: bool
+            :param with_total: insert total row to chart (default: False)
         """
         # kwargs
         name_header = kwargs.get("fixed_header", row)
         total_skipped = kwargs.get("total_skipped", False)
+        total_row = kwargs.get("total_row", None)
+        with_total = kwargs.get("with_total", False)
+
+        # check total_row
+        if with_total and total_row is None:
+            if total_skipped:
+                with_total = False
+            else:
+                total_row = row+1
+        range_prefix = []
+        if with_total:
+            range_prefix = [total_row]
+
         index_start = 1 if not total_skipped else 0
 
         # constants
@@ -833,10 +861,10 @@ class CrossStackedChartBuilder(ChartBuilder):
         xaxis_count = self.xaxisCount()
         if total_skipped:
             xaxis_count -= 1
-        categories = self.createChartRange(sheet.name, COLUMN_C, [row+1+index_start+i for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops])
+        categories = utils.createChartRange(sheet.name, [(x, COLUMN_C-1) for x in range_prefix]+[(row+1+index_start+i, COLUMN_C) for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops])
         for i in range(self.yaxisCount()):
             COLUMN_RC = COLUMN_R1 + i  # R-current
-            values_range = [row+1+index_start+x for x in range(xaxis_count) if self.frame.index[x+1] not in self.drops]
+            values_range = range_prefix+[row+1+index_start+x for x in range(xaxis_count) if self.frame.index[x+1] not in self.drops]
             chart.add_series({
                 "name": self.createChartRange(sheet.name, COLUMN_R1+i, [name_header]),
                 "categories": categories,
@@ -1008,6 +1036,19 @@ class CrossAzemichiChartBuilder(ChartBuilder):
         # kwargs
         name_header = kwargs.get("fixed_header", row)
         total_skipped = kwargs.get("total_skipped", False)
+        total_row = kwargs.get("total_row", None)
+        with_total = kwargs.get("with_total", False)
+
+        # check total_row
+        if with_total and total_row is None:
+            if total_skipped:
+                with_total = False
+            else:
+                total_row = row+1
+        range_prefix = []
+        if with_total:
+            range_prefix = [total_row]
+
         index_start = 2 if not total_skipped else 0  # index of [A]
 
         # constants
@@ -1021,8 +1062,8 @@ class CrossAzemichiChartBuilder(ChartBuilder):
         # column-base
         xaxis_count = self.xaxisCount()
         # row + 2 + index_start (skip common-header)
-        categories = self.createChartRange(sheet.name, COLUMN_I, [row+1+index_start+i*2 for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops])
-        values_range = [row+2+index_start+i*2 for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops]
+        categories = utils.createChartRange(sheet.name, [(x, COLUMN_I-1) for x in range_prefix]+[(row+1+index_start+i*2, COLUMN_I) for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops])
+        values_range = range_prefix+[row+2+index_start+i*2 for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops]
         for i in range(self.yaxisCount()):
             current_col = COLUMN_C1 + i + 1  # skip TOTAL
             chart.add_series({
