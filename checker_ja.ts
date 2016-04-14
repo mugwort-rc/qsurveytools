@@ -103,6 +103,11 @@
         <source>Warning: It exceeds the forbidden value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
         <translation>警告：入力制限フィルターエラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
     </message>
+    <message>
+        <location filename="src/qvalidator.py" line="109"/>
+        <source>Warning: It exceeds the incomplete value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Source</name>
