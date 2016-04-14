@@ -29,6 +29,9 @@ class ValidationCallback(callback.Callback):
     def forbiddenError(self, column, row, value, **kwargs):
         raise NotImplementedError
 
+    def incompleteError(self, column, row, value, **kwargs):
+        raise NotImplementedError
+
 
 class ValidationObject(object):
     def __init__(self, cb, conf):
@@ -51,8 +54,8 @@ class ValidationObject(object):
             if column not in frame:
                 self.cb.columnNotFound(column)
                 continue
-            # drop N/A
-            series = frame[column].dropna()
+            series = frame[column]
+
             # get type
             conf = self.config.columns[column]
             type = conf.get('type', config.UNKNOWN)
@@ -63,6 +66,10 @@ class ValidationObject(object):
             elif type not in [config.SINGLE, config.MULTIPLE]:
                 self.cb.settingIsUnknown(column)
                 continue
+
+            # drop N/A
+            series = frame[column].dropna()
+
             # get choice size
             size = len(conf.choice)
             # check answers
@@ -95,8 +102,18 @@ class ValidationObject(object):
                 for i in mseries[mseries > conf.limit].index:
                     self.registerError(column, i)
                     self.cb.limitationError(column, i, series[i], id=get_id(i))
-            # check filtered notnull
+
             filtered = self.filter.applyFilter(frame, column, extend_refs=True)
+
+            # check complete
+            filtered_series = frame[column][frame.index.isin(filtered.index)].notnull()
+            complete = conf.get('complete', False)
+            if complete and filtered_series.hasnans():
+                for i in filtered_series[filtered_series.isnull()].index:
+                    self.registerError(column, i)
+                    self.cb.incompleteError(column, i, series[i], id=get_id(i))
+
+            # check filtered notnull
             notnull = frame[column][~frame.index.isin(filtered.index)].notnull()
             for i in notnull[notnull == True].index:
                 self.registerError(column, i)

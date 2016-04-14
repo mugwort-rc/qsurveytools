@@ -141,10 +141,9 @@ def test_simple_aggregation_object():
 
     vc = obj.value_counts(frame, "3")
     assert isinstance(vc, pandas.Series)
-    # vc.values == [8, 2, 3, 3, nan]
-    assert vc.values.tolist()[:-1] == [8, 2, 3, 3]
-    assert numpy.isnan(vc.values.tolist()[-1])
-    assert vc.index.tolist() == ["TOTAL", "1", "2", "3", "BLANK"]
+    # vc.values == [8, 2, 3, 3]
+    assert vc.values.tolist() == [8, 2, 3, 3]
+    assert vc.index.tolist() == ["TOTAL", "1", "2", "3"]
 
     # test the not existing column
     vc = obj.value_counts(frame, "not existing")
@@ -258,10 +257,10 @@ def test_simple_aggregation_object_with_callback():
     assert isinstance(cb.series[2][1], pandas.Series)
     assert cb.series[0][1].values.tolist()[:-1] == [13, 1, 4, 5, 3]
     assert cb.series[1][1].values.tolist() == [10, 6, 5, 6, 1]
-    assert cb.series[2][1].values.tolist()[:-1] == [8, 2, 3, 3]
+    assert cb.series[2][1].values.tolist() == [8, 2, 3, 3]
     assert cb.series[0][1].index.tolist() == ["TOTAL", "a", "b", "c", "d", "BLANK"]
     assert cb.series[1][1].index.tolist() == ["TOTAL", "x", "y", "z", "BLANK"]
-    assert cb.series[2][1].index.tolist() == ["TOTAL", "1", "2", "3", "BLANK"]
+    assert cb.series[2][1].index.tolist() == ["TOTAL", "1", "2", "3"]
 
 
 def test_cross_aggregation_object():
@@ -350,7 +349,7 @@ def test_cross_aggregation_object():
     assert isinstance(crossed, pandas.DataFrame)
 
     assert crossed.index.tolist() == ["TOTAL", "x", "y", "z", "BLANK"]
-    assert crossed.columns.tolist() == ["TOTAL", "1", "2", "3", "BLANK"]
+    assert crossed.columns.tolist() == ["TOTAL", "1", "2", "3"]
 
     assert crossed["TOTAL"].values.tolist()[:-1] == [8, 6, 5, 5]
     assert crossed["1"].values.tolist()[:-1] == [2, 2, 1, 2]
@@ -364,7 +363,7 @@ def test_cross_aggregation_object():
     assert isinstance(crossed, pandas.DataFrame)
 
     assert crossed.index.tolist() == ["TOTAL", "a", "b", "c", "d", "BLANK"]
-    assert crossed.columns.tolist() == ["TOTAL", "1", "2", "3", "BLANK"]
+    assert crossed.columns.tolist() == ["TOTAL", "1", "2", "3"]
 
     assert crossed["TOTAL"].values.tolist()[:-2] == [8, 1, 3, 4]
     assert crossed["1"].values.tolist()[:-2] == [2, 0, 0, 2]

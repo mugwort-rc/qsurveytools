@@ -104,6 +104,16 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
         )
         self.error = True
 
+    def incompleteError(self, column, row, value, **kwargs):
+        row = row if kwargs.get("id") is None else kwargs.get("id")
+        self.messages.append(
+            QApplication.translate("QValidationObject", 'Warning: It exceeds the incomplete value was found in "%1" - #%2 : \'%3\'')
+                    .arg(column)
+                    .arg(row)
+                    .arg(value)
+        )
+        self.error = True
+
     def validate(self, frame):
         self.impl.validate(frame)
 

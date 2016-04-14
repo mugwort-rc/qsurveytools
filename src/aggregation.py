@@ -110,26 +110,28 @@ class SimpleAggregationObject(AggregationObject):
         """
         # check config error
         if column not in self.config.columns:
-            return self.reindex(pandas.Series(), column, named_index)
+            return self.reindex(pandas.Series(), column, named_index, self.dropna)
         # check source error
         if column not in frame.columns:
-            return self.reindex(pandas.Series(), column, named_index)
+            return self.reindex(pandas.Series(), column, named_index, self.dropna)
         # get column config
         conf = self.config.columns.get(column, config.Column())
         # check column type
         if conf.type not in [config.SINGLE, config.MULTIPLE]:
-            return self.reindex(pandas.Series(), column, named_index)
+            return self.reindex(pandas.Series(), column, named_index, self.dropna)
+        # get dropna
+        dropna = self.dropna or conf.complete
         # apply filter
         frame = self.filteredFrame(frame, [column], extend_refs=self.extend_refs)
         # aggregation
         if conf.type == config.SINGLE:
-            return self.single_value_counts(frame, column, named_index)
+            return self.single_value_counts(frame, column, named_index, dropna)
         elif conf.type == config.MULTIPLE:
-            return self.multiple_value_counts(frame, column, named_index)
+            return self.multiple_value_counts(frame, column, named_index, dropna)
         # error case
-        return self.reindex(pandas.Series(), column, named_index)
+        return self.reindex(pandas.Series(), column, named_index, dropna)
 
-    def single_value_counts(self, frame, column, named_index):
+    def single_value_counts(self, frame, column, named_index, dropna):
         """
         :type frame: pandas.DataFrame
         :param frame: source data frame
@@ -137,19 +139,21 @@ class SimpleAggregationObject(AggregationObject):
         :param column: target column
         :type named_index: bool
         :param named_index: reindex to named index
+        :type dropna: bool
+        :param dropna: drop N/A
         """
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         series = frame[column]
-        if self.dropna:
+        if dropna:
             series = series.dropna()
         else:
             series = series.fillna(BLANK)
         vc = pandas.value_counts(series, sort=False)
         vc.set_value(TOTAL, len(series))
-        return self.reindex(vc, column, named_index)
+        return self.reindex(vc, column, named_index, dropna)
 
-    def multiple_value_counts(self, frame, column, named_index):
+    def multiple_value_counts(self, frame, column, named_index, dropna):
         """
         :type frame: pandas.DataFrame
         :param frame: source data frame
@@ -157,26 +161,28 @@ class SimpleAggregationObject(AggregationObject):
         :param column: target column
         :type named_index: bool
         :param named_index: reindex to named index
+        :type dropna: bool
+        :param dropna: drop N/A
         """
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         series = frame[column]
-        if self.dropna:
+        if dropna:
             series = series.dropna()
         frame = utils.expand_multiple(series)
         vc_frame = pandas.melt(frame).dropna().groupby("value").agg(len)
         vc = vc_frame["variable"] if "variable" in vc_frame else pandas.Series()
         vc.set_value(TOTAL, len(frame.index))
         blank = len(series)-series.count()  # total - notnull
-        if not self.dropna and blank > 0:
+        if not dropna and blank > 0:
             vc.set_value(BLANK, blank)
-        return self.reindex(vc, column, named_index)
+        return self.reindex(vc, column, named_index, dropna)
 
-    def reindex(self, series, column, named_index):
+    def reindex(self, series, column, named_index, dropna):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         ERROR = six.text_type(self.ERROR_STR)
-        suffix = [BLANK] if not self.dropna else []
+        suffix = [BLANK] if not dropna else []
         errors = [ERROR] if self.aggregate_error else []
         return super(SimpleAggregationObject, self).reindex(series, column, "index", prefix=[TOTAL], suffix=suffix, errors=errors, named_index=named_index)
 
@@ -209,30 +215,33 @@ class CrossAggregationObject(AggregationObject):
         :rtype: pandas.DataFrame
         :return: result of cross aggregation
         """
-        # check same
-        if index == column:
-            return self.reindex(pandas.DataFrame(), index, column)
         # check config
         if index not in self.config.columns or column not in self.config.columns:
-            return self.reindex(pandas.DataFrame(), index, column)
+            return self.reindex(pandas.DataFrame(), index, column, self.dropna, self.dropna)
         # check source
         if index not in frame.columns or column not in frame.columns:
-            return self.reindex(pandas.DataFrame(), index, column)
+            return self.reindex(pandas.DataFrame(), index, column, self.dropna, self.dropna)
         # get configs
         index_conf = self.config.columns.get(index, config.Column())
         column_conf = self.config.columns.get(column, config.Column())
+        # get complete
+        index_dropna = self.dropna or index_conf.complete
+        column_dropna = self.dropna or column_conf.complete
+        # check same
+        if index == column:
+            return self.reindex(pandas.DataFrame(), index, column, index_dropna, column_dropna)
         # check type
         if index_conf.type not in [config.SINGLE, config.MULTIPLE]:
-            return self.reindex(pandas.DataFrame(), index, column)
+            return self.reindex(pandas.DataFrame(), index, column, index_dropna, column_dropna)
         if column_conf.type not in [config.SINGLE, config.MULTIPLE]:
-            return self.reindex(pandas.DataFrame(), index, column)
+            return self.reindex(pandas.DataFrame(), index, column, index_dropna, column_dropna)
         # apply filter
         frame = self.filteredFrame(frame, [index, column], extend_refs=self.extend_refs)
         if len(frame) == 0:
             # empty
-            return self.reindex(pandas.DataFrame(), index, column)
+            return self.reindex(pandas.DataFrame(), index, column, index_dropna, column_dropna)
         # make arguments
-        args = (frame, index, column)
+        args = (frame, index, column, index_dropna, column_dropna)
         kwargs = dict(values=values, aggfunc=aggfunc)
         # aggregations
         if index_conf.type == config.SINGLE:
@@ -246,16 +255,24 @@ class CrossAggregationObject(AggregationObject):
             elif column_conf.type == config.MULTIPLE:
                 return self.mm_crosstab(*args, **kwargs)
 
-    def ss_crosstab(self, frame, index, column, values=None, aggfunc=len):
+    def ss_crosstab(self, frame, index, column, index_dropna, column_dropna, values=None, aggfunc=len):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
-        if self.dropna:
-            dropped_index = frame[[index,column]].dropna().index
+        drop_targets = []
+        if index_dropna:
+            drop_targets.append(index)
+        if column_dropna:
+            drop_targets.append(column)
+        if drop_targets:
+            dropped_index = frame[drop_targets].dropna().index
             frame = frame.ix[dropped_index]
+        if index_dropna:
             iseries = frame[index]
-            cseries = frame[column]
         else:
             iseries = frame[index].fillna(BLANK)
+        if column_dropna:
+            cseries = frame[column]
+        else:
             cseries = frame[column].fillna(BLANK)
         kwargs = {
             'aggfunc': aggfunc,
@@ -263,18 +280,26 @@ class CrossAggregationObject(AggregationObject):
         if values is not None:
             kwargs['values'] = frame[values]
         crossed = pandas.crosstab(iseries, cseries, margins=True, **kwargs)
-        return self.reindex(crossed, index, column)
+        return self.reindex(crossed, index, column, index_dropna, column_dropna)
 
-    def sm_crosstab(self, frame, index, column, values=None, aggfunc=len):
+    def sm_crosstab(self, frame, index, column, index_dropna, column_dropna, values=None, aggfunc=len):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
-        if self.dropna:
-            dropped_index = frame[[index,column]].dropna().index
+        drop_targets = []
+        if index_dropna:
+            drop_targets.append(index)
+        if column_dropna:
+            drop_targets.append(column)
+        if drop_targets:
+            dropped_index = frame[drop_targets].dropna().index
             frame = frame.ix[dropped_index]
+        if index_dropna:
             iseries = frame[index]
-            cframe = utils.expand_multiple(frame[column])
         else:
             iseries = frame[index].fillna(BLANK)
+        if column_dropna:
+            cframe = utils.expand_multiple(frame[column])
+        else:
             cframe = utils.expand_multiple(frame[column].fillna(BLANK))
         iframe = pandas.DataFrame()
         iframe["key"] = iseries
@@ -293,16 +318,21 @@ class CrossAggregationObject(AggregationObject):
             kwargs['values'] = vseries
         crossed = pandas.crosstab(aframe["key"], aframe["value"], **kwargs)
         crossed = self.update_all(crossed, frame, index, column)
-        return self.reindex(crossed, index, column)
+        return self.reindex(crossed, index, column, index_dropna, column_dropna)
 
-    def ms_crosstab(self, frame, index, column, values=None, aggfunc=len):
-        return self.sm_crosstab(frame, column, index, values=values, aggfunc=aggfunc).T
+    def ms_crosstab(self, frame, index, column, index_dropna, column_dropna, values=None, aggfunc=len):
+        return self.sm_crosstab(frame, column, index, column_dropna, index_dropna, values=values, aggfunc=aggfunc).T
 
-    def mm_crosstab(self, frame, index, column, values=None, aggfunc=len):
+    def mm_crosstab(self, frame, index, column, index_dropna, column_dropna, values=None, aggfunc=len):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
-        if self.dropna:
-            dropped_index = frame[[index,column]].dropna().index
+        drop_targets = []
+        if index_dropna:
+            drop_targets.append(index)
+        if column_dropna:
+            drop_targets.append(column)
+        if drop_targets:
+            dropped_index = frame[drop_targets].dropna().index
             frame = frame.ix[dropped_index]
             iframe = utils.expand_multiple(frame[index])
             cframe = utils.expand_multiple(frame[column])
@@ -313,8 +343,10 @@ class CrossAggregationObject(AggregationObject):
         ccolumns = ['col_{}'.format(x) for x in cframe.columns]
         iframe.columns = icolumns
         cframe.columns = ccolumns
-        iframe["blank"] = self.gen_blanks(frame, index)
-        cframe["blank"] = self.gen_blanks(frame, column)
+        if not index_dropna:
+            iframe["blank"] = self.gen_blanks(frame, index)
+        if not column_dropna:
+            cframe["blank"] = self.gen_blanks(frame, column)
         iframe["index"] = iframe.index
         cframe["index"] = cframe.index
         aframe = pandas.merge(pandas.melt(iframe, id_vars=["index"]),
@@ -329,16 +361,17 @@ class CrossAggregationObject(AggregationObject):
             kwargs['values'] = vseries
         crossed = pandas.crosstab(aframe["value_x"], aframe["value_y"], **kwargs)
         crossed = self.update_all(crossed, frame, index, column)
-        return self.reindex(crossed, index, column)
+        return self.reindex(crossed, index, column, index_dropna, column_dropna)
 
-    def reindex(self, frame, index, column):
+    def reindex(self, frame, index, column, index_dropna, column_dropna):
         TOTAL = six.text_type(self.TOTAL_STR)
         BLANK = six.text_type(self.BLANK_STR)
         ERROR = six.text_type(self.ERROR_STR)
-        suffix = [BLANK] if not self.dropna else []
+        index_suffix = [BLANK] if not index_dropna else []
+        column_suffix = [BLANK] if not column_dropna else []
         errors = [ERROR] if self.aggregate_error else []
-        frame = super(CrossAggregationObject, self).reindex(frame, index, 'index', prefix=['All'], suffix=suffix, errors=errors)
-        frame = super(CrossAggregationObject, self).reindex(frame, column, 'columns', prefix=['All'], suffix=suffix, errors=errors)
+        frame = super(CrossAggregationObject, self).reindex(frame, index, 'index', prefix=['All'], suffix=index_suffix, errors=errors)
+        frame = super(CrossAggregationObject, self).reindex(frame, column, 'columns', prefix=['All'], suffix=column_suffix, errors=errors)
         frame.index = [TOTAL] + frame.index.tolist()[1:]
         frame.columns = [TOTAL] + frame.columns.tolist()[1:]
         return frame
