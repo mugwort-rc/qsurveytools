@@ -94,11 +94,42 @@ class SurveyExcelSheet(ExcelSheet):
     def __init__(self, sheet, book, **kwargs):
         super(SurveyExcelSheet, self).__init__(sheet, book)
         with_percent = kwargs.get("with_percent", False)
+        self.reserved_names = kwargs.get("reserved_names", [])
 
+        self.em_formats = [
+            self.book.add_format({
+                "pattern": 17,
+                "bg_color": "#444444",
+                "fg_color": "#000000",
+                "font_color": "#ffffff",
+            }),
+            self.book.add_format({
+                "pattern": 18,
+                "bg_color": "#cccccc",
+                "fg_color": "#000000",
+            }),
+        ]
         self.percent_format = self.book.add_format({
             'num_format': '0.0' + ('"%"' if with_percent else "")
         })
+        self.percent_em_formats = [
+            self.book.add_format({
+                'num_format': '0.0' + ('"%"' if with_percent else ""),
+                "pattern": 17,
+                "bg_color": "#444444",
+                "fg_color": "#000000",
+                "font_color": "#ffffff",
+            }),
+            self.book.add_format({
+                'num_format': '0.0' + ('"%"' if with_percent else ""),
+                "pattern": 18,
+                "bg_color": "#cccccc",
+                "fg_color": "#000000",
+            }),
+        ]
         self.percent_format.set_border()
+        for fmt in self.em_formats + self.percent_em_formats:
+            fmt.set_border()
         self.chart_row = None
 
     def paste(self, frame_or_series, **kwargs):
@@ -119,17 +150,31 @@ class SurveyExcelSheet(ExcelSheet):
         :param to_pie: change to pie chart
         :type builder: ChartBuilder
         :param builder: chart builder
+        :type with_emphasis: bool
+        :param with_emphasis: cell emphasis (default: False)
         """
         with_formula = kwargs.get('with_formula', True)
         to_pie = kwargs.get("to_pie", False)
+        with_emphasis = kwargs.get("with_emphasis", False)
+
+        sorted_value = sorted(set([value for i, value in enumerate(series) if not numpy.isnan(value) and value != 0 and series.index[i] not in self.reserved_names]), reverse=True)
+        top_value = sorted_value[:2]
+        while len(top_value) < 2:
+            top_value.append(None)
         start = None
         for i, value in enumerate(series):
             if i == 0:
                 start = self.cell(i, 1, row_abs=True)
             self.write(i, 0, series.index[i], self.table_format)
-            self.write(i, 1, value, self.table_format)
+            if not with_emphasis or series.index[i] in self.reserved_names or value not in top_value:
+                self.write(i, 1, value, self.table_format)
+            else:
+                self.write(i, 1, value, self.em_formats[top_value.index(value)])
             if with_formula:
-                self.write(i, 2, SURVEY_FORMULA.format(self.cell(i, 1), start), self.percent_format)
+                if not with_emphasis or series.index[i] in self.reserved_names or value not in top_value:
+                    self.write(i, 2, SURVEY_FORMULA.format(self.cell(i, 1), start), self.percent_format)
+                else:
+                    self.write(i, 2, SURVEY_FORMULA.format(self.cell(i, 1), start), self.percent_em_formats[top_value.index(value)])
 
         with_chart = kwargs.get("with_chart", True)
         Builder = kwargs.get("builder", SimpleBarChartBuilder)
@@ -148,6 +193,16 @@ class SurveyExcelSheet(ExcelSheet):
 
     def pasteDataFrame(self, frame, **kwargs):
         with_formula = kwargs.get('with_formula', True)
+        with_emphasis = kwargs.get("with_emphasis", False)
+
+        top_values = []
+        for index in frame.index:
+            sorted_value = sorted(set([value for i, value in enumerate(frame.ix[index]) if not numpy.isnan(value) and value != 0 and frame.columns[i] not in self.reserved_names]), reverse=True)
+            top_value = sorted_value[:2]
+            while len(top_value) < 2:
+                top_value.append(None)
+            top_values.append(top_value)
+
         table_start = 0
         left_header = 1
         formula_start = len(frame.columns) + left_header*2
@@ -178,13 +233,20 @@ class SurveyExcelSheet(ExcelSheet):
                         "total_row": self.current_row+1,
                     })
                 # write to value table
-                self.write(y+1, x+1, frame.values[y][x], self.table_format)
+                value = frame.values[y][x]
+                if not with_emphasis or column in self.reserved_names or value not in top_values[y]:
+                    self.write(y+1, x+1, value, self.table_format)
+                else:
+                    self.write(y+1, x+1, value, self.em_formats[top_values[y].index(value)])
                 # write to formula table
                 if with_formula and x != 0:
                     # write to
                     #    row: y + 1 (row header)
                     # column: formula_start + x + 1 (column header) - 1 (skip total)
-                    self.write(y+1, formula_start+x, SURVEY_FORMULA.format(self.cell(y+1, x+1), starts[y]), self.percent_format)
+                    if not with_emphasis or column in self.reserved_names or value not in top_values[y]:
+                        self.write(y+1, formula_start+x, SURVEY_FORMULA.format(self.cell(y+1, x+1), starts[y]), self.percent_format)
+                    else:
+                        self.write(y+1, formula_start+x, SURVEY_FORMULA.format(self.cell(y+1, x+1), starts[y]), self.percent_em_formats[top_values[y].index(value)])
 
         self.add_cross_chart(frame, formula_start, **kwargs)
 
@@ -274,6 +336,16 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                 raise Exception("columns does not match the common header.")
 
         with_formula = kwargs.get('with_formula', True)
+        with_emphasis = kwargs.get("with_emphasis", False)
+
+        top_values = []
+        for index in frame.index:
+            sorted_value = sorted(set([value for i, value in enumerate(frame.ix[index]) if not numpy.isnan(value) and value != 0 and frame.columns[i] not in self.reserved_names]), reverse=True)
+            top_value = sorted_value[:2]
+            while len(top_value) < 2:
+                top_value.append(None)
+            top_values.append(top_value)
+
         # check first series (except total series.)
         skip_total = False
         current_total = None
@@ -378,25 +450,44 @@ class CrossSingleTableSheet(SurveyExcelSheet):
                                 # cell format
                                 self.table_format)
                 # write to value table
-                self.write(
-                    # row, col
-                    y+index_start, table_start+x+1,
-                    # value
-                    frame.values[y][x],
-                    # cell format
-                    self.table_format)
+                value = frame.values[y][x]
+                if not with_emphasis or column in self.reserved_names or value not in top_values[y]:
+                    self.write(
+                        # row, col
+                        y+index_start, table_start+x+1,
+                        # value
+                        value,
+                        # cell format
+                        self.table_format)
+                else:
+                    self.write(
+                        # row, col
+                        y+index_start, table_start+x+1,
+                        # value
+                        value,
+                        # cell format
+                        self.em_formats[top_values[y].index(value)])
                 # write to formula table
                 if with_formula and x != 0:
                     # write to
                     #    row: y + 1 (row header)
                     # column: formula_start + x + 1 (column header) - 1 (skip total)
-                    self.write(
-                        # row, col
-                        y+index_start, formula_start+x,
-                        # value
-                        SURVEY_FORMULA.format(self.cell(y+index_start, table_start+x+1), starts[y]),
-                        # cell format
-                        self.percent_format)
+                    if not with_emphasis or column in self.reserved_names or value not in top_values[y]:
+                        self.write(
+                            # row, col
+                            y+index_start, formula_start+x,
+                            # value
+                            SURVEY_FORMULA.format(self.cell(y+index_start, table_start+x+1), starts[y]),
+                            # cell format
+                            self.percent_format)
+                    else:
+                        self.write(
+                            # row, col
+                            y+index_start, formula_start+x,
+                            # value
+                            SURVEY_FORMULA.format(self.cell(y+index_start, table_start+x+1), starts[y]),
+                            # cell format
+                            self.percent_em_formats[top_values[y].index(value)])
 
         self.add_cross_chart(frame, formula_start, skip_total=skip_total, **kwargs)
 
@@ -480,6 +571,16 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
         if init or not skip_header:
             self.writeCommonHeader()
 
+        with_emphasis = kwargs.get("with_emphasis", False)
+
+        top_values = []
+        for index in frame.index:
+            sorted_value = sorted(set([value for i, value in enumerate(frame.ix[index]) if not numpy.isnan(value) and value != 0 and frame.columns[i] not in self.reserved_names]), reverse=True)
+            top_value = sorted_value[:2]
+            while len(top_value) < 2:
+                top_value.append(None)
+            top_values.append(top_value)
+
         # check first series (except total series.)
         skip_total = False
         current_total = None
@@ -560,20 +661,38 @@ class CrossAzemichiTableSheet(SurveyExcelSheet):
                             # cell format
                             self.merge_format)
                 # write to value table
-                self.write(
-                    # row, col
-                    y*2+index_start, table_start+x+1,
-                    # value
-                    frame.values[y][x],
-                    # cell format
-                    self.table_format)
-                self.write(
-                    # row, col
-                    y*2+index_start+1, table_start+x+1,
-                    # value
-                    SURVEY_FORMULA.format(self.cell(y*2+index_start, table_start+x+1), starts[y]),
-                    # cell format
-                    self.percent_format)
+                value = frame.values[y][x]
+                if not with_emphasis or column in self.reserved_names or value not in top_values[y]:
+                    self.write(
+                        # row, col
+                        y*2+index_start, table_start+x+1,
+                        # value
+                        value,
+                        # cell format
+                        self.table_format)
+                    self.write(
+                        # row, col
+                        y*2+index_start+1, table_start+x+1,
+                        # value
+                        SURVEY_FORMULA.format(self.cell(y*2+index_start, table_start+x+1), starts[y]),
+                        # cell format
+                        self.percent_format)
+                else:
+                    self.write(
+                        # row, col
+                        y*2+index_start, table_start+x+1,
+                        # value
+                        value,
+                        # cell format
+                        self.em_formats[top_values[y].index(value)])
+                    self.write(
+                        # row, col
+                        y*2+index_start+1, table_start+x+1,
+                        # value
+                        SURVEY_FORMULA.format(self.cell(y*2+index_start, table_start+x+1), starts[y]),
+                        # cell format
+                        self.percent_em_formats[top_values[y].index(value)])
+
 
         self.add_cross_chart(frame, table_start, skip_total=skip_total, **kwargs)
 

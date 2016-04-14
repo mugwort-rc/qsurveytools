@@ -224,6 +224,12 @@ class MainWindow(QMainWindow):
             "with_percent": with_percent,
             "sa_to_pie": sa_to_pie,
             "gen_abstract": gen_abstract,
+            "with_emphasis": self.ui.checkBoxCellEmphasis.isChecked(),
+            "reserved_names": [
+                self.STRINGS.get("TOTAL", "TOTAL"),
+                self.STRINGS.get("BLANK", "BLANK"),
+                self.STRINGS.get("ERROR", "ERROR"),
+            ],
         }
 
         self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), output_options, strings=self.STRINGS)
@@ -258,6 +264,12 @@ class MainWindow(QMainWindow):
         output_options = {
             "cross_table_format": cross_table_format,
             "with_percent": with_percent,
+            "with_emphasis": self.ui.checkBoxCellEmphasis.isChecked(),
+            "reserved_names": [
+                self.STRINGS.get("TOTAL", "TOTAL"),
+                self.STRINGS.get("BLANK", "BLANK"),
+                self.STRINGS.get("ERROR", "ERROR"),
+            ],
             # chart option
             "chart": {
                 "with_total": self.ui.checkBoxChartAddYTotal.isChecked(),
@@ -299,7 +311,7 @@ class MainWindow(QMainWindow):
             if columnConfig.type not in [config.SINGLE, config.MULTIPLE]:
                 dest[column] = frame[column]
                 continue
-            if columnConfig.type == config.SINGLE:
+            if columnConfig.type == config.SINGLE or len(columnConfig.choice) <= 1:
                 dest[column] = frame[column]
             elif columnConfig.type == config.MULTIPLE:
                 expanded = (
@@ -572,9 +584,11 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
         with_percent = self.options.get("with_percent", False)
         sa_to_pie = self.options.get("sa_to_pie", False)
         gen_abstract = self.options.get("gen_abstract", False)
+        with_emphasis = self.options.get("with_emphasis", False)
+        reserved_names = self.options.get("reserved_names", [])
 
         from .. import excel
-        book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent)
+        book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent, reserved_names=reserved_names)
         sheet = book.worksheet(six.text_type(self.tr('SimpleAggregation')))
 
         abstracts = []
@@ -585,7 +599,7 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
             title = current_config.get('title', '')
             sheet.setTitle(title)
             to_pie = sa_to_pie and (current_config.get("type") == config.SINGLE)
-            sheet.paste(self.series[column], with_percent=with_percent, to_pie=to_pie)
+            sheet.paste(self.series[column], to_pie=to_pie, with_emphasis=with_emphasis)
             if gen_abstract:
                 abstracts.append((column, title, self.analyzer.abstract(self.series[column])))
             sheet.addPadding(3)
@@ -622,10 +636,11 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
     def save(self):
         # options
         with_percent = self.options.get("with_percent", False)
+        reserved_names = self.options.get("reserved_names", [])
 
         # create workbook
         from .. import excel
-        book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent)
+        book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent, reserved_names=reserved_names)
         # get option
         names = []
         cross_table_format = self.options.get("cross_table_format", CrossFormat.Default)
@@ -661,6 +676,7 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
                     continue
                 paste_option = {
                     "chart": self.options.get("chart", {}),
+                    "with_emphasis": self.options.get("with_emphasis", False),
                 }
                 if cross_table_format in [CrossFormat.SingleTable, CrossFormat.Azemichi, CrossFormat.AzemichiAdvanced]:
                     if cross_table_format == CrossFormat.AzemichiAdvanced:
