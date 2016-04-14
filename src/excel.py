@@ -859,8 +859,6 @@ class CrossStackedChartBuilder(ChartBuilder):
         chart = self._createChart(sheet)
         # column-base
         xaxis_count = self.xaxisCount()
-        if total_skipped:
-            xaxis_count -= 1
         categories = utils.createChartRange(sheet.name, [(x, COLUMN_C-1) for x in range_prefix]+[(row+1+index_start+i, COLUMN_C) for i in range(xaxis_count) if self.frame.index[i+1] not in self.drops])
         for i in range(self.yaxisCount()):
             COLUMN_RC = COLUMN_R1 + i  # R-current
