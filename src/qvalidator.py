@@ -114,6 +114,9 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
         )
         self.error = True
 
+    def updateConfig(self, conf):
+        return self.impl.updateConfig(conf)
+
     def validate(self, frame):
         self.impl.validate(frame)
 

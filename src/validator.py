@@ -39,9 +39,19 @@ class ValidationObject(object):
         self.config = conf
         self.filter = config.FilterController(self.config)
         self.errors = []
+        self.incompletes = []
 
     def registerError(self, column, index):
         self.errors.append((column, index))
+
+    def registerIncomplete(self, column):
+        if column not in self.incompletes:
+            self.incompletes.append(column)
+
+    def updateConfig(self, conf):
+        for column in self.incompletes:
+            conf.columns[column].complete = False
+        return conf
 
     def validate(self, frame):
         has_id = "ID" in frame.columns
@@ -111,6 +121,7 @@ class ValidationObject(object):
             if complete and filtered_series.hasnans():
                 for i in filtered_series[filtered_series.isnull()].index:
                     self.registerError(column, i)
+                    self.registerIncomplete(column)
                     self.cb.incompleteError(column, i, filtered_series[i], id=get_id(i))
 
             # check filtered notnull

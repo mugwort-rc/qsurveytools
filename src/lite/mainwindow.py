@@ -430,6 +430,7 @@ class MainWindow(QMainWindow):
                 sourceFrame = self.validator.errorToError(sourceFrame, ERROR)
             else:
                 sourceFrame = self.validator.errorToNaN(sourceFrame)
+            conf = self.validator.updateConfig(conf)
 
         self.ui.progressBarGeneral.setValue(2)
 
