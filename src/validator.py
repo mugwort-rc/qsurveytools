@@ -106,12 +106,12 @@ class ValidationObject(object):
             filtered = self.filter.applyFilter(frame, column, extend_refs=True)
 
             # check complete
-            filtered_series = frame[column][frame.index.isin(filtered.index)].notnull()
+            filtered_series = frame[column][frame.index.isin(filtered.index)]
             complete = conf.get('complete', False)
             if complete and filtered_series.hasnans():
                 for i in filtered_series[filtered_series.isnull()].index:
                     self.registerError(column, i)
-                    self.cb.incompleteError(column, i, series[i], id=get_id(i))
+                    self.cb.incompleteError(column, i, filtered_series[i], id=get_id(i))
 
             # check filtered notnull
             notnull = frame[column][~frame.index.isin(filtered.index)].notnull()

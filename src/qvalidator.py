@@ -68,7 +68,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
             QApplication.translate("QValidationObject", 'Warning: Undefined value found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
-                    .arg(value)
+                    .arg(self.valueEscape(value))
         )
         self.error = True
 
@@ -78,7 +78,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
             QApplication.translate("QValidationObject", 'Warning: Multiple exception error found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
-                    .arg(value)
+                    .arg(self.valueEscape(value))
         )
         self.error = True
 
@@ -88,7 +88,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
             QApplication.translate("QValidationObject", 'Warning: It exceeds the limit value was found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
-                    .arg(value)
+                    .arg(self.valueEscape(value))
         )
         self.error = True
 
@@ -100,7 +100,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
             QApplication.translate("QValidationObject", 'Warning: It exceeds the forbidden value was found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
-                    .arg(value)
+                    .arg(self.valueEscape(value))
         )
         self.error = True
 
@@ -110,7 +110,7 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
             QApplication.translate("QValidationObject", 'Warning: It exceeds the incomplete value was found in "%1" - #%2 : \'%3\'')
                     .arg(column)
                     .arg(row)
-                    .arg(value)
+                    .arg(self.valueEscape(value))
         )
         self.error = True
 
@@ -122,3 +122,6 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
 
     def errorToError(self, frame, error_string):
         return self.impl.errorToError(frame, error_string)
+
+    def valueEscape(self, value):
+        return value if value is not None else "nan"

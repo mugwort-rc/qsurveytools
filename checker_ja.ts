@@ -106,7 +106,7 @@
     <message>
         <location filename="src/qvalidator.py" line="109"/>
         <source>Warning: It exceeds the incomplete value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：完全回答に対して未入力値が見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
     </message>
 </context>
 <context>
