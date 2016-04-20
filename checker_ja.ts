@@ -3,12 +3,12 @@
 <context>
     <name>ConfigValidationObject</name>
     <message>
-        <location filename="src/checker/mainwindow.py" line="241"/>
+        <location filename="src/checker/mainwindow.py" line="244"/>
         <source>column &quot;%1&quot; has duplicate choices.</source>
         <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="249"/>
+        <location filename="src/checker/mainwindow.py" line="252"/>
         <source>column &quot;%1&quot; has reserved name.</source>
         <translation>&quot;%1&quot; 列に予約された選択肢があります。</translation>
     </message>
@@ -21,12 +21,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="src/checker/ui_mainwindow.ui" line="21"/>
+        <location filename="src/checker/ui_mainwindow.ui" line="24"/>
         <source>Start</source>
         <translation>開始</translation>
     </message>
     <message>
-        <location filename="src/checker/ui_mainwindow.ui" line="46"/>
+        <location filename="src/checker/ui_mainwindow.ui" line="53"/>
         <source>Exit</source>
         <translation>終了</translation>
     </message>
@@ -46,12 +46,12 @@
         <translation>エクセルを開いてください。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="174"/>
+        <location filename="src/checker/mainwindow.py" line="177"/>
         <source>Error: Sheet &quot;%1&quot; is not found.</source>
         <translation>エラー：シート &quot;%1&quot; が見つかりませんでした。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="177"/>
+        <location filename="src/checker/mainwindow.py" line="180"/>
         <source>Error: Sheet &quot;%1&quot; load failed.</source>
         <translation>エラー：シート &quot;%1&quot; のロードに失敗しました。</translation>
     </message>
@@ -61,9 +61,14 @@
         <translation>エラー： シート &quot;%1&quot; が正しい形式ではありません。</translation>
     </message>
     <message>
-        <location filename="src/checker/mainwindow.py" line="194"/>
+        <location filename="src/checker/mainwindow.py" line="197"/>
         <source>finished.</source>
         <translation>完了しました。</translation>
+    </message>
+    <message>
+        <location filename="src/checker/ui_mainwindow.ui" line="44"/>
+        <source>Check forbidden errors</source>
+        <translation>入力制限エラーを調べる</translation>
     </message>
 </context>
 <context>

@@ -15,6 +15,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0" colspan="3">
+     <widget class="QListView" name="listView"/>
+    </item>
     <item row="0" column="0">
      <widget class="QPushButton" name="pushButtonStart">
       <property name="text">
@@ -22,7 +25,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="0" column="2">
      <spacer name="horizontalSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -35,8 +38,12 @@
       </property>
      </spacer>
     </item>
-    <item row="1" column="0" colspan="2">
-     <widget class="QListView" name="listView"/>
+    <item row="0" column="1">
+     <widget class="QCheckBox" name="checkBoxCheckForbiddenErrors">
+      <property name="text">
+       <string>Check forbidden errors</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

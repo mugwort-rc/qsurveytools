@@ -163,7 +163,10 @@ class MainWindow(QMainWindow):
 
         # start validating
         self.error_ctx.setValidating()
-        self.validator = CustomValidationObject(conf, sheets[sheet_source], self)
+        validation_args = {
+            "noticeForbidden": self.ui.checkBoxCheckForbiddenErrors.isChecked(),
+        }
+        self.validator = CustomValidationObject(conf, sheets[sheet_source], self, **validation_args)
         self.setProgressObject(self.validator)
         self.progressBar.setVisible(True)
         self.validator.finished.connect(self.validationFinished)
@@ -264,14 +267,14 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
 
 
 class CustomValidationObject(qvalidator.QValidationObject):
-    def __init__(self, conf, sheet, parent=None):
+    def __init__(self, conf, sheet, parent=None, **kwargs):
         """
         :type sheet: win32com.client.Object
         :type parent: QObject
         """
         self.sheet = sheet
         self.last_error = None
-        super(CustomValidationObject, self).__init__(conf, parent)
+        super(CustomValidationObject, self).__init__(conf, parent, **kwargs)
 
         self._column_map = {x:i for i,x in enumerate(self.sheet.UsedRange()[0])}
         self._error_map = {}
@@ -317,7 +320,8 @@ class CustomValidationObject(qvalidator.QValidationObject):
         super(CustomValidationObject, self).limitationError(column, row, value, **kwargs)
 
     def forbiddenError(self, column, row, value, **kwargs):
-        self.setError(column, row)
+        if self.noticeForbidden:
+            self.setError(column, row)
         super(CustomValidationObject, self).forbiddenError(column, row, value, **kwargs)
 
     def incompleteError(self, column, row, value, **kwargs):
