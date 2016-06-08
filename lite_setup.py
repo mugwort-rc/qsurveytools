@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 import py2exe
 from distutils.core import setup
 
@@ -20,6 +24,13 @@ setup(
     data_files=matplotlib.get_py2exe_datafiles(),
     options={"py2exe" : py2exe_options},
     windows=[{"script" : "lite.py",
-              "dest_base": "surveytools"}],
+              "dest_base": "アンケート集計ツール",
+              # version
+              "version": "1.8.2.0",
+              "name": "アンケート集計ツール",
+              "company_name": "LANDBRAINS",
+              "copyright": "Copyright (c) 2015-2016 landbrains.",
+              "description": "アンケート集計ツール",
+              }],
     zipfile=None,
 )

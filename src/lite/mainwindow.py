@@ -656,15 +656,14 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             if target.id not in self.frames:
                 continue
             # check unique sheet name & normalize name
-            name = (target.name if target.name else target.id)[:31]
-            name = name.replace("[", "【").replace("]", "】")
-            name = name.replace("\r", "").replace("\n", "")
+            name = utils.normalizeSheetName((target.name if target.name else target.id))
+            name = name[:31]
             if name.lower() in names:
                 i = 1
                 while True:
                     i += 1
                     num_size = len(str(i))
-                    test_name = "{}({})".format(name[:31-(num_size+2)], i)
+                    test_name = "{} ({})".format(name[:31-(num_size+3)], i)
                     if test_name.lower() not in names:
                         name = test_name
                         break

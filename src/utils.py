@@ -164,4 +164,12 @@ def createChartRange(sheetname, rowcols):
             vec = RangeVector.Unknown
         prev = rowcol
     cells.append(to_range(start, rowcol))
-    return "=({})".format(",".join(["'{}'!{}".format(sheetname.replace("'", "''"), x) for x in cells]))
+    sheetname = sheetname.replace("'", "''")
+    return "=({})".format(",".join(["'{}'!{}".format(sheetname, x) for x in cells]))
+
+def normalizeSheetName(sheetname):
+    # reserved chars: :\/?*[]
+    sheetname = sheetname.replace("[", "【").replace("]", "】").replace("［", "【").replace("］", "】")
+    sheetname = re.sub(r"[:\\/\?\*：￥／？＊]", "", sheetname)
+    sheetname = re.sub(r"\s", "", sheetname)
+    return sheetname
