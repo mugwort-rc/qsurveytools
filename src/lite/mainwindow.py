@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import enum
+import os
 
 import pandas
 import six
@@ -230,6 +231,8 @@ class MainWindow(QMainWindow):
                 self.STRINGS.get("BLANK", "BLANK"),
                 self.STRINGS.get("ERROR", "ERROR"),
             ],
+            # raw output
+            "raw_output": self.ui.checkBoxRaw.isChecked(),
         }
 
         self.simple_aggregation = SimpleAggregationObject(conf, QDir(filepath).filePath(self.tr('simple.xlsx')), output_options, strings=self.STRINGS)
@@ -275,6 +278,8 @@ class MainWindow(QMainWindow):
                 "with_total": self.ui.checkBoxChartAddYTotal.isChecked(),
                 "drops": drops,
             },
+            # raw output
+            "raw_output": self.ui.checkBoxRaw.isChecked(),
         }
 
         self.cross_aggregation = CrossAggregationObject(conf, QDir(filepath).filePath(self.tr('cross.xlsx')), output_options, strings=self.STRINGS)
@@ -588,6 +593,21 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
         with_emphasis = self.options.get("with_emphasis", False)
         reserved_names = self.options.get("reserved_names", [])
 
+        if self.options.get("raw_output", False):
+            root, ext = os.path.splitext(six.text_type(self.filepath))
+            try:
+                with open(root + ".pickle", "wb") as fp:
+                    import pickle
+                    pickle.dump({
+                        "type": "simple",
+                        #"config": self.config,
+                        #"options": self.options,
+                        "series": [{"dict": x.to_dict(), "index": x.index.tolist()} for x in self.series],
+                    }, fp)
+            except IOError:
+                return False
+            return True
+
         from .. import excel
         book = excel.SurveyExcelBook(six.text_type(self.filepath), with_percent=with_percent, reserved_names=reserved_names)
         sheet = book.worksheet(six.text_type(self.tr('SimpleAggregation')))
@@ -638,6 +658,21 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
         # options
         with_percent = self.options.get("with_percent", False)
         reserved_names = self.options.get("reserved_names", [])
+
+        if self.options.get("raw_output", False):
+            root, ext = os.path.splitext(six.text_type(self.filepath))
+            try:
+                with open(root + ".pickle", "wb") as fp:
+                    import pickle
+                    pickle.dump({
+                        "type": "cross",
+                        #"config": self.config,
+                        #"options": self.options,
+                        "frames": [{"dict": x.to_dict(), "index": x.index.tolist(), "columns": x.columns.tolist()} for x in self.frames],
+                    }, fp)
+            except IOError:
+                return False
+            return True
 
         # create workbook
         from .. import excel
