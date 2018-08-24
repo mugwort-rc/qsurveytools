@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import QAbstractItemModel, QAbstractListModel, QAbstractTableModel
-from PyQt4.QtCore import QModelIndex
+from PyQt5.QtCore import QAbstractItemModel, QAbstractListModel, QAbstractTableModel
+from PyQt5.QtCore import QModelIndex
 
 class FetchObject(object):
     """

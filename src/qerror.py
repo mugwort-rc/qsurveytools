@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 from . import error
 from . import models
@@ -15,16 +15,16 @@ class ErrorContext(error.ErrorContext):
         super(ErrorContext, self).__init__()
         self.model_ = models.ArrayListModel(parent)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def addMessage(self, message):
         """
-        :type message: QString
+        :type message: str
         """
         current = self.model_.array()
         self.addError(len(current))
         self.model_.setArray(current+[message])
 
-    @pyqtSlot(QStringList)
+    @pyqtSlot(list)
     def addMessages(self, messages):
         """
         :type message: QStringList

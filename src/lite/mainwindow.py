@@ -10,7 +10,7 @@ import six
 import xlrd
 import yaml
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 from .. import analyzer
 from .. import qaggregation
@@ -23,7 +23,7 @@ from .. import qsource
 from .. import qvalidator
 from .. import status
 
-from ui_mainwindow import Ui_MainWindow
+from .ui_mainwindow import Ui_MainWindow
 
 
 class CrossFormat(enum.Enum):
@@ -156,11 +156,11 @@ class MainWindow(QMainWindow):
                                  Q_ARG(dict, self.STRINGS),
                                  Q_ARG(dict, options))
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def addMessage(self, text):
         self.model.setArray(self.model.array()+[text])
 
-    @pyqtSlot(QStringList)
+    @pyqtSlot(list)
     def addMessages(self, texts):
         self.model.setArray(self.model.array()+texts)
 
@@ -503,7 +503,7 @@ class MainWindow(QMainWindow):
         if error:
             self.model.setArray(self.model.array()+self.validator.messages)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def on_lineEditInput_textChanged(self, text):
         inputFilePath = six.text_type(self.ui.lineEditInput.text())
         outputFilePath = six.text_type(self.ui.lineEditOutput.text())
@@ -514,7 +514,7 @@ class MainWindow(QMainWindow):
 
 class ConfigValidationObject(QObject, config.ConfigCallback):
 
-    warning = pyqtSignal(QString)
+    warning = pyqtSignal(str)
 
     DUPLICATED = 1
 

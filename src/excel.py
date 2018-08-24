@@ -9,7 +9,7 @@ import six
 import xlsxwriter
 from xlsxwriter import utility
 
-import utils
+from . import utils
 
 EXCEL_CELL_WIDTH = 72.0
 EXCEL_CELL_HEIGHT = 18.0

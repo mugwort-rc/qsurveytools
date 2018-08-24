@@ -9,7 +9,7 @@ from pywintypes import com_error
 from ..win32 import constants
 from ..win32 import excel
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 from .. import config
 from .. import cursor
@@ -19,7 +19,7 @@ from .. import qerror
 from .. import qsource
 from .. import qvalidator
 
-from ui_mainwindow import Ui_MainWindow
+from .ui_mainwindow import Ui_MainWindow
 
 
 class Mode:
@@ -215,7 +215,7 @@ class MainWindow(QMainWindow):
 
 class ConfigValidationObject(QObject, config.ConfigCallback):
 
-    warning = pyqtSignal(QString)
+    warning = pyqtSignal(str)
 
     DUPLICATED = 1
     RESERVED = 2

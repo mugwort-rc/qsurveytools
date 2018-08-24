@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import Qt, QMimeData, QUrl
-from PyQt4.QtGui import QLineEdit, QDragEnterEvent, QDropEvent
+from PyQt5.QtCore import Qt, QMimeData, QUrl
+from PyQt5.QtGui import QLineEdit, QDragEnterEvent, QDropEvent
 
 from .. import events
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from models import ArrayListModel
+from ..models import ArrayListModel
 
-from ui_crosstabdialog import Ui_CrosstabDialog
+from .ui_crosstabdialog import Ui_CrosstabDialog
 
 class CrosstabDialog(QDialog):
     def __init__(self, parent=None):

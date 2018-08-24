@@ -7,9 +7,9 @@ import sys
 import six
 import pandas
 
-import callback
-import config
-import utils
+from . import callback
+from . import config
+from . import utils
 
 class AggregationCallback(callback.Callback):
     def addSeries(self, column, series):

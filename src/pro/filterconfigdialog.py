@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from models import ArrayListModel
+from ..models import ArrayListModel
 
-from ui_filterconfigdialog import Ui_FilterConfigDialog
+from .ui_filterconfigdialog import Ui_FilterConfigDialog
 
 class FilterConfigDialog(QDialog):
     def __init__(self, columns, keys, parent=None):

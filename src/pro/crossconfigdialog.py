@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 from models import ArrayListModel
 from models import convertToBuiltinType
 
-from ui_crossconfigdialog import Ui_CrossConfigDialog
+from .ui_crossconfigdialog import Ui_CrossConfigDialog
 
 class CrossConfigDialog(QDialog):
     def __init__(self, columns, parent=None):

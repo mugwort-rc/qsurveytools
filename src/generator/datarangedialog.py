@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from ui_datarangedialog import Ui_DataRangeDialog
+from .ui_datarangedialog import Ui_DataRangeDialog
 
 
 class DataRangeDialog(QDialog):

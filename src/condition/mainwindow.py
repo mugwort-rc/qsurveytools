@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 import win32com.client
 from pywintypes import com_error
@@ -11,9 +11,9 @@ from .. import config
 from .. import cursor
 from .. import models
 
-from conditiondialog import ConditionDialog
+from .conditiondialog import ConditionDialog
 
-from ui_mainwindow import Ui_MainWindow
+from .ui_mainwindow import Ui_MainWindow
 
 class Mode:
     Default = 0

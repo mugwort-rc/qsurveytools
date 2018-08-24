@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
 
-# python2 compatibility
-_str = str
-str = unicode
-
 import os
 from decimal import Decimal
 
 from jinja2 import Environment, FileSystemLoader
 import pandas
 
-from PyQt4.Qt import *
-from PyQt4.QtWebKit import *
+from PyQt5.Qt import *
+from PyQt5.QtWebKit import *
 
-from models import DataFrameTableModel
-from models import SeriesTableModel
+from ..models import DataFrameTableModel
+from ..models import SeriesTableModel
 
-from ui_surveydialog import Ui_SurveyDialog
+from .ui_surveydialog import Ui_SurveyDialog
 
 BASEPATH = os.path.abspath(os.path.dirname(__file__))
 

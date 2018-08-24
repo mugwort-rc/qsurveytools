@@ -4,7 +4,7 @@
 import sys
 import os
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 
 def main(argv):

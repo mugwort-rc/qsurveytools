@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 
 import pandas
 
-import aggregation
-import config
-import progress
+from . import aggregation
+from . import config
+from . import progress
 
 
 class QAggregationObject(progress.ProgressObject):

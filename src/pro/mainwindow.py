@@ -1,34 +1,29 @@
 # -*- coding: utf-8 -*-
 
-# python2 compatibility
-from __future__ import unicode_literals
-_str = str
-str = unicode
-
 import re
 
 import pandas
 import yaml
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from aggregation import SimpleAggregationObject, CrossAggregationObject
-from aggregation import AggregationCallback
-import config
-from config import Config
-from config import SafeDumper
-from config import makeConfigByDataFrame
-from models import DataFrameTableModel
+from ..aggregation import SimpleAggregationObject, CrossAggregationObject
+from ..aggregation import AggregationCallback
+from .. import config
+from ..config import Config
+from ..config import SafeDumper
+from ..config import makeConfigByDataFrame
+from ..models import DataFrameTableModel
 
-from configdialog import ConfigDialog
-from sourceinfodialog import SourceInfoDialog
-from crosstabdialog import CrosstabDialog
+from .configdialog import ConfigDialog
+from .sourceinfodialog import SourceInfoDialog
+from .crosstabdialog import CrosstabDialog
 
-from listdialog import ArraySelectDialog
-from tabledialog import DataFrameDialog, SeriesDialog
-from surveydialog import SimpleSurveyDialog, CrossSurveyDialog
+from .listdialog import ArraySelectDialog
+from .tabledialog import DataFrameDialog, SeriesDialog
+from .surveydialog import SimpleSurveyDialog, CrossSurveyDialog
 
-from ui_mainwindow import Ui_MainWindow
+from .ui_mainwindow import Ui_MainWindow
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):

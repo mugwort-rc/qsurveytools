@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import QObject, QEvent
+from PyQt5.QtCore import QObject, QEvent
 
 
 class FileDragAndDropFilter(QObject):

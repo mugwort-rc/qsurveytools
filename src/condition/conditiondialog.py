@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 from .. import models
 from .. import utils
 
-from ui_conditiondialog import Ui_ConditionDialog
+from .ui_conditiondialog import Ui_ConditionDialog
 
 
 class ConditionDialog(QDialog):
@@ -79,7 +79,7 @@ class ConditionDialog(QDialog):
         button = self.ui.buttonBox.button(QDialogButtonBox.Ok)
         button.setEnabled(enabled)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def on_comboBox_currentIndexChanged(self, text):
         text = utils.text_type(text)
         if text not in self.config.columns:

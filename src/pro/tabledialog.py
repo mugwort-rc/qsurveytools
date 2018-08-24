@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from models import DataFrameTableModel
-from models import SeriesTableModel
+from ..models import DataFrameTableModel
+from ..models import SeriesTableModel
 
-from ui_tabledialog import Ui_TableDialog
+from .ui_tabledialog import Ui_TableDialog
 
 class TableDialog(QDialog):
     def __init__(self, parent=None):

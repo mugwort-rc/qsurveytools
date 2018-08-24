@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from ui_columndialog import Ui_ColumnDialog
+from .ui_columndialog import Ui_ColumnDialog
 
 
 class ColumnDialog(QDialog):

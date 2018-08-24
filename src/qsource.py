@@ -2,7 +2,7 @@
 
 import six
 
-from PyQt4.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication
 
 _ = six.text_type
 

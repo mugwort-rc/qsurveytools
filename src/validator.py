@@ -2,9 +2,9 @@
 
 import numpy
 
-import callback
-import config
-import utils
+from . import callback
+from . import config
+from . import utils
 
 
 class ValidationCallback(callback.Callback):

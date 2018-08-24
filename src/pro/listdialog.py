@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
 from models import ArrayListModel
 
-from ui_listdialog import Ui_ListDialog
+from .ui_listdialog import Ui_ListDialog
 
 class ListDialog(QDialog):
     def __init__(self, parent):

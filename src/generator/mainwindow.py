@@ -2,9 +2,9 @@
 
 from __future__ import unicode_literals
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from ui_mainwindow import Ui_MainWindow
+from .ui_mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow):

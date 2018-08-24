@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QApplication
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QApplication
 
-import progress
-import validator
+from . import progress
+from . import validator
 
 
 class QValidationObject(progress.ProgressObject, validator.ValidationCallback):

@@ -3,9 +3,9 @@
 import numpy
 import six
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-import abstract
+from . import abstract
 
 def convertToBuiltinType(data):
     if isinstance(data, numpy.int64):

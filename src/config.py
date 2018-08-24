@@ -9,9 +9,9 @@ import yaml
 from yaml.dumper import SafeDumper
 from yaml.representer import SafeRepresenter
 
-import utils
-from utils import and_concat, or_concat
-from utils import expand_multiple_bool
+from . import utils
+from .utils import and_concat, or_concat
+from .utils import expand_multiple_bool
 
 UNKNOWN = 0
 SINGLE = 1

@@ -3,12 +3,9 @@
 import os
 import pandas
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from ui_sourceinfodialog import Ui_SourceInfoDialog
-
-# python2 compatibility
-str = unicode
+from .ui_sourceinfodialog import Ui_SourceInfoDialog
 
 class SourceInfoDialog(QDialog):
     def __init__(self, parent=None):

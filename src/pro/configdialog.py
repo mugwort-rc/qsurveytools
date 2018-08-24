@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.Qt import *
+from PyQt5.Qt import *
 
-from config import Config
-from config import Filter
-from config import Cross, CrossItem
-from models import StrArrayListModel
-from config import SafeDumper
-from models import ArrayListModel
-from models import convertToBuiltinType
-from utils import and_concat
+from ..config import Config
+from ..config import Filter
+from ..config import Cross, CrossItem
+from ..models import StrArrayListModel
+from ..config import SafeDumper
+from ..models import ArrayListModel
+from ..models import convertToBuiltinType
+from ..utils import and_concat
 
-from crossconfigdialog import CrossConfigDialog
-from filterconfigdialog import FilterConfigDialog
-from listdialog import ArraySelectDialog
+from .crossconfigdialog import CrossConfigDialog
+from .filterconfigdialog import FilterConfigDialog
+from .listdialog import ArraySelectDialog
 
-from ui_configdialog import Ui_ConfigDialog
-
-# python2 compatibility
-_str = str
-str = unicode
+from .ui_configdialog import Ui_ConfigDialog
 
 class ConfigDialog(QDialog):
     def __init__(self, parent=None):
@@ -148,7 +144,7 @@ class ConfigDialog(QDialog):
         key = convertToBuiltinType(value)
         self.setupColumnsForm(key)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def on_lineEditColumnsTitle_textChanged(self, text):
         self.updateColumnsConfig('title', str(text))
 

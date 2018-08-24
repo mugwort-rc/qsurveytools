@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import pyqtSlot, QObject
+from PyQt5.QtCore import pyqtSlot, QObject
 
 from .. import progress
 

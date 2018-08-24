@@ -10,7 +10,7 @@ py2exe_options = {
     "compressed": 1,
     "optimize": 2,
     "bundle_files": 1,
-    "includes" : ["sip", "PyQt4.QtCore", "PyQt4.QtGui",
+    "includes" : ["sip", "PyQt5.QtCore", "PyQt5.QtGui", "PyQt5.QtWidgets",
                   "zmq.backend.cython"],
     "excludes": ["zmq.libzmq"],
     "dll_excludes": ["MSVCP90.dll", "HID.DLL", "w9xpopen.exe",
