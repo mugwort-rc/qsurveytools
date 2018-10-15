@@ -31,11 +31,9 @@ def main(args):
     env = Environment(loader=FileSystemLoader(os.path.join(BASEDIR, 'templates'), encoding='utf8'))
     tpl = env.get_template('template.html')
     import markdown
-    from markdown.extensions.headerid import HeaderIdExtension
     md = markdown.Markdown(
         extensions=[
             'markdown.extensions.attr_list',
-            HeaderIdExtension(forceid=False),
             'markdown.extensions.toc',
             "markdown.extensions.meta",
         ]
