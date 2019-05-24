@@ -607,7 +607,7 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
                 return False
             return True
 
-        from .. import excel
+        from . import excel
         book = excel.SurveyExcelBook(str(self.filepath), with_percent=with_percent, reserved_names=reserved_names)
         sheet = book.worksheet(str(self.tr('SimpleAggregation')))
 
@@ -674,7 +674,7 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
             return True
 
         # create workbook
-        from .. import excel
+        from . import excel
         book = excel.SurveyExcelBook(str(self.filepath), with_percent=with_percent, reserved_names=reserved_names)
         # get option
         names = []
