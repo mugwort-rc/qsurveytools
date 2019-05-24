@@ -3,8 +3,6 @@
 import re
 import types
 
-import six
-
 import yaml
 from yaml.dumper import SafeDumper
 from yaml.representer import SafeRepresenter
@@ -89,20 +87,20 @@ make_unique = make_lambda(utils.unique_list, [])
 class Config(ConfigBase):
 
     CONFIG = [
-        ("columnOrder", make_lambda_map(six.text_type)),
+        ("columnOrder", make_lambda_map(str)),
         # lazy eval (lambda x: ...)
-        ("columns", make_lambda_dict(six.text_type, lambda x: Column(x))),
+        ("columns", make_lambda_dict(str, lambda x: Column(x))),
         ("filters", make_lambda_map(lambda x: Filter(x))),
         ("cross", make_lambda(lambda x: Cross(x), {})),]
 
 
-_make_column_choice = make_lambdas([make_lambda_map(six.text_type), make_unique], [])
+_make_column_choice = make_lambdas([make_lambda_map(str), make_unique], [])
 _make_multiex = make_lambdas([make_lambda_map(int), make_unique], [])
 
 class Column(ConfigBase):
     CONFIG = [
         ("type", int),
-        ("title", six.text_type),
+        ("title", str),
         ("choice", _make_column_choice),
         ("complete", bool),
         ("limit", int),
@@ -111,15 +109,15 @@ class Column(ConfigBase):
 class Filter(ConfigBase):
 
     CONFIG = [
-        ("key", six.text_type),
-        ("type", six.text_type),
-        ("targets", make_lambda_map(six.text_type)),
+        ("key", str),
+        ("type", str),
+        ("targets", make_lambda_map(str)),
         ("choices", make_lambda_map(int)),]
 
     def __unicode__(self):
         return '<{}:"{}" [{}]>: {}'.format(
             self.type, self.key,
-            ', '.join(map(six.text_type, self.choices)),
+            ', '.join(map(str, self.choices)),
             ', '.join(map(lambda x: '"{}"'.format(x), self.targets))
         )
 
@@ -153,8 +151,8 @@ class Cross(ConfigBase):
 class CrossItem(ConfigBase):
 
     CONFIG = [
-        ("id", six.text_type),
-        ("name", six.text_type),]
+        ("id", str),
+        ("name", str),]
 
     def __unicode__(self):
         return '<{}>'.format(self.name if self.name else '#{}'.format(self.id))
@@ -332,7 +330,7 @@ def makeConfigByDataFrame(frame, cross=None, cb=None, reserved=[]):
     del frame['ID']
     # drop auto generated columns
     for col in frame.columns:
-        if not isinstance(col, six.string_types):
+        if not isinstance(col, str):
             continue
         # special case for pandas.read_excel and win32.byUsedRange
         if not is_auto_generated(col):
@@ -360,7 +358,7 @@ def makeConfigByDataFrame(frame, cross=None, cb=None, reserved=[]):
     # generate config by frame
     config = Config()
     # columnOrder
-    config.columnOrder = map(six.text_type, columns)
+    config.columnOrder = map(str, columns)
     # columns
     for rawcol, strcol in zip(columns, config.columnOrder):
         # skip empty column
@@ -371,8 +369,8 @@ def makeConfigByDataFrame(frame, cross=None, cb=None, reserved=[]):
             'complete': get_complete(types[rawcol]),
             'limit': get_limit(types[rawcol]),
             'multiex': get_multiex(types[rawcol]),
-            'title': six.text_type(titles[rawcol]),
-            'choice': map(six.text_type, choices[rawcol].dropna().values.tolist()),
+            'title': str(titles[rawcol]),
+            'choice': map(str, choices[rawcol].dropna().values.tolist()),
         })
         if cb is not None:
             for choice in choices[rawcol].dropna():
@@ -508,7 +506,7 @@ def mk_type(type, complete=False):
     return '/'.join(temp)
 
 def get_type(type):
-    if not isinstance(type, six.string_types):
+    if not isinstance(type, str):
         return UNKNOWN
     type = utils.text_normalize(type)
     if 'F' in type:
@@ -520,7 +518,7 @@ def get_type(type):
     return UNKNOWN
 
 def get_complete(type):
-    if isinstance(type, six.string_types):
+    if isinstance(type, str):
         type = utils.text_normalize(type)
         return 'C' in type
     return False

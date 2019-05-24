@@ -1,58 +1,54 @@
 # -*- coding: utf-8 -*-
 
-import six
-
 from PyQt5.QtCore import QCoreApplication
-
-_ = six.text_type
 
 class Source:
     # Sheets
     @staticmethod
     def sheet_setting():
-        return _(QCoreApplication.translate("Source", "Setting"))
+        return str(QCoreApplication.translate("Source", "Setting"))
 
     @staticmethod
     def sheet_cross():
-        return _(QCoreApplication.translate("Source", "Cross"))
+        return str(QCoreApplication.translate("Source", "Cross"))
 
     @staticmethod
     def sheet_source():
-        return _(QCoreApplication.translate("Source", "Source"))
+        return str(QCoreApplication.translate("Source", "Source"))
 
     # Setting
     @staticmethod
     def setting_id():
-        return _(QCoreApplication.translate("Source", "ID"))
+        return str(QCoreApplication.translate("Source", "ID"))
 
     @staticmethod
     def setting_title():
-        return _(QCoreApplication.translate("Source", "TITLE"))
+        return str(QCoreApplication.translate("Source", "TITLE"))
 
     @staticmethod
     def setting_type():
-        return _(QCoreApplication.translate("Source", "TYPE"))
+        return str(QCoreApplication.translate("Source", "TYPE"))
 
     @staticmethod
     def setting_ok():
-        return _(QCoreApplication.translate("Source", "OK"))
+        return str(QCoreApplication.translate("Source", "OK"))
 
     @staticmethod
     def setting_ng():
-        return _(QCoreApplication.translate("Source", "NG"))
+        return str(QCoreApplication.translate("Source", "NG"))
 
     # Cross
     @staticmethod
     def cross_sheet():
-        return _(QCoreApplication.translate("Source", "Sheets"))
+        return str(QCoreApplication.translate("Source", "Sheets"))
 
     @staticmethod
     def cross_element():
-        return _(QCoreApplication.translate("Source", "Element"))
+        return str(QCoreApplication.translate("Source", "Element"))
 
     @staticmethod
     def cross_element_name():
-        return _(QCoreApplication.translate("Source", "ElementName"))
+        return str(QCoreApplication.translate("Source", "ElementName"))
 
 
     @classmethod

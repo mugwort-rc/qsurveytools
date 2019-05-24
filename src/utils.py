@@ -6,7 +6,6 @@ import unicodedata
 import re
 
 import enum
-import six
 import pandas
 from xlsxwriter import utility
 
@@ -91,7 +90,7 @@ def expand_base(series):
         series
             .dropna()
             .apply(round_cast)
-            .apply(six.text_type)
+            .apply(str)
             .apply(text_normalize)
             .str
             .split(r"\s*,\s*")
@@ -118,7 +117,7 @@ def round_cast(x):
         return x
 
 
-text_type = six.text_type
+text_type = str
 
 def text_normalize(text):
     return unicodedata.normalize("NFKC", text_type(text))

@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import math
 import numpy
 import pandas
-import six
 import xlsxwriter
 from xlsxwriter import utility
 
@@ -856,7 +855,7 @@ class SimpleBarChartBuilder(ChartBuilder):
         # plot area size
         longest_category = ""
         for index in self.series.index:
-            index = six.text_type(index)
+            index = str(index)
             longest_category = index if len(index) > len(longest_category) else longest_category
         index_width = min(self.FONT_PT * len(longest_category), self.WIDTH / 2)
         if to_pie:
@@ -1037,7 +1036,7 @@ class CrossStackedChartBuilder(ChartBuilder):
         chart_xaxis_count -= len([x for x in self.frame.index if x in self.drops])
         longest_category = ""
         for index in self.frame.index:
-            index = six.text_type(index)
+            index = str(index)
             longest_category = index if len(index) > len(longest_category) else longest_category
         index_width = min(self.FONT_PT * len(longest_category), self.WIDTH / 2)
         index_height = self.HEIGHT_PER_SERIES * chart_xaxis_count
@@ -1204,7 +1203,7 @@ class CrossAzemichiChartBuilder(ChartBuilder):
         # plot area size
         longest_category = ""
         for index in self.frame.index:
-            index = six.text_type(index)
+            index = str(index)
             longest_category = index if len(index) > len(longest_category) else longest_category
         index_width = min(self.FONT_PT * len(longest_category), self.WIDTH / 2)
         index_height = self.HEIGHT_PER_SERIES * self.xaxisCount()

@@ -3,7 +3,6 @@
 import os.path
 
 import pandas
-import six
 import yaml
 
 from .. import config
@@ -88,14 +87,14 @@ def test_make_lambda_dict():
         def __eq__(self, rhs):
             return isinstance(rhs, Dummy) and self.value == rhs.value
 
-    lmd = config.make_lambda_dict(six.text_type, Dummy)
+    lmd = config.make_lambda_dict(str, Dummy)
     assert lmd() == {}
     assert lmd({
         "a": "x",
         1: 0,
     }) == {"a": Dummy("x"), "1": Dummy(0)}
 
-    lmd = config.make_lambda_dict(six.text_type, Dummy, {"a": "z"})
+    lmd = config.make_lambda_dict(str, Dummy, {"a": "z"})
     assert lmd() == {"a":Dummy("z")}
     assert lmd({
         "a": "x",

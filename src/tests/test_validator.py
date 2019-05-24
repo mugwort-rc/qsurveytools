@@ -2,7 +2,6 @@
 
 import mock
 import pandas
-import six
 
 
 from .. import config
