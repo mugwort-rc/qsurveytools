@@ -16,7 +16,7 @@ py2exe_options = {
     "bundle_files": 1,
     "includes" : ["sip", "PyQt5.QtCore", "PyQt5.QtGui", "PyQt5.QtGui",
                   "zmq.backend.cython"],
-    "excludes": ["zmq.libzmq"],
+    "excludes": ["zmq.libzmq", "six.moves.urllib", "jsonschema", "nbformat", "jinja2.asyncsupport", "py", "tkinter"],
     "dll_excludes": ["MSVCP90.dll", "HID.DLL", "w9xpopen.exe",
                      "libzmq.pyd", "libiomp5md.dll"]
 }
