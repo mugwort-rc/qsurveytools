@@ -2,7 +2,21 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-アンケート等の集計ツールです。
+Excelでデータ管理を行うことができる集計ツールです。
+
+![mainwindow](./docs/html/html/img/mainwindow-menu.png)
+
+[テンプレートファイル](https://github.com/mugwort-rc/qsurveytools/raw/master/templates/template_ja.xlsx)をもとに設問設定シートに集計したい設問情報を設定し、
+
+![setting](./docs/html/html/img/setting.png)
+
+ソースシートに対応するデータを設定することで単純集計表を出力します。
+
+![source](./docs/html/html/img/source.png)
+
+クロス設定シートにクロスしたい要素を列挙することで、クロス集計表も出力可能です。
+
+![cross](./docs/html/html/img/cross.png)
 
 ## Linux
 
