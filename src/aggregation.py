@@ -187,7 +187,7 @@ class SimpleAggregationObject(AggregationObject):
 
 
 class CrossAggregationObject(AggregationObject):
-    def cross_aggregation(self, frame, values=None, aggfunc=len):
+    def cross_aggregation(self, frame, values=None, aggfunc=None):
         self.cb.initialize(len(self.config.cross.keys)*len(self.config.cross.targets))
         for i, key in enumerate(self.config.cross.keys):
             base = i * len(self.config.cross.targets)
@@ -197,7 +197,7 @@ class CrossAggregationObject(AggregationObject):
                 self.cb.addDataFrame(key.id, target.id, crossed)
         self.cb.finish()
 
-    def crosstab(self, frame, index, column, values=None, aggfunc=len):
+    def crosstab(self, frame, index, column, values=None, aggfunc=None):
         """
         :type frame: pandas.DataFrame
         :param frame: source frame

@@ -769,7 +769,7 @@ class ChartBuilder(object):
 
     def createChartRange(self, sheetname, column, rows):
         assert(len(rows) > 0)
-        return utils.createChartRange(sheetname, zip(rows, [column]*len(rows)))
+        return utils.createChartRange(sheetname, list(zip(rows, [column]*len(rows))))
 
 
 class SimpleBarChartBuilder(ChartBuilder):
@@ -938,7 +938,7 @@ class CrossStackedChartBuilder(ChartBuilder):
         :param row: start row
         :type column: int
         :param column: start column
-        
+
         kwargs:
             :type fixed_header: int
             :param fixed_header: fixed header value (default: row)
