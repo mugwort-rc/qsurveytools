@@ -22,9 +22,9 @@ def main(argv):
     if qtTr.load("qt_" + QLocale.system().name(), ':/i18n'):
         app.installTranslator(qtTr)
 
-    liteTr = QTranslator()
-    if liteTr.load("lite_" + QLocale.system().name(), ':/i18n'):
-        app.installTranslator(liteTr)
+    appTr = QTranslator()
+    if appTr.load("qsurveytools_" + QLocale.system().name(), ':/i18n'):
+        app.installTranslator(appTr)
 
     from src.mainwindow import MainWindow
 

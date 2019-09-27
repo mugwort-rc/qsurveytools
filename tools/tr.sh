@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-pylupdate4 qsurveytools.pro
+pylupdate5 qsurveytools.pro

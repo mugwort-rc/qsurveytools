@@ -149,7 +149,7 @@ class SimpleAggregationObject(AggregationObject):
         else:
             series = series.fillna(BLANK)
         vc = pandas.value_counts(series, sort=False)
-        vc.set_value(TOTAL, len(series))
+        vc.at[TOTAL] = len(series)
         return self.reindex(vc, column, named_index, dropna)
 
     def multiple_value_counts(self, frame, column, named_index, dropna):
@@ -171,10 +171,10 @@ class SimpleAggregationObject(AggregationObject):
         frame = utils.expand_multiple(series)
         vc_frame = pandas.melt(frame).dropna().groupby("value").agg(len)
         vc = vc_frame["variable"] if "variable" in vc_frame else pandas.Series()
-        vc.set_value(TOTAL, len(frame.index))
+        vc.at[TOTAL] = len(frame.index)
         blank = len(series)-series.count()  # total - notnull
         if not dropna and blank > 0:
-            vc.set_value(BLANK, blank)
+            vc.at[BLANK] = blank
         return self.reindex(vc, column, named_index, dropna)
 
     def reindex(self, series, column, named_index, dropna):
@@ -303,7 +303,7 @@ class CrossAggregationObject(AggregationObject):
         iframe = pandas.DataFrame()
         iframe["key"] = iseries
         iframe["index"] = iseries.index
-        columns = map(lambda x: "col_{}".format(x), cframe.columns)
+        columns = list(map(lambda x: "col_{}".format(x), cframe.columns))
         cframe.columns = columns
         cframe["index"] = cframe.index
         cframe[None] = self.gen_blanks(frame, column)

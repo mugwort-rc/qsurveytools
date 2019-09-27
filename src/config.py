@@ -34,7 +34,7 @@ class ConfigBase(dict):
         self.update(base)
         for attr in self.CONFIG:
             if isinstance(attr, tuple) and len(attr) == 2:
-                key,default = attr
+                key, default = attr
                 if callable(default):
                     if key in self:
                         setattr(self, key, default(self[key]))
@@ -72,7 +72,7 @@ def make_lambdas(funcs, default):
     return result
 
 def make_lambda_map(type, default=[]):
-    return make_lambda(lambda x: map(type, x), default)
+    return make_lambda(lambda x: list(map(type, x)), default)
 
 def make_lambda_dict(ktype, vtype, default={}):
     _gen = lambda x: _gen_type_dict(ktype, vtype, x)
@@ -358,7 +358,7 @@ def makeConfigByDataFrame(frame, cross=None, cb=None, reserved=[]):
     # generate config by frame
     config = Config()
     # columnOrder
-    config.columnOrder = map(str, columns)
+    config.columnOrder = list(map(str, columns))
     # columns
     for rawcol, strcol in zip(columns, config.columnOrder):
         # skip empty column
@@ -370,7 +370,7 @@ def makeConfigByDataFrame(frame, cross=None, cb=None, reserved=[]):
             'limit': get_limit(types[rawcol]),
             'multiex': get_multiex(types[rawcol]),
             'title': str(titles[rawcol]),
-            'choice': map(str, choices[rawcol].dropna().values.tolist()),
+            'choice': list(map(str, choices[rawcol].dropna().values.tolist())),
         })
         if cb is not None:
             for choice in choices[rawcol].dropna():

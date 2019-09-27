@@ -100,21 +100,21 @@ class MainWindow(QMainWindow):
     def getOpenFileName(self, filter, caption='', dir=None):
         if dir is None:
             dir = self.lastDirectory
-        result = QFileDialog.getOpenFileName(self, caption, dir, filter)
+        result, filter = QFileDialog.getOpenFileName(self, caption, dir, filter)
         self.setLastDirectory(result)
         return result
 
     def getSaveFileName(self, filter, caption='', dir=None):
         if dir is None:
             dir = self.lastDirectory
-        result = QFileDialog.getSaveFileName(self, caption, dir, filter)
+        result, filter = QFileDialog.getSaveFileName(self, caption, dir, filter)
         self.setLastDirectory(result)
         return result
 
     def getExistingDirectory(self, caption='', dir=None):
         if dir is None:
             dir = self.lastDirectory
-        result = QFileDialog.getExistingDirectory(self, caption, dir)
+        result, filter = QFileDialog.getExistingDirectory(self, caption, dir)
         self.setLastDirectory(result)
         return result
 
@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
             'na_values': na_values,
         }
         if info.suffix() in ['xlsx', 'xlsm']:
-            frame = pandas.read_excel(filepath, sheetname=0, **kwargs)
+            frame = pandas.read_excel(filepath, sheet_name=0, **kwargs)
         elif info.suffix() == 'csv':
             frame = pandas.read_csv(filepath, **kwargs)
         else:
@@ -354,9 +354,9 @@ class MainWindow(QMainWindow):
             sheet_source = qsource.Source.sheet_source()
             try:
                 frames = self.load_excel_sheets(inputFilePath, [
-                    sheet_setting,
-                    sheet_cross,
-                    sheet_source,
+                    (sheet_setting, None),
+                    (sheet_cross, 0),
+                    (sheet_source, None),
                 ])
             except:
                 self.addMessage(self.tr('Error: Input "{}" load failed.').format(inputFilePath))
@@ -450,13 +450,17 @@ class MainWindow(QMainWindow):
         names = book.sheet_names()
         size = len(book.sheets())
         temp = []
-        for sheet in sheets:
+        for sheet, index_col in sheets:
             if ((isinstance(sheet, str) and sheet in names) or
                 (isinstance(sheet, int) and sheet < size)):
-                temp.append(sheet)
+                temp.append((sheet, index_col))
         result = {}
-        for index in temp:
-            result[index] = pandas.read_excel(path, sheetname=index)
+        for index, index_col in temp:
+            result[index] = pandas.read_excel(
+                path,
+                sheet_name=index,
+                index_col=index_col
+            )
         return result
 
     @pyqtSlot(int)
@@ -545,8 +549,7 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
 
 class QSimpleAggregationAnalyzer(QObject, analyzer.SimpleAggregationAnalyzer):
     def __init__(self, reserved_names, parent=None):
-        QObject.__init__(self, parent)
-        analyzer.SimpleAggregationAnalyzer.__init__(self, reserved_names)
+        super().__init__(reserved_names=reserved_names, parent=parent)
 
     def abstract(self, series):
         rs = self._abstract_info(series)
@@ -578,7 +581,7 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
         self.filepath = filepath
         self.options = options
         self.strings = strings
-        self.analyzer = QSimpleAggregationAnalyzer(reserved_names=self.strings)
+        self.analyzer = QSimpleAggregationAnalyzer(self.strings)
         self.series = {}
 
     def addSeries(self, name, series):
