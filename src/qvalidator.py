@@ -43,52 +43,46 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
 
     def columnNotFound(self, column):
         self.messages.append(
-            QApplication.translate("QValidationObject", "Warning: Column \"%1\" is not found.")
-                    .arg(column)
+            QApplication.translate("QValidationObject", "Warning: Column \"{}\" is not found.")
+                    .format(column)
         )
         self.error = True
 
     def settingNotFound(self, column):
         self.messages.append(
-            QApplication.translate("QValidationObject", "Warning: Setting \"%1\" is not found.")
-                    .arg(column)
+            QApplication.translate("QValidationObject", "Warning: Setting \"{}\" is not found.")
+                    .format(column)
         )
         self.error = True
 
     def settingIsUnknown(self, column):
         self.messages.append(
-            QApplication.translate("QValidationObject", "Warning: Setting \"%1\" is Unknown type.")
-                    .arg(column)
+            QApplication.translate("QValidationObject", "Warning: Setting \"{}\" is Unknown type.")
+                    .format(column)
         )
         self.error = True
 
     def validationError(self, column, row, value, **kwargs):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            QApplication.translate("QValidationObject", 'Warning: Undefined value found in "%1" - #%2 : \'%3\'')
-                    .arg(column)
-                    .arg(row)
-                    .arg(self.valueEscape(value))
+            QApplication.translate("QValidationObject", 'Warning: Undefined value found in "{}" - #{} : \'{}\'')
+                    .format(column, row, self.valueEscape(value))
         )
         self.error = True
 
     def multipleExceptionError(self, column, row, value, **kwargs):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            QApplication.translate("QValidationObject", 'Warning: Multiple exception error found in "%1" - #%2 : \'%3\'')
-                    .arg(column)
-                    .arg(row)
-                    .arg(self.valueEscape(value))
+            QApplication.translate("QValidationObject", 'Warning: Multiple exception error found in "{}" - #{} : \'{}\'')
+                    .format(column, row, self.valueEscape(value))
         )
         self.error = True
 
     def limitationError(self, column, row, value, **kwargs):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            QApplication.translate("QValidationObject", 'Warning: It exceeds the limit value was found in "%1" - #%2 : \'%3\'')
-                    .arg(column)
-                    .arg(row)
-                    .arg(self.valueEscape(value))
+            QApplication.translate("QValidationObject", 'Warning: It exceeds the limit value was found in "{}" - #{} : \'{}\'')
+                    .format(column, row, self.valueEscape(value))
         )
         self.error = True
 
@@ -97,20 +91,16 @@ class QValidationObject(progress.ProgressObject, validator.ValidationCallback):
             return
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            QApplication.translate("QValidationObject", 'Warning: It exceeds the forbidden value was found in "%1" - #%2 : \'%3\'')
-                    .arg(column)
-                    .arg(row)
-                    .arg(self.valueEscape(value))
+            QApplication.translate("QValidationObject", 'Warning: It exceeds the forbidden value was found in "{}" - #{} : \'{}\'')
+                    .format(column, row, self.valueEscape(value))
         )
         self.error = True
 
     def incompleteError(self, column, row, value, **kwargs):
         row = row if kwargs.get("id") is None else kwargs.get("id")
         self.messages.append(
-            QApplication.translate("QValidationObject", 'Warning: It exceeds the incomplete value was found in "%1" - #%2 : \'%3\'')
-                    .arg(column)
-                    .arg(row)
-                    .arg(self.valueEscape(value))
+            QApplication.translate("QValidationObject", 'Warning: It exceeds the incomplete value was found in "{}" - #{} : \'{}\'')
+                    .format(column, row, self.valueEscape(value))
         )
         self.error = True
 

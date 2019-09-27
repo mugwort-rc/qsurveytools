@@ -4,13 +4,13 @@
     <name>ConfigValidationObject</name>
     <message>
         <location filename="src/lite/mainwindow.py" line="529"/>
-        <source>column &quot;%1&quot; has duplicate choices.</source>
-        <translation>&quot;%1&quot; 列に重複した選択肢があります。</translation>
+        <source>column &quot;{}&quot; has duplicate choices.</source>
+        <translation>&quot;{}&quot; 列に重複した選択肢があります。</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="536"/>
-        <source>column &quot;%1&quot; has reserved name.</source>
-        <translation>&quot;%1&quot; 列に予約された選択肢があります。</translation>
+        <source>column &quot;{}&quot; has reserved name.</source>
+        <translation>&quot;{}&quot; 列に予約された選択肢があります。</translation>
     </message>
 </context>
 <context>
@@ -67,18 +67,18 @@
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="345"/>
-        <source>Error: Input &quot;%1&quot; not found.</source>
-        <translation>エラー： 入力 &quot;%1&quot; が見つかりません。</translation>
+        <source>Error: Input &quot;{}&quot; not found.</source>
+        <translation>エラー： 入力 &quot;{}&quot; が見つかりません。</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="347"/>
-        <source>Input: &quot;%1&quot;</source>
-        <translation>入力： &quot;%1&quot;</translation>
+        <source>Input: &quot;{}&quot;</source>
+        <translation>入力： &quot;{}&quot;</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="359"/>
-        <source>Error: Input &quot;%1&quot; load failed.</source>
-        <translation>エラー：入力 &quot;%1&quot; の読み込みに失敗しました。</translation>
+        <source>Error: Input &quot;{}&quot; load failed.</source>
+        <translation>エラー：入力 &quot;{}&quot; の読み込みに失敗しました。</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="425"/>
@@ -157,18 +157,18 @@
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="363"/>
-        <source>Error: Sheet &quot;%1&quot; is not found.</source>
-        <translation>エラー：シート &quot;%1&quot; が見つかりません。</translation>
+        <source>Error: Sheet &quot;{}&quot; is not found.</source>
+        <translation>エラー：シート &quot;{}&quot; が見つかりません。</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="378"/>
-        <source>Error: Sheet &quot;%1&quot; is invalid format.</source>
-        <translation>エラー：シート &quot;%1&quot; が正しい形式ではありません。</translation>
+        <source>Error: Sheet &quot;{}&quot; is invalid format.</source>
+        <translation>エラー：シート &quot;{}&quot; が正しい形式ではありません。</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="415"/>
-        <source>Error: filter key &quot;%1&quot; is not defined.</source>
-        <translation>エラー：フィルター要素 &quot;%1&quot; は定義されていません。</translation>
+        <source>Error: filter key &quot;{}&quot; is not defined.</source>
+        <translation>エラー：フィルター要素 &quot;{}&quot; は定義されていません。</translation>
     </message>
     <message>
         <location filename="src/lite/ui_mainwindow.ui" line="294"/>
@@ -295,8 +295,8 @@
     <name>QSimpleAggregationAnalyzer</name>
     <message>
         <location filename="src/lite/mainwindow.py" line="556"/>
-        <source>&quot;%1&quot; is %2%, it is most common</source>
-        <translation>「%1」が%2%と最も多く</translation>
+        <source>&quot;{}&quot; is {}%, it is most common</source>
+        <translation>「{}」が{}%と最も多く</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="562"/>
@@ -311,13 +311,13 @@
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="563"/>
-        <source>&quot;%1&quot;</source>
-        <translation>「%1」</translation>
+        <source>&quot;{}&quot;</source>
+        <translation>「{}」</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="564"/>
-        <source>%1%2 is %3%</source>
-        <translation>%1%2が%3%</translation>
+        <source>{}{} is {}%</source>
+        <translation>{}{}が{}%</translation>
     </message>
     <message>
         <location filename="src/lite/mainwindow.py" line="568"/>
@@ -335,43 +335,43 @@
     <name>QValidationObject</name>
     <message>
         <location filename="src/qvalidator.py" line="45"/>
-        <source>Warning: Column &quot;%1&quot; is not found.</source>
-        <translation>警告： &quot;%1&quot;列が見つかりません。</translation>
+        <source>Warning: Column &quot;{}&quot; is not found.</source>
+        <translation>警告： &quot;{}&quot;列が見つかりません。</translation>
     </message>
     <message>
         <location filename="src/qvalidator.py" line="52"/>
-        <source>Warning: Setting &quot;%1&quot; is not found.</source>
-        <translation>警告： 設定 &quot;%1&quot; が見つかりません。</translation>
+        <source>Warning: Setting &quot;{}&quot; is not found.</source>
+        <translation>警告： 設定 &quot;{}&quot; が見つかりません。</translation>
     </message>
     <message>
         <location filename="src/qvalidator.py" line="59"/>
-        <source>Warning: Setting &quot;%1&quot; is Unknown type.</source>
-        <translation>警告： 設定 &quot;%1&quot; は未定義です。</translation>
+        <source>Warning: Setting &quot;{}&quot; is Unknown type.</source>
+        <translation>警告： 設定 &quot;{}&quot; は未定義です。</translation>
     </message>
     <message>
         <location filename="src/qvalidator.py" line="67"/>
-        <source>Warning: Undefined value found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
-        <translation>警告： 未定義の値 &quot;%3&quot; が見つかりました。 位置： &quot;%1&quot; - ID:%2</translation>
+        <source>Warning: Undefined value found in &quot;{}&quot; - #{} : &apos;{}&apos;</source>
+        <translation>警告： 未定義の値 &quot;{}&quot; が見つかりました。 位置： &quot;{}&quot; - ID:{}</translation>
     </message>
     <message>
         <location filename="src/qvalidator.py" line="87"/>
-        <source>Warning: It exceeds the limit value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
-        <translation>警告：制限を超えた値が見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
+        <source>Warning: It exceeds the limit value was found in &quot;{}&quot; - #{} : &apos;{}&apos;</source>
+        <translation>警告：制限を超えた値が見つかりました。 位置： &quot;{}&quot; - ID:{} 値：&apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="src/qvalidator.py" line="77"/>
-        <source>Warning: Multiple exception error found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
-        <translation>警告： 複数回答例外エラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値： &apos;%3&apos;</translation>
+        <source>Warning: Multiple exception error found in &quot;{}&quot; - #{} : &apos;{}&apos;</source>
+        <translation>警告： 複数回答例外エラーが見つかりました。 位置： &quot;{}&quot; - ID:{} 値： &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="src/qvalidator.py" line="99"/>
-        <source>Warning: It exceeds the forbidden value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
-        <translation>警告：入力制限フィルターエラーが見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
+        <source>Warning: It exceeds the forbidden value was found in &quot;{}&quot; - #{} : &apos;{}&apos;</source>
+        <translation>警告：入力制限フィルターエラーが見つかりました。 位置： &quot;{}&quot; - ID:{} 値：&apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="src/qvalidator.py" line="109"/>
-        <source>Warning: It exceeds the incomplete value was found in &quot;%1&quot; - #%2 : &apos;%3&apos;</source>
-        <translation>警告：完全回答に対して未入力値が見つかりました。 位置： &quot;%1&quot; - ID:%2 値：&apos;%3&apos;</translation>
+        <source>Warning: It exceeds the incomplete value was found in &quot;{}&quot; - #{} : &apos;{}&apos;</source>
+        <translation>警告：完全回答に対して未入力値が見つかりました。 位置： &quot;{}&quot; - ID:{} 値：&apos;{}&apos;</translation>
     </message>
 </context>
 <context>

@@ -6,49 +6,49 @@ class Source:
     # Sheets
     @staticmethod
     def sheet_setting():
-        return str(QCoreApplication.translate("Source", "Setting"))
+        return QCoreApplication.translate("Source", "Setting")
 
     @staticmethod
     def sheet_cross():
-        return str(QCoreApplication.translate("Source", "Cross"))
+        return QCoreApplication.translate("Source", "Cross")
 
     @staticmethod
     def sheet_source():
-        return str(QCoreApplication.translate("Source", "Source"))
+        return QCoreApplication.translate("Source", "Source")
 
     # Setting
     @staticmethod
     def setting_id():
-        return str(QCoreApplication.translate("Source", "ID"))
+        return QCoreApplication.translate("Source", "ID")
 
     @staticmethod
     def setting_title():
-        return str(QCoreApplication.translate("Source", "TITLE"))
+        return QCoreApplication.translate("Source", "TITLE")
 
     @staticmethod
     def setting_type():
-        return str(QCoreApplication.translate("Source", "TYPE"))
+        return QCoreApplication.translate("Source", "TYPE")
 
     @staticmethod
     def setting_ok():
-        return str(QCoreApplication.translate("Source", "OK"))
+        return QCoreApplication.translate("Source", "OK")
 
     @staticmethod
     def setting_ng():
-        return str(QCoreApplication.translate("Source", "NG"))
+        return QCoreApplication.translate("Source", "NG")
 
     # Cross
     @staticmethod
     def cross_sheet():
-        return str(QCoreApplication.translate("Source", "Sheets"))
+        return QCoreApplication.translate("Source", "Sheets")
 
     @staticmethod
     def cross_element():
-        return str(QCoreApplication.translate("Source", "Element"))
+        return QCoreApplication.translate("Source", "Element")
 
     @staticmethod
     def cross_element_name():
-        return str(QCoreApplication.translate("Source", "ElementName"))
+        return QCoreApplication.translate("Source", "ElementName")
 
 
     @classmethod

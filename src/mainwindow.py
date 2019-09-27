@@ -49,9 +49,9 @@ class MainWindow(QMainWindow):
         self.OUTPUT_FILTER = self.tr('Excel (*.xlsx)')
         self.lastDirectory = ''
         self.STRINGS = {
-            "TOTAL": str(self.tr("TOTAL")),
-            "BLANK": str(self.tr("BLANK")),
-            "ERROR": str(self.tr("ERROR")),
+            "TOTAL": self.tr("TOTAL"),
+            "BLANK": self.tr("BLANK"),
+            "ERROR": self.tr("ERROR"),
         }
 
         self.setWindowTitle(self.tr('surveytool'))
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
 
     def openExcel(self, filepath, header=0, index_col=None, na_values=None):
         info = QFileInfo(filepath)
-        filepath = str(filepath)
+        filepath = filepath
         frame = None
         kwargs = {
             'header': header,
@@ -325,7 +325,7 @@ class MainWindow(QMainWindow):
                 )
                 for i, xcol in enumerate(expanded.columns, 1):
                     dest["{}-{}".format(column, i)] = expanded[xcol]
-        dest.to_excel(str(QDir(filepath).filePath(self.tr('expand.xlsx'))))
+        dest.to_excel(QDir(filepath).filePath(self.tr('expand.xlsx')))
         QMessageBox.information(self, self.tr('Finished'), self.tr('Finished.'))
 
     def loadSources(self, **kwargs):
@@ -343,11 +343,11 @@ class MainWindow(QMainWindow):
         # load source
         with status.MainWindowStatus(self) as state:
             state.setMessage(self.tr("loading..."))
-            inputFilePath = str(self.ui.lineEditInput.text())
+            inputFilePath = self.ui.lineEditInput.text()
             if not QFile.exists(inputFilePath):
-                self.addMessage(self.tr('Error: Input "%1" not found.').arg(inputFilePath))
+                self.addMessage(self.tr('Error: Input "{}" not found.').format(inputFilePath))
                 raise LoadException()
-            self.addMessage(self.tr('Input: "%1"').arg(inputFilePath))
+            self.addMessage(self.tr('Input: "{}"').format(inputFilePath))
 
             sheet_setting = qsource.Source.sheet_setting()
             sheet_cross = qsource.Source.sheet_cross()
@@ -359,11 +359,11 @@ class MainWindow(QMainWindow):
                     sheet_source,
                 ])
             except:
-                self.addMessage(self.tr('Error: Input "%1" load failed.').arg(inputFilePath))
+                self.addMessage(self.tr('Error: Input "{}" load failed.').format(inputFilePath))
                 raise LoadException()
 
             def sheetNotFound(name):
-                self.addMessage(self.tr('Error: Sheet "%1" is not found.').arg(name))
+                self.addMessage(self.tr('Error: Sheet "{}" is not found.').format(name))
 
             no_error = True
             for name in [sheet_setting, sheet_cross, sheet_source]:
@@ -378,7 +378,7 @@ class MainWindow(QMainWindow):
             sourceFrame = frames[sheet_source]
 
             def invalidSource(name):
-                self.addMessage(self.tr('Error: Sheet "%1" is invalid format.').arg(name))
+                self.addMessage(self.tr('Error: Sheet "{}" is invalid format.').format(name))
 
             # check frame
             no_error = True
@@ -415,7 +415,7 @@ class MainWindow(QMainWindow):
             # check filter validation
             for filter in conf.filters:
                 if filter.key not in conf.columnOrder:
-                    self.addMessage(self.tr('Error: filter key "%1" is not defined.').arg(filter.key))
+                    self.addMessage(self.tr('Error: filter key "{}" is not defined.').format(filter.key))
                     no_error = False
             if not no_error:
                 raise LoadException()
@@ -438,7 +438,7 @@ class MainWindow(QMainWindow):
 
         self.ui.progressBarGeneral.setValue(2)
 
-        outputFilePath = str(self.ui.lineEditOutput.text())
+        outputFilePath = self.ui.lineEditOutput.text()
         if not QFileInfo(outputFilePath).isDir():
             self.addMessage(self.tr('Error: output file path is not directory.'))
             raise LoadException()
@@ -504,8 +504,8 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot(str)
     def on_lineEditInput_textChanged(self, text):
-        inputFilePath = str(self.ui.lineEditInput.text())
-        outputFilePath = str(self.ui.lineEditOutput.text())
+        inputFilePath = self.ui.lineEditInput.text()
+        outputFilePath = self.ui.lineEditOutput.text()
         # input existing & output empty
         if QFile.exists(inputFilePath) and not outputFilePath:
             self.ui.lineEditOutput.setText(QFileInfo(inputFilePath).dir().absolutePath())
@@ -530,14 +530,14 @@ class ConfigValidationObject(QObject, config.ConfigCallback):
         :type column: str
         :param column: name of error column
         """
-        self.messages_.append(self.tr('column "%1" has duplicate choices.').arg(column))
+        self.messages_.append(self.tr('column "{}" has duplicate choices.').format(column))
 
     def reservedChoice(self, column):
         """
         :type column: str
         :param column: name of error column
         """
-        self.messages_.append(self.tr('column "%1" has reserved name.').arg(column))
+        self.messages_.append(self.tr('column "{}" has reserved name.').format(column))
 
     def messages(self):
         return self.messages_
@@ -557,18 +557,18 @@ class QSimpleAggregationAnalyzer(QObject, analyzer.SimpleAggregationAnalyzer):
             names = rs[key]
             if count == 0 and len(names) == 1:
                 # first special
-                abstracts.append(str(self.tr('"%1" is %2%, it is most common').arg(names[0]).arg(key, 0, "f", 1)))
+                abstracts.append(self.tr('"{}" is {:.1f}%, it is most common').format(names[0], key))
             else:
                 # other
                 secondary = ""
                 if count == 1:
-                    secondary = str(self.tr(u"secondary,"))
-                indexes = str(self.tr(" ", "spacer")).join([str(self.tr(u'"%1"').arg(x)) for x in names])
-                abstracts.append(str(self.tr(u'%1%2 is %3%').arg(secondary).arg(indexes).arg(key, 0, "f", 1)))
+                    secondary = self.tr(u"secondary,")
+                indexes = self.tr(" ", "spacer").join([self.tr(u'"{}"').format(x) for x in names])
+                abstracts.append(self.tr(u'{}{} is {:.1f}%').format(secondary, indexes, key))
             count += len(names)
             if count >= max_count:
                 break
-        return str(self.tr(", ", "separator")).join(abstracts) + str(self.tr("Concluded."))
+        return self.tr(", ", "separator").join(abstracts) + self.tr("Concluded.")
 
 
 class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
@@ -593,7 +593,7 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
         reserved_names = self.options.get("reserved_names", [])
 
         if self.options.get("raw_output", False):
-            root, ext = os.path.splitext(str(self.filepath))
+            root, ext = os.path.splitext(self.filepath)
             try:
                 with open(root + ".pickle", "wb") as fp:
                     import pickle
@@ -608,8 +608,8 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
             return True
 
         from . import excel
-        book = excel.SurveyExcelBook(str(self.filepath), with_percent=with_percent, reserved_names=reserved_names)
-        sheet = book.worksheet(str(self.tr('SimpleAggregation')))
+        book = excel.SurveyExcelBook(self.filepath, with_percent=with_percent, reserved_names=reserved_names)
+        sheet = book.worksheet(self.tr('SimpleAggregation'))
 
         abstracts = []
         for column in self.config.columnOrder:
@@ -625,7 +625,7 @@ class SimpleAggregationObject(qaggregation.SimpleAggregationObject):
             sheet.addPadding(3)
 
         if gen_abstract and abstracts:
-            sheet = book.worksheet(str(self.tr("Comment")))
+            sheet = book.worksheet(self.tr("Comment"))
             for column, title, abstract in abstracts:
                 sheet.write(0, 0, column)
                 sheet.write(1, 0, title)
@@ -659,7 +659,7 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
         reserved_names = self.options.get("reserved_names", [])
 
         if self.options.get("raw_output", False):
-            root, ext = os.path.splitext(str(self.filepath))
+            root, ext = os.path.splitext(self.filepath)
             try:
                 with open(root + ".pickle", "wb") as fp:
                     import pickle
@@ -675,7 +675,7 @@ class CrossAggregationObject(qaggregation.CrossAggregationObject):
 
         # create workbook
         from . import excel
-        book = excel.SurveyExcelBook(str(self.filepath), with_percent=with_percent, reserved_names=reserved_names)
+        book = excel.SurveyExcelBook(self.filepath, with_percent=with_percent, reserved_names=reserved_names)
         # get option
         names = []
         cross_table_format = self.options.get("cross_table_format", CrossFormat.Default)

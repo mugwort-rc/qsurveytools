@@ -141,8 +141,8 @@ class SimpleAggregationObject(AggregationObject):
         :type dropna: bool
         :param dropna: drop N/A
         """
-        TOTAL = str(self.TOTAL_STR)
-        BLANK = str(self.BLANK_STR)
+        TOTAL = self.TOTAL_STR
+        BLANK = self.BLANK_STR
         series = frame[column]
         if dropna:
             series = series.dropna()
@@ -163,8 +163,8 @@ class SimpleAggregationObject(AggregationObject):
         :type dropna: bool
         :param dropna: drop N/A
         """
-        TOTAL = str(self.TOTAL_STR)
-        BLANK = str(self.BLANK_STR)
+        TOTAL = self.TOTAL_STR
+        BLANK = self.BLANK_STR
         series = frame[column]
         if dropna:
             series = series.dropna()
@@ -178,9 +178,9 @@ class SimpleAggregationObject(AggregationObject):
         return self.reindex(vc, column, named_index, dropna)
 
     def reindex(self, series, column, named_index, dropna):
-        TOTAL = str(self.TOTAL_STR)
-        BLANK = str(self.BLANK_STR)
-        ERROR = str(self.ERROR_STR)
+        TOTAL = self.TOTAL_STR
+        BLANK = self.BLANK_STR
+        ERROR = self.ERROR_STR
         suffix = [BLANK] if not dropna else []
         errors = [ERROR] if self.aggregate_error else []
         return super(SimpleAggregationObject, self).reindex(series, column, "index", prefix=[TOTAL], suffix=suffix, errors=errors, named_index=named_index)
@@ -255,8 +255,8 @@ class CrossAggregationObject(AggregationObject):
                 return self.mm_crosstab(*args, **kwargs)
 
     def ss_crosstab(self, frame, index, column, index_dropna, column_dropna, values=None, aggfunc=len):
-        TOTAL = str(self.TOTAL_STR)
-        BLANK = str(self.BLANK_STR)
+        TOTAL = self.TOTAL_STR
+        BLANK = self.BLANK_STR
         drop_targets = []
         if index_dropna:
             drop_targets.append(index)
@@ -282,8 +282,8 @@ class CrossAggregationObject(AggregationObject):
         return self.reindex(crossed, index, column, index_dropna, column_dropna)
 
     def sm_crosstab(self, frame, index, column, index_dropna, column_dropna, values=None, aggfunc=len):
-        TOTAL = str(self.TOTAL_STR)
-        BLANK = str(self.BLANK_STR)
+        TOTAL = self.TOTAL_STR
+        BLANK = self.BLANK_STR
         drop_targets = []
         if index_dropna:
             drop_targets.append(index)
@@ -323,8 +323,8 @@ class CrossAggregationObject(AggregationObject):
         return self.sm_crosstab(frame, column, index, column_dropna, index_dropna, values=values, aggfunc=aggfunc).T
 
     def mm_crosstab(self, frame, index, column, index_dropna, column_dropna, values=None, aggfunc=len):
-        TOTAL = str(self.TOTAL_STR)
-        BLANK = str(self.BLANK_STR)
+        TOTAL = self.TOTAL_STR
+        BLANK = self.BLANK_STR
         drop_targets = []
         if index_dropna:
             drop_targets.append(index)
@@ -363,9 +363,9 @@ class CrossAggregationObject(AggregationObject):
         return self.reindex(crossed, index, column, index_dropna, column_dropna)
 
     def reindex(self, frame, index, column, index_dropna, column_dropna):
-        TOTAL = str(self.TOTAL_STR)
-        BLANK = str(self.BLANK_STR)
-        ERROR = str(self.ERROR_STR)
+        TOTAL = self.TOTAL_STR
+        BLANK = self.BLANK_STR
+        ERROR = self.ERROR_STR
         index_suffix = [BLANK] if not index_dropna else []
         column_suffix = [BLANK] if not column_dropna else []
         errors = [ERROR] if self.aggregate_error else []
@@ -376,7 +376,7 @@ class CrossAggregationObject(AggregationObject):
         return frame
 
     def gen_blanks(self, frame, column):
-        BLANK = str(self.BLANK_STR)
+        BLANK = self.BLANK_STR
         result = pandas.Series(index=frame.index)
         result[frame[column].isnull()] = BLANK
         return result
