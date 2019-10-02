@@ -26,7 +26,7 @@ setup(
     windows=[{"script" : "main.py",
               "dest_base": "アンケート集計ツール",
               # version
-              "version": "1.8.2.0",
+              "version": "2.0.0.0",
               "name": "アンケート集計ツール",
               "copyright": "Copyright (c) 2015-2019 mugwort_rc.",
               "description": "アンケート集計ツール",
